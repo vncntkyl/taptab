@@ -15,15 +15,19 @@ export default {
         "secondary-dark": "#2A8FBC",
       },
       width: {
-        sidebar: "17rem",
-        "sidebar-1/2": "8.5rem",
+        sidebar: "15rem",
+        "sidebar-1/2": "7.5rem",
+        "sidebar-xl": "18.75rem",
+        "sidebar-xl-1/2": "9.375rem",
       },
       height: {
         navbar: "3.75rem",
       },
       spacing: {
-        sidebar: "17rem",
-        "sidebar-1/2": "8.5rem",
+        sidebar: "15rem",
+        "sidebar-1/2": "7.5rem",
+        "sidebar-xl": "18.75rem",
+        "sidebar-xl-1/2": "9.375rem",
         navbar: "3.75rem",
       },
     },

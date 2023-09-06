@@ -7,12 +7,8 @@ function SidebarLink({ name, icon, count = null, toggle }) {
   const { capitalize, convertText } = Functions;
   return (
     <Link
-      to={
-        name === "dashboard"
-          ? `/${convertText(name)}`
-          : `/dashboard/${convertText(name)}`
-      }
-      className="relative hover:bg-sidebar-highlight transition-all border-l-sidebar-highlight"
+      to={`/${convertText(name)}`}
+      className="relative hover:bg-secondary-dark transition-all "
     >
       <div className="relative">
         {icon}
@@ -29,7 +25,7 @@ function SidebarLink({ name, icon, count = null, toggle }) {
       </div>
       <p
         className={classNames(
-          "absolute top-[50%] translate-y-[-50%] left-[52px] text-sm whitespace-nowrap",
+          "absolute top-[50%] translate-y-[-50%] left-[40px] lg:text-lg whitespace-nowrap",
           count !== null
             ? "w-[calc(100%_-_52px)] pr-4 flex flex-row items-center justify-between"
             : ""
@@ -47,7 +43,7 @@ SidebarLink.propTypes = {
   name: PropTypes.string,
   icon: PropTypes.node,
   count: PropTypes.number,
-  toggle: PropTypes.func,
+  toggle: PropTypes.bool,
 };
 
 export default SidebarLink;

@@ -16,18 +16,14 @@ function Header({ toggleSidebar, logout }) {
         </span>
         <button
           type="button"
+          className="lg:hidden"
           onClick={() => toggleSidebar((current) => !current)}
         >
           <GiHamburgerMenu className="text-3xl" />
         </button>
       </Navbar.Brand>
       <div className="flex md:order-2">
-        <Dropdown inline label="Username">
-          <Dropdown.Header className="text-black">
-            <span className="block truncate text-sm font-medium">
-              {getFullName()}
-            </span>
-          </Dropdown.Header>
+        <Dropdown inline label={getFullName()}>
           <div className="flex flex-col px-4 gap-4 pb-4">
             <Link className="text-black">Account Settings</Link>
             <Button onClick={() => logout()}>Logout</Button>

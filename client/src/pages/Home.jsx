@@ -27,13 +27,13 @@ function Home() {
     return (
       <div className="min-h-screen">
         <Header logout={logoutUser} toggleSidebar={toggleSidebar} />
-        <Sidebar toggle={onSidebar} />
         {onSidebar && (
           <div
             className="fixed top-0 left-0 bg-[#00000025] w-screen h-screen pointer-events-auto lg:hidden"
             onClick={() => toggleSidebar(false)}
           />
         )}
+        <Sidebar toggle={onSidebar} />
         {/* {localStorage.getItem("user")} */}
       </div>
     );
