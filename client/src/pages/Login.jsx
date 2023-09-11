@@ -50,7 +50,7 @@ function Login() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-cover bg-center"
+      className="min-h-screen flex items-center justify-center bg-cover bg-center bg-white dark:bg-matte-black"
       style={{ backgroundImage: `url('${bg}')` }}
     >
       <div className="flex flex-col items-center justify-center gap-2 w-full px-4">
@@ -85,7 +85,7 @@ function Login() {
               onChange={(e) => updateForm({ password: e.target.value })}
             />
           </div>
-          <Link to={"/"} className="text-secondary-dark text-right w-full">
+          <Link to={"/"} className="text-secondary-dark text-right w-fit float-right">
             Forgot password?
           </Link>
           <Button

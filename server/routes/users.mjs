@@ -9,7 +9,12 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     let collection = db.collection("users");
-    let results = await collection.find({}).toArray();
+    let results = await collection
+      .find({})
+      .project({
+        password: 0
+      })
+      .toArray();
     res.send(results).status(200);
   } catch (error) {
     console.error(error);
@@ -22,7 +27,7 @@ router.post("/register", async (req, res) => {
   try {
     const loginData = req.body;
     const newUser = {
-      username: loginData.username,
+      username: loginData.username.toLowerCase(),
       password: md5(loginData.password),
     };
     let collection = db.collection("users");
@@ -44,7 +49,7 @@ router.post("/login", async (req, res) => {
     const loginData = req.body;
     let collection = db.collection("users");
     let query = {
-      username: loginData.username,
+      username: loginData.username.toLowerCase(),
       password: md5(loginData.password),
     };
     let result = await collection.findOne(query);

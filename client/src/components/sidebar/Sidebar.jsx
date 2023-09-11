@@ -3,18 +3,18 @@ import PropTypes from "prop-types";
 import SidebarLink from "./SidebarLink";
 import { BiSolidDashboard } from "react-icons/bi";
 import { BsFillCalendarWeekFill } from "react-icons/bs";
-import { FaTabletScreenButton } from "react-icons/fa6";
+import { FaTabletScreenButton, FaUsers } from "react-icons/fa6";
 import { RiSurveyFill } from "react-icons/ri";
 import { FaPhotoVideo } from "react-icons/fa";
-import { MdOutlineVideoLibrary } from "react-icons/md";
+import { MdOutlineVideoLibrary, MdWarning } from "react-icons/md";
 
-function Sidebar({ toggle }) {
+function Sidebar({ toggle, setToggle }) {
   const sidebarLinkClassname =
     "text-xl h-[40px] w-[40px] p-2 transition-all duration-200"; /* toggle && "lg:h-[45px] lg:w-[45px] pl-4"*/
   return (
     <div
       className={classNames(
-        "w-sidebar transition-all duration-150 bg-sidebar min-h-[calc(100vh_-_3.125rem)] sm:min-h-[calc(100vh_-_3.5rem)] bg-dark text-white flex flex-col gap-2 z-[12]",
+        "w-sidebar transition-all duration-150 bg-sidebar min-h-[calc(100vh_-_3.125rem)] sm:min-h-[calc(100vh_-_3.5rem)] bg-dark text-white flex flex-col gap-2 z-[12] pt-2",
         toggle
           ? "translate-x-0 lg:translate-x-[unset] lg:w-sidebar xl:w-sidebar-xl lg:overflow-hidden lg:gap-2"
           : "translate-x-[-100%] lg:translate-x-[unset] lg:w-sidebar xl:w-sidebar-xl"
@@ -23,17 +23,20 @@ function Sidebar({ toggle }) {
       <SidebarLink
         name="dashboard"
         toggle={toggle}
+        toggler={setToggle}
         icon={<BiSolidDashboard className={classNames(sidebarLinkClassname)} />}
       />
-      <hr className="mx-2" />
+      <hr className="mx-2 border-secondary" />
       <SidebarLink
         name="media library"
         toggle={toggle}
+        toggler={setToggle}
         icon={<FaPhotoVideo className={classNames(sidebarLinkClassname)} />}
       />
       <SidebarLink
         name="playlist"
         toggle={toggle}
+        toggler={setToggle}
         icon={
           <MdOutlineVideoLibrary className={classNames(sidebarLinkClassname)} />
         }
@@ -41,6 +44,7 @@ function Sidebar({ toggle }) {
       <SidebarLink
         name="planner"
         toggle={toggle}
+        toggler={setToggle}
         icon={
           <BsFillCalendarWeekFill
             className={classNames(sidebarLinkClassname)}
@@ -50,15 +54,30 @@ function Sidebar({ toggle }) {
       <SidebarLink
         name="players"
         toggle={toggle}
+        toggler={setToggle}
         icon={
           <FaTabletScreenButton className={classNames(sidebarLinkClassname)} />
         }
       />
-      <hr className="mx-2" />
+      <hr className="mx-2 border-secondary" />
       <SidebarLink
         name="surveys and feedbacks"
         toggle={toggle}
+        toggler={setToggle}
         icon={<RiSurveyFill className={classNames(sidebarLinkClassname)} />}
+      />
+      <hr className="mx-2 border-secondary" />
+      <SidebarLink
+        name="incident reports"
+        toggle={toggle}
+        toggler={setToggle}
+        icon={<MdWarning className={classNames(sidebarLinkClassname)} />}
+      />
+      <SidebarLink
+        name="user accounts"
+        toggle={toggle}
+        toggler={setToggle}
+        icon={<FaUsers className={classNames(sidebarLinkClassname)} />}
       />
     </div>
   );
@@ -66,6 +85,7 @@ function Sidebar({ toggle }) {
 
 Sidebar.propTypes = {
   toggle: PropTypes.bool,
+  setToggle: PropTypes.func,
 };
 
 export default Sidebar;

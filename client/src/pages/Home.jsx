@@ -5,6 +5,7 @@ import Sidebar from "../components/sidebar/Sidebar";
 import { Route, Routes } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import Breadcrumb from "../fragments/Breadcrumb";
+import UserAccounts from "./UserAccounts";
 
 function Home() {
   const [users, setUsers] = useState(null);
@@ -28,20 +29,21 @@ function Home() {
     return;
   } else {
     return (
-      <div className="min-h-screen relative">
-        <div className="absolute top-navbar left-0 px-4 sm:px-2 lg:left-sidebar transition-all xl:left-sidebar-xl">
+      <div className="min-h-screen relative bg-default">
+        <div className="absolute top-navbar left-0 px-4 sm:pt-2 lg:left-sidebar transition-all xl:left-sidebar-xl w-full  lg:w-[calc(100%_-_15rem)] xl:w-[calc(100%_-_18.75rem)]">
           <Breadcrumb />
           <Routes>
             <Route exact path="/" element={<Dashboard />} />
-            <Route exact path="/media_library" element={<>media_library</>} />
-            <Route exact path="/playlist" element={<>playlist</>} />
-            <Route exact path="/planner" element={<>planner</>} />
-            <Route exact path="/players" element={<>players</>} />
+            <Route path="/media_library" element={<>media_library</>} />
+            <Route path="/playlist" element={<>playlist</>} />
+            <Route path="/planner" element={<>planner</>} />
+            <Route path="/players" element={<>players</>} />
             <Route
-              exact
               path="/surveys_and_feedbacks"
               element={<>surveys and feedbacks management page</>}
             />
+            <Route path="/incident_reports" element={<>Incident Reports</>} />
+            <Route path="/user_accounts" element={<UserAccounts />} />
           </Routes>
         </div>
         <Header logout={logoutUser} toggleSidebar={toggleSidebar} />

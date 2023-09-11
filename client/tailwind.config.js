@@ -6,13 +6,23 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
     "node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}",
   ],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        main: "#25B9F8",
-        secondary: "#7FCEF0",
-        dark: "#0C3242",
-        "secondary-dark": "#2A8FBC",
+        black: "#343434",
+        "matte-black": "#28282B",
+        "onyx-black": "#353935",
+        main: "#119dd8",
+        secondary: "#39b1e5",
+        light: "#47b8e9",
+        dark: "#052f41",
+        "secondary-dark": "#1d5973",
+        "secondary-light": "#1c4a5d",
+        red: "#dc2929",
+        yellow:"#efd615",
+        default: "#eaecef",
+        "default-dark": "#e1e1e1",
       },
       width: {
         sidebar: "15rem",

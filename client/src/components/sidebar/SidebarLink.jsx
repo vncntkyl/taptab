@@ -1,14 +1,15 @@
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import classNames from "classnames";
-import { values as Functions } from "../../context/Functions";
+import { values as useFunction } from "../../context/Functions";
 
-function SidebarLink({ name, icon, count = null, toggle }) {
-  const { capitalize, convertText } = Functions;
+function SidebarLink({ name, icon, count = null, toggle, toggler }) {
+  const { capitalize, convertText } = useFunction();
   return (
     <Link
-      to={`/${convertText(name)}`}
-      className="relative hover:bg-secondary-dark transition-all "
+      to={name === "dashboard" ? "/" : `/${convertText(name)}`}
+      onClick={() => toggler(false)}
+      className="relative hover:bg-secondary-dark transition-all py-1"
     >
       <div className="relative">
         {icon}
@@ -25,7 +26,7 @@ function SidebarLink({ name, icon, count = null, toggle }) {
       </div>
       <p
         className={classNames(
-          "absolute top-[50%] translate-y-[-50%] left-[40px] lg:text-lg whitespace-nowrap",
+          "absolute top-[50%] translate-y-[-50%] left-[40px] whitespace-nowrap",
           count !== null
             ? "w-[calc(100%_-_52px)] pr-4 flex flex-row items-center justify-between"
             : ""
@@ -44,6 +45,7 @@ SidebarLink.propTypes = {
   icon: PropTypes.node,
   count: PropTypes.number,
   toggle: PropTypes.bool,
+  toggler: PropTypes.func,
 };
 
 export default SidebarLink;
