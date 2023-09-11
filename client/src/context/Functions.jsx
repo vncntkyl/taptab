@@ -39,4 +39,6 @@ function createBreadCrumb(path = "") {
   return tempString.split("/");
 }
 
-export const values = { capitalize, convertText, getPath, createBreadCrumb };
+export const values = () => {
+  return { capitalize, convertText, getPath, createBreadCrumb };
+};
