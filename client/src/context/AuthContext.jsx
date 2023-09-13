@@ -10,11 +10,30 @@ export function useAuth() {
 }
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [onAlert, setAlert] = useState({
+    isOn: false,
+    type: "info",
+    message: "",
+  });
   const navigate = useNavigate();
 
   const loginUser = async (loginForm) => {
     try {
       const response = await axios.post(url.userLogin, loginForm, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const registerUser = async (userForm) => {
+    try {
+      const response = await axios.post(url.userRegistration, userForm, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -55,8 +74,11 @@ export function AuthProvider({ children }) {
   }, []);
   const values = {
     user,
+    onAlert,
+    setAlert,
     navigate,
     loginUser,
+    registerUser,
     getUser,
     retrieveUsers,
     getFullName,

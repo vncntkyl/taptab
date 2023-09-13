@@ -9,6 +9,30 @@ export default {
   darkMode: "class",
   theme: {
     extend: {
+      animation: {
+        "fade-fr-t": "fade-fr-t 300ms ease-in-out",
+        fade: "fade 200ms ease-in-out",
+      },
+      keyframes: {
+        fade: {
+          "0%": {
+            opacity: 0,
+          },
+          "100%": {
+            opacity: 1,
+          },
+        },
+        "fade-fr-t": {
+          "0%": {
+            opacity: 0,
+            transform: "translate(-50%,-100%)",
+          },
+          "100%": {
+            opacity: 1,
+            transform: "translate(-50%,0)",
+          },
+        },
+      },
       colors: {
         black: "#343434",
         "matte-black": "#28282B",
@@ -19,8 +43,8 @@ export default {
         dark: "#052f41",
         "secondary-dark": "#1d5973",
         "secondary-light": "#1c4a5d",
-        red: "#dc2929",
-        yellow:"#efd615",
+        "c-red": "#dc2929",
+        "c-yellow": "#efdnp615",
         default: "#eaecef",
         "default-dark": "#e1e1e1",
       },

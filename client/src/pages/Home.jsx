@@ -6,11 +6,13 @@ import { Route, Routes } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import Breadcrumb from "../fragments/Breadcrumb";
 import UserAccounts from "./UserAccounts";
+import { RiInformationFill } from "react-icons/ri";
+import { Alert } from "flowbite-react";
 
 function Home() {
   const [users, setUsers] = useState(null);
   const [onSidebar, toggleSidebar] = useState(false);
-  const { retrieveUsers, navigate } = useAuth();
+  const { retrieveUsers, navigate, onAlert, setAlert } = useAuth();
 
   useEffect(() => {
     const setup = async () => {
@@ -55,6 +57,24 @@ function Home() {
         )}
         <Sidebar toggle={onSidebar} setToggle={toggleSidebar} />
         {/* {localStorage.getItem("user")} */}
+        {onAlert.isOn && (
+          <Alert
+            icon={RiInformationFill}
+            color={onAlert.type}
+            onDismiss={() =>
+              setAlert({
+                isOn: false,
+                type: "info",
+                message: "",
+              })
+            }
+            className="absolute top-[10%] left-[50%] translate-x-[-50%] animate-fade-fr-t whitespace-nowrap"
+          >
+            <span>
+              <p>{onAlert.message}</p>
+            </span>
+          </Alert>
+        )}
       </div>
     );
   }

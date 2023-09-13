@@ -1,24 +1,79 @@
-import { Button, Table } from "flowbite-react";
+import { Button, Label, Modal, Select, TextInput } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { BsPersonFillAdd } from "react-icons/bs";
 import { useUsers } from "../context/UserContext";
 import PageHeader from "../fragments/PageHeader";
+import UsersTable from "../tables/UsersTable";
 import { values as useFunction } from "../context/Functions";
-import { RiDeleteBinFill, RiEditBoxFill } from "react-icons/ri";
-
+import {
+  lightButton,
+  mainButton,
+  modalTheme,
+  selectTheme,
+  textTheme,
+} from "../context/CustomThemes";
+import { useAuth } from "../context/AuthContext";
 function UserAccounts() {
+  const { capitalize, convertText } = useFunction();
+  const { registerUser, setAlert } = useAuth();
   const { getUsers } = useUsers();
-  const { capitalize } = useFunction();
   const [users, setUsers] = useState(null);
-  const headers = ["name", "position", "role", "actions"];
+  const [modal, setModal] = useState({
+    title: null,
+  });
+  const [user, setUser] = useState({
+    first_name: "",
+    middle_name: "",
+    last_name: "",
+    position: "",
+    role: "",
+    email_address: "",
+  });
+
+  const handleUserRegistration = async (e) => {
+    e.preventDefault();
+    const response = await registerUser(user);
+    const alert = {
+      isOn: true,
+      type: "success",
+      message:
+        "You have successfully registered " +
+        user.first_name +
+        ". Their login credentials are their surname in lowercase.",
+    };
+
+    setModal({
+      title: null,
+    });
+    if (response.acknowledged) {
+      setAlert(alert);
+    } else {
+      alert.type = "failure";
+      alert.message = response;
+      setAlert(alert);
+    }
+  };
+
+  const onInputChange = (e, key) => {
+    setUser((current) => {
+      return {
+        ...current,
+        [key]: e.target.value,
+      };
+    });
+  };
 
   useEffect(() => {
     const setup = async () => {
       const response = await getUsers();
       setUsers(response);
-      console.log(response);
     };
     setup();
+    const realtimeData = setInterval(setup, 5000);
+
+    return () => {
+      clearInterval(realtimeData);
+    };
   }, [getUsers]);
   return (
     users && (
@@ -28,80 +83,89 @@ function UserAccounts() {
             <PageHeader>Manage User Accounts</PageHeader>
             <Button
               className="focus:ring-0 w-fit bg-white"
+              onClick={() =>
+                setModal({
+                  toggle: true,
+                  title: "Create User",
+                })
+              }
               color="transparent"
-              theme={{
-                base: "group flex h-min items-center justify-center p-0 text-center font-medium relative focus:z-10 focus:outline-none shadow-md text-main border border-main hover:bg-main hover:text-white",
-                inner: {
-                  base: "flex items-center gap-2",
-                },
-              }}
+              theme={lightButton}
             >
               <BsPersonFillAdd />
               <p>Create User</p>
             </Button>
           </div>
           <div className="w-full overflow-x-auto rounded-md shadow-md">
-            <Table className="border bg-white">
-              <Table.Head className="shadow-md">
-                {headers.map((header, index) => {
-                  return (
-                    <Table.HeadCell
-                      key={index}
-                      className="text-main text-center"
-                    >
-                      {header}
-                    </Table.HeadCell>
-                  );
-                })}
-              </Table.Head>
-              <Table.Body className="divide-y">
-                {users.length > 0 ? (
-                  users.map((user, index) => {
-                    return (
-                      <Table.Row key={index} className="text-center">
-                        <Table.Cell align="center">{`${user.first_name} ${capitalize(
-                          user.last_name.substring(0, 1)
-                        )}.`}</Table.Cell>
-                        <Table.Cell align="center">{user.position}</Table.Cell>
-                        <Table.Cell align="center">{capitalize(user.role)}</Table.Cell>
-                        <Table.Cell align="center">
-                          <div className="flex items-center justify-center gap-1">
-                            <Button
-                              className="focus:ring-0 w-fit bg-white"
-                              color="transparent"
-                              size="sm"
-                              theme={{
-                                base: "group flex h-min items-center justify-center p-0 text-center font-medium relative focus:z-10 focus:outline-none text-yellow",
-                              }}
-                            >
-                              <RiEditBoxFill className="text-lg" />
-                            </Button>
-                            <Button
-                              className="focus:ring-0 w-fit bg-white"
-                              color="transparent"
-                              size="sm"
-                              theme={{
-                                base: "group flex h-min items-center justify-center p-0 text-center font-medium relative focus:z-10 focus:outline-none text-red",
-                              }}
-                            >
-                              <RiDeleteBinFill className="text-lg" />
-                            </Button>
-                          </div>
-                        </Table.Cell>
-                      </Table.Row>
-                    );
-                  })
-                ) : (
-                  <Table.Row>
-                    <Table.Cell colSpan={headers.length}>
-                      No users found
-                    </Table.Cell>
-                  </Table.Row>
-                )}
-              </Table.Body>
-            </Table>
+            <UsersTable users={users} />
           </div>
         </div>
+        <Modal
+          position="center"
+          show={modal.toggle}
+          dismissible
+          onClose={() =>
+            setModal({
+              toggle: false,
+              title: null,
+            })
+          }
+          size="lg"
+          theme={modalTheme}
+        >
+          <Modal.Header className="border-b-default-dark p-3 px-4">
+            {modal.title}
+          </Modal.Header>
+          <Modal.Body>
+            <form
+              className="flex flex-col gap-2"
+              onSubmit={handleUserRegistration}
+            >
+              {Object.keys(user).map((key, index) => {
+                return (
+                  <div className="w-full" key={index}>
+                    <Label htmlFor={key} value={capitalize(convertText(key))} />
+                    {key === "role" ? (
+                      <Select
+                        id={key}
+                        onChange={(e) => onInputChange(e, key)}
+                        required
+                        theme={selectTheme}
+                      >
+                        <option defaultChecked>--Select Role--</option>
+                        {["administrator", "manager", "contributor"].map(
+                          (opt, index) => {
+                            return (
+                              <option key={index} value={opt}>
+                                {capitalize(opt)}
+                              </option>
+                            );
+                          }
+                        )}
+                      </Select>
+                    ) : (
+                      <TextInput
+                        onChange={(e) => onInputChange(e, key)}
+                        type="text"
+                        value={user[key]}
+                        required
+                        theme={textTheme}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+              <Button
+                className="mt-4 w-full"
+                type="submit"
+                color="transparent"
+                theme={mainButton}
+              >
+                Save User
+              </Button>
+            </form>
+          </Modal.Body>
+        </Modal>
       </>
     )
   );

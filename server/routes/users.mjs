@@ -12,7 +12,7 @@ router.get("/", async (req, res) => {
     let results = await collection
       .find({})
       .project({
-        password: 0
+        password: 0,
       })
       .toArray();
     res.send(results).status(200);
@@ -27,8 +27,14 @@ router.post("/register", async (req, res) => {
   try {
     const loginData = req.body;
     const newUser = {
-      username: loginData.username.toLowerCase(),
-      password: md5(loginData.password),
+      username: loginData.last_name.split(" ").join("").toLowerCase(),
+      password: md5(loginData.last_name.split(" ").join("").toLowerCase()),
+      first_name: loginData.first_name,
+      middle_name: loginData.middle_name,
+      last_name: loginData.last_name,
+      position: loginData.position,
+      role: loginData.role,
+      email_address: loginData.email_address,
     };
     let collection = db.collection("users");
     let result = await collection.findOne({ username: newUser.username });
