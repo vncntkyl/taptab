@@ -68,10 +68,10 @@ function Home() {
                 message: "",
               })
             }
-            className="absolute top-[10%] left-[50%] translate-x-[-50%] animate-fade-fr-t whitespace-nowrap"
+            className="absolute top-[10%] left-[50%] translate-x-[-50%] animate-fade-fr-t"
           >
             <span>
-              <p>{onAlert.message}</p>
+              <p className="w-[300px] text-center">{onAlert.message}</p>
             </span>
           </Alert>
         )}
