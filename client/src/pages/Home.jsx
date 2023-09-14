@@ -9,6 +9,7 @@ import UserAccounts from "./UserAccounts";
 import { RiInformationFill } from "react-icons/ri";
 import { Alert } from "flowbite-react";
 import Loader from "../fragments/Loader";
+import MediaLibrary from "./MediaLibrary";
 
 function Home() {
   const [onSidebar, toggleSidebar] = useState(false);
@@ -41,7 +42,7 @@ function Home() {
           <Breadcrumb />
           <Routes>
             <Route exact path="/" element={<Dashboard />} />
-            <Route path="/media_library" element={<>media_library</>} />
+            <Route path="/media_library" element={<MediaLibrary />} />
             <Route path="/playlist" element={<>playlist</>} />
             <Route path="/planner" element={<>planner</>} />
             <Route path="/players" element={<>players</>} />
