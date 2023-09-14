@@ -6,14 +6,18 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { RiInformationFill } from "react-icons/ri";
 import { mainButton } from "../context/CustomThemes";
+import Loader from "../fragments/Loader";
 function Login() {
   const [loginForm, setLoginForm] = useState({
     username: "",
     password: "",
   });
-  const [onError, toggleError] = useState(false);
+  const [onError, toggleError] = useState({
+    toggle: false,
+    message: "",
+  });
 
-  const { loginUser, navigate } = useAuth();
+  const { loginUser, navigate, isLoading, setIsLoading } = useAuth();
   const customTextInputTheme = {
     field: {
       input: {
@@ -34,16 +38,20 @@ function Login() {
 
   const login = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     const response = await loginUser(loginForm);
-
     if (response._id) {
       localStorage.setItem("last_login", Date.now());
       localStorage.setItem("user", JSON.stringify(response));
       navigate("/");
     } else {
-      toggleError(true);
+      toggleError({
+        toggle: true,
+        message: response,
+      });
     }
+    setTimeout(() => setIsLoading(false));
   };
 
   useEffect(() => {
@@ -54,11 +62,12 @@ function Login() {
 
   return (
     <>
+      {isLoading && <Loader />}
       <div
         className="relative min-h-screen flex items-center justify-center bg-cover bg-center bg-white dark:bg-matte-black"
         style={{ backgroundImage: `url('${bg}')` }}
       >
-        <div className="flex flex-col items-center justify-center gap-2 w-full px-4">
+        <div className="relative flex flex-col items-center justify-center gap-2 w-full px-4">
           <img
             src={logo}
             alt=""
@@ -67,6 +76,18 @@ function Login() {
           <span className="text-2xl font-semibold text-center">
             Taptab Content Manager
           </span>
+
+          {/* UNCOMMENT THE CODE BELOW IF YOU WANT TO CENTER THE FORM */}
+          {/* <div className="absolute flex flex-col items-center gap-2 top-[-50%] md:top-[-60%]">
+            <img
+              src={logo}
+              alt=""
+              className="max-w-[200px] md:max-w-[250px] transition-all"
+            />
+            <span className="text-2xl font-semibold text-center">
+              Taptab Content Manager
+            </span>
+          </div> */}
           <form
             onSubmit={login}
             className="min-w-full sm:min-w-[350px] bg-white shadow-md border-2 p-4 flex flex-col items-center gap-2 rounded-md transition-all"
@@ -109,15 +130,20 @@ function Login() {
           </form>
         </div>
       </div>
-      {onError && (
+      {onError.toggle && (
         <Alert
           icon={RiInformationFill}
           color="failure"
-          onDismiss={() => toggleError(false)}
-          className="absolute top-[10%] left-[50%] translate-x-[-50%] animate-fade-fr-t whitespace-nowrap"
+          onDismiss={() =>
+            toggleError({
+              toggle: false,
+              message: "",
+            })
+          }
+          className="absolute top-[10%] left-[50%] translate-x-[-50%] animate-fade-fr-t"
         >
           <span>
-            <p>Username or password is incorrect.</p>
+            <p className="w-[275px] text-center">{onError.message}</p>
           </span>
         </Alert>
       )}

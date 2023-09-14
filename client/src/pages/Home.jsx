@@ -8,30 +8,35 @@ import Breadcrumb from "../fragments/Breadcrumb";
 import UserAccounts from "./UserAccounts";
 import { RiInformationFill } from "react-icons/ri";
 import { Alert } from "flowbite-react";
+import Loader from "../fragments/Loader";
 
 function Home() {
-  const [users, setUsers] = useState(null);
   const [onSidebar, toggleSidebar] = useState(false);
-  const { retrieveUsers, navigate, onAlert, setAlert } = useAuth();
-
-  useEffect(() => {
-    const setup = async () => {
-      const response = await retrieveUsers();
-      setUsers(response);
-    };
-    setup();
-  }, [retrieveUsers]);
+  const { navigate, onAlert, setAlert, isLoading } = useAuth();
 
   const logoutUser = () => {
     localStorage.clear();
     navigate("/login");
   };
+
+  useEffect(() => {
+    if (onAlert.isOn) {
+      setTimeout(() => {
+        setAlert({
+          isOn: false,
+          type: "info",
+          message: "",
+        });
+      }, 3000);
+    }
+  }, [onAlert]);
   if (!localStorage.getItem("user")) {
     navigate("/login");
     return;
   } else {
     return (
       <div className="min-h-screen relative bg-default">
+        {isLoading && <Loader />}
         <div className="absolute top-navbar left-0 px-4 sm:pt-2 lg:left-sidebar transition-all xl:left-sidebar-xl w-full  lg:w-[calc(100%_-_15rem)] xl:w-[calc(100%_-_18.75rem)]">
           <Breadcrumb />
           <Routes>

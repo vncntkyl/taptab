@@ -26,6 +26,9 @@ export const selectTheme = {
 export const mainButton = {
   base: "group flex h-min items-center justify-center text-center font-semibold relative focus:z-10 focus:outline-none bg-main text-white",
 };
+export const redMainButton = {
+  base: "group flex h-min items-center justify-center text-center font-semibold relative focus:z-10 focus:outline-none bg-c-red text-white",
+};
 export const lightButton = {
   base: "group flex h-min items-center justify-center p-0 text-center font-medium relative focus:z-10 focus:outline-none shadow-md text-main border border-main hover:bg-main hover:text-white",
   inner: {
@@ -33,6 +36,9 @@ export const lightButton = {
   },
 };
 
+export const iconButton = {
+  base: "group flex h-min items-center justify-center p-0 text-center font-medium relative focus:z-10 focus:outline-none",
+};
 export const modalTheme = {
   root: {
     base: "animate-fade z-50",

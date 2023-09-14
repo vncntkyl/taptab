@@ -10,7 +10,7 @@ export default {
   theme: {
     extend: {
       animation: {
-        "fade-fr-t": "fade-fr-t 300ms ease-in-out",
+        "fade-fr-t": "fade-fr-t 750ms ease-in-out",
         fade: "fade 200ms ease-in-out",
       },
       keyframes: {
@@ -24,6 +24,10 @@ export default {
         },
         "fade-fr-t": {
           "0%": {
+            opacity: 0,
+            transform: "translate(-50%,-100%)",
+          },
+          "50%": {
             opacity: 0,
             transform: "translate(-50%,-100%)",
           },
@@ -44,7 +48,9 @@ export default {
         "secondary-dark": "#1d5973",
         "secondary-light": "#1c4a5d",
         "c-red": "#dc2929",
-        "c-yellow": "#efdnp615",
+        "c-orange": "#dc8129",
+        "c-green": "#29dc5e",
+        "c-yellow": "#efd615",
         default: "#eaecef",
         "default-dark": "#e1e1e1",
       },

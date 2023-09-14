@@ -10,6 +10,7 @@ export function useAuth() {
 }
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [onAlert, setAlert] = useState({
     isOn: false,
     type: "info",
@@ -45,9 +46,13 @@ export function AuthProvider({ children }) {
       console.error(error);
     }
   };
-  const retrieveUsers = async () => {
+  const updateUser = async (userData) => {
     try {
-      const response = await axios.get(url.users);
+      const response = await axios.patch(url.users + userData._id, userData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       if (response.status === 200) {
         return response.data;
       }
@@ -55,7 +60,48 @@ export function AuthProvider({ children }) {
       console.error(error);
     }
   };
-
+  const deactivateUser = async (_id) => {
+    try {
+      const response = await axios.delete(url.userDeactivate + _id, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const reactivateUser = async (_id) => {
+    try {
+      const response = await axios.patch(url.userReactivate + _id, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const deleteUser = async (_id) => {
+    try {
+      const response = await axios.delete(url.userDelete + _id, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const getUser = () => {
     return JSON.parse(localStorage.getItem("user"));
   };
@@ -75,13 +121,18 @@ export function AuthProvider({ children }) {
   const values = {
     user,
     onAlert,
+    isLoading,
+    setIsLoading,
     setAlert,
     navigate,
     loginUser,
     registerUser,
     getUser,
-    retrieveUsers,
     getFullName,
+    updateUser,
+    deleteUser,
+    deactivateUser,
+    reactivateUser,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
