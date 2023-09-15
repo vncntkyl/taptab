@@ -6,4 +6,5 @@ export const developmentRoutes = {
   userReactivate: "http://192.168.11.199:5050/users/reactivate/",
   userDelete: "http://192.168.11.199:5050/users/delete/",
   storage: "http://192.168.11.199:5050/storage/",
+  uploadMedia: "http://192.168.11.199:5050/storage/upload",
 };

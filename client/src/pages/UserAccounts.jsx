@@ -137,7 +137,10 @@ function UserAccounts() {
     const alert = {
       isOn: true,
       type: "success",
-      message: "You have successfully reactivated " + user.first_name + ". Updates will show in few seconds.",
+      message:
+        "You have successfully reactivated " +
+        user.first_name +
+        ". Updates will show in few seconds.",
     };
     setModal({
       toggle: false,
@@ -174,156 +177,158 @@ function UserAccounts() {
       clearInterval(realtimeData);
     };
   }, [getUsers]);
-  return (
-    users && (
-      <>
-        <div className="transition-all w-full flex flex-col gap-4">
-          <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
-            <PageHeader>Manage User Accounts</PageHeader>
-            <Button
-              className="focus:ring-0 w-fit bg-white"
-              onClick={() =>
-                setModal({
-                  toggle: true,
-                  title: "Create User",
-                })
-              }
-              color="transparent"
-              theme={lightButton}
-            >
-              <BsPersonFillAdd />
-              <p>Create User</p>
-            </Button>
-          </div>
-          <div className="w-full overflow-x-auto rounded-md shadow-md">
-            <UsersTable users={users} setItem={setUser} setModal={setModal} />
-          </div>
+
+  return users ? (
+    <>
+      {setIsLoading(false)}
+      <div className="transition-all w-full flex flex-col gap-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
+          <PageHeader>Manage User Accounts</PageHeader>
+          <Button
+            className="focus:ring-0 w-fit bg-white"
+            onClick={() =>
+              setModal({
+                toggle: true,
+                title: "Create User",
+              })
+            }
+            color="transparent"
+            theme={lightButton}
+          >
+            <BsPersonFillAdd />
+            <p>Create User</p>
+          </Button>
         </div>
-        <Modal
-          position="center"
-          show={modal.toggle}
-          dismissible
-          onClose={() => {
-            setModal({
-              toggle: false,
-              title: null,
-            });
-            setUser({
-              first_name: "",
-              middle_name: "",
-              last_name: "",
-              position: "",
-              role: "",
-              email_address: "",
-            });
-          }}
-          size="lg"
-          theme={modalTheme}
-        >
-          <Modal.Header className="border-b-default-dark p-3 px-4">
-            {modal.toggle && capitalize(modal.title) + " User"}
-          </Modal.Header>
-          <Modal.Body>
-            {["delete", "deactivate", "reactivate"].includes(modal.title) ? (
-              <div>
-                <p>
-                  {modal.title === "delete" ? (
-                    <>Confirm account deletion for </>
-                  ) : modal.title === "deactivate" ? (
-                    <>Confirm account deactivation for </>
-                  ) : (
-                    <>Confirm account reactivation for </>
-                  )}
-                  <strong>{user.first_name}</strong>?
-                </p>
-                <Button
-                  className="mt-4 w-fit float-right"
-                  color="transparent"
-                  theme={redMainButton}
-                  onClick={
-                    modal.title === "delete"
-                      ? handleAccountDeletion
-                      : modal.title === "deactivate"
-                      ? handleAccountDeactivation
-                      : handleAccountReactivation
-                  }
-                >
-                  {capitalize(modal.title)}
-                </Button>
-              </div>
-            ) : (
-              <form
-                className="flex flex-col gap-2"
-                onSubmit={
-                  user._id ? handleUpdateInformation : handleUserRegistration
+        <div className="w-full overflow-x-auto rounded-md shadow-md">
+          <UsersTable users={users} setItem={setUser} setModal={setModal} />
+        </div>
+      </div>
+      <Modal
+        position="center"
+        show={modal.toggle}
+        dismissible
+        onClose={() => {
+          setModal({
+            toggle: false,
+            title: null,
+          });
+          setUser({
+            first_name: "",
+            middle_name: "",
+            last_name: "",
+            position: "",
+            role: "",
+            email_address: "",
+          });
+        }}
+        size="lg"
+        theme={modalTheme}
+      >
+        <Modal.Header className="border-b-default-dark p-3 px-4">
+          {modal.toggle && capitalize(modal.title) + " User"}
+        </Modal.Header>
+        <Modal.Body>
+          {["delete", "deactivate", "reactivate"].includes(modal.title) ? (
+            <div>
+              <p>
+                {modal.title === "delete" ? (
+                  <>Confirm account deletion for </>
+                ) : modal.title === "deactivate" ? (
+                  <>Confirm account deactivation for </>
+                ) : (
+                  <>Confirm account reactivation for </>
+                )}
+                <strong>{user.first_name}</strong>?
+              </p>
+              <Button
+                className="mt-4 w-fit float-right"
+                color="transparent"
+                theme={redMainButton}
+                onClick={
+                  modal.title === "delete"
+                    ? handleAccountDeletion
+                    : modal.title === "deactivate"
+                    ? handleAccountDeactivation
+                    : handleAccountReactivation
                 }
               >
-                {Object.keys(user)
-                  .filter((key) => key !== "_id")
-                  .map((key, index) => {
-                    return (
-                      <div className="w-full" key={index}>
-                        <Label
-                          htmlFor={key}
-                          value={
-                            capitalize(convertText(key)) +
-                            (key === "middle_name" ? " (optional)" : "")
-                          }
-                        />
-                        {key === "role" ? (
-                          <Select
-                            id={key}
-                            onChange={(e) => onInputChange(e, key)}
-                            required
-                            theme={selectTheme}
+                {capitalize(modal.title)}
+              </Button>
+            </div>
+          ) : (
+            <form
+              className="flex flex-col gap-2"
+              onSubmit={
+                user._id ? handleUpdateInformation : handleUserRegistration
+              }
+            >
+              {Object.keys(user)
+                .filter((key) => key !== "_id")
+                .map((key, index) => {
+                  return (
+                    <div className="w-full" key={index}>
+                      <Label
+                        htmlFor={key}
+                        value={
+                          capitalize(convertText(key)) +
+                          (key === "middle_name" ? " (optional)" : "")
+                        }
+                      />
+                      {key === "role" ? (
+                        <Select
+                          id={key}
+                          onChange={(e) => onInputChange(e, key)}
+                          required
+                          theme={selectTheme}
+                        >
+                          <option
+                            selected={user[key] === ""}
+                            defaultChecked
+                            disabled
                           >
-                            <option
-                              selected={user[key] === ""}
-                              defaultChecked
-                              disabled
-                            >
-                              --Select Role--
-                            </option>
-                            {["administrator", "manager", "contributor"].map(
-                              (opt, index) => {
-                                return (
-                                  <option
-                                    key={index}
-                                    value={opt}
-                                    selected={user[key] === opt}
-                                  >
-                                    {capitalize(opt)}
-                                  </option>
-                                );
-                              }
-                            )}
-                          </Select>
-                        ) : (
-                          <TextInput
-                            onChange={(e) => onInputChange(e, key)}
-                            type="text"
-                            value={user[key]}
-                            required={key !== "middle_name"}
-                            theme={textTheme}
-                          />
-                        )}
-                      </div>
-                    );
-                  })}
-                <Button
-                  className="mt-4 w-full"
-                  type="submit"
-                  color="transparent"
-                  theme={mainButton}
-                >
-                  Save User
-                </Button>
-              </form>
-            )}
-          </Modal.Body>
-        </Modal>
-      </>
-    )
+                            --Select Role--
+                          </option>
+                          {["administrator", "manager", "contributor"].map(
+                            (opt, index) => {
+                              return (
+                                <option
+                                  key={index}
+                                  value={opt}
+                                  selected={user[key] === opt}
+                                >
+                                  {capitalize(opt)}
+                                </option>
+                              );
+                            }
+                          )}
+                        </Select>
+                      ) : (
+                        <TextInput
+                          onChange={(e) => onInputChange(e, key)}
+                          type="text"
+                          value={user[key]}
+                          required={key !== "middle_name"}
+                          theme={textTheme}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              <Button
+                className="mt-4 w-full"
+                type="submit"
+                color="transparent"
+                theme={mainButton}
+              >
+                Save User
+              </Button>
+            </form>
+          )}
+        </Modal.Body>
+      </Modal>
+    </>
+  ) : (
+    setIsLoading(true)
   );
 }
 

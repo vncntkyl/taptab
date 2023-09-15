@@ -1,5 +1,7 @@
 import express from "express";
+import db from "../db/conn.mjs";
 import { Storage } from "@google-cloud/storage";
+import multer from "multer";
 
 const storage = new Storage({
   projectId: process.env.GCLOUD_PROJECT_ID,
@@ -8,21 +10,21 @@ const storage = new Storage({
 const router = express.Router();
 const bucket = storage.bucket(process.env.GCLOUD_BUCKET_NAME);
 //GET FILES
-
-function getFileURL(objectName) {
-  return `https://storage.googleapis.com/tamc_advertisements/${objectName}`;
-}
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.get("/", async (req, res) => {
   try {
+    let collection = db.collection("media");
+    let results = await collection.find({}).toArray();
     const [files] = await bucket.getFiles();
     const items = [];
 
     files.forEach((file) => {
+      if (file.metadata.contentType === "text/plain") return;
       items.push({
-        _id: file.metadata.generation,
+        _id: file.metadata.metadata.dbID,
         _urlID: file.id,
-        name: file.name,
+        fileName: file.name,
         contentType: file.metadata.contentType,
         size: file.metadata.size,
         bucket: file.metadata.bucket,
@@ -30,9 +32,75 @@ router.get("/", async (req, res) => {
         timeUpdated: file.metadata.updated,
       });
     });
-    res.send(items).status(200);
+    const library = results.map((result) => {
+      const match = items.find(
+        (item) => item._id == result._id && !item.fileName.includes("tmb")
+      );
+      if (match) {
+        return { ...result, ...match };
+      }
+      return result; // If no match is found, use the result from MongoDB
+    });
+    items
+      .filter(
+        (item) =>
+          !results.find(
+            (result) => result._id == item._id && !item.fileName.includes("tmb")
+          )
+      )
+      .forEach((unmatchedItem) => {
+        library.push(unmatchedItem);
+      });
+
+    results
+      .filter((result) => !items.find((item) => item._id == result._id))
+      .forEach((unmatchedResult) => {
+        library.push(unmatchedResult);
+      });
+
+    res.send(library).status(200);
   } catch (error) {
     console.error("Error listing bucket contents:", error);
+    res.status(500).send(error);
+  }
+});
+
+router.post("/upload", upload.array("files", 5), async (req, res) => {
+  try {
+    const files = req.files;
+    const data = JSON.parse(req.body.mediaData);
+    let collection = await db.collection("media");
+    let result = await collection.insertOne(data);
+    if (!files || files.length === 0) {
+      // return res.status(400).send("No files uploaded.");
+    }
+
+    files.forEach(async (file) => {
+      if (file.originalname.includes("tmb")) {
+        file.originalname = "thumbnail/" + file.originalname;
+      }
+      const fileUpload = bucket.file(file.originalname);
+      const stream = fileUpload.createWriteStream({
+        metadata: {
+          contentType: file.mimetype,
+          metadata: {
+            dbID: result.insertedId,
+          },
+        },
+      });
+      stream.on("error", (error) => {
+        res.status(400).send(error);
+        console.error(`Error uploading ${file.originalname}:`, error);
+      });
+
+      // Upload the file
+      stream.end(file.buffer);
+      await new Promise((resolve) => stream.on("finish", resolve));
+    });
+
+    res.status(200).send("Files uploaded successfully.");
+  } catch (error) {
+    console.error("Error uploading: ", error);
     res.status(500).send(error);
   }
 });

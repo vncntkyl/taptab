@@ -15,9 +15,31 @@ const getMedia = async () => {
     console.error(error);
   }
 };
+const uploadMedia = async (files, mediaData) => {
+  try {
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append("files", files[i]);
+    }
+    formData.append("mediaData", JSON.stringify(mediaData));
+
+    const response = await axios.post(url.uploadMedia, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 export const useStorage = () => {
   return {
     getMedia,
+    uploadMedia,
   };
 };
