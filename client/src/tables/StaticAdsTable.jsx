@@ -41,7 +41,7 @@ function StaticAdsTable({ ads, setItem, setModal }) {
                     src={getFileURL(item._urlID)}
                     alt=""
                     loading="lazy"
-                    className="max-w-[250px]"
+                    className="max-w-[250px] rounded"
                   />
                 </Table.Cell>
                 <Table.Cell>

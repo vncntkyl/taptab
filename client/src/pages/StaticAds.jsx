@@ -58,6 +58,7 @@ function StaticAds() {
 
   const handleAdUpload = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const adData = { ...adItem };
     const file = adItem.imageFile;
     delete adData.imageFile;
@@ -65,17 +66,22 @@ function StaticAds() {
     adData.status = "active";
     adData.views = 0;
 
+    resetDefaults();
     const response = await createStaticAds(file, adData);
     console.log(response);
+    setIsLoading(false);
   };
   const handleAdEdit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const adData = { ...adItem };
     if (adItem.imageFile) {
       delete adData.image;
     }
+    resetDefaults();
     const response = await updateStaticAd(adData);
     console.log(response);
+    setIsLoading(false);
   };
   const onInputChange = (e, key) => {
     setAdItem((current) => {
