@@ -2,7 +2,7 @@ import classNames from "classnames";
 import PropTypes from "prop-types";
 import SidebarLink from "./SidebarLink";
 import { BiSolidDashboard } from "react-icons/bi";
-import { BsFillCalendarWeekFill } from "react-icons/bs";
+import { BsFillCalendarWeekFill, BsMegaphoneFill } from "react-icons/bs";
 import { FaTabletScreenButton, FaUsers } from "react-icons/fa6";
 import { RiSurveyFill } from "react-icons/ri";
 import { FaPhotoVideo } from "react-icons/fa";
@@ -11,6 +11,23 @@ import { MdOutlineVideoLibrary, MdWarning } from "react-icons/md";
 function Sidebar({ toggle, setToggle }) {
   const sidebarLinkClassname =
     "text-xl h-[40px] w-[40px] p-2 transition-all duration-200"; /* toggle && "lg:h-[45px] lg:w-[45px] pl-4"*/
+
+  const Divider = ({ children, className }) => {
+    return (
+      <p
+        className={classNames(
+          "mx-2 uppercase font-bold text-main tracking-wider text-sm",
+          className
+        )}
+      >
+        {children}
+      </p>
+    );
+  };
+  Divider.propTypes = {
+    children: PropTypes.node,
+    className: PropTypes.string,
+  };
   return (
     <div
       className={classNames(
@@ -26,7 +43,7 @@ function Sidebar({ toggle, setToggle }) {
         toggler={setToggle}
         icon={<BiSolidDashboard className={classNames(sidebarLinkClassname)} />}
       />
-      <hr className="mx-2 border-secondary" />
+      <Divider>Media</Divider>
       <SidebarLink
         name="media library"
         toggle={toggle}
@@ -59,14 +76,19 @@ function Sidebar({ toggle, setToggle }) {
           <FaTabletScreenButton className={classNames(sidebarLinkClassname)} />
         }
       />
-      <hr className="mx-2 border-secondary" />
+      <Divider>Others</Divider>
       <SidebarLink
-        name="surveys and feedbacks"
+        name="static ads"
+        toggle={toggle}
+        toggler={setToggle}
+        icon={<BsMegaphoneFill className={classNames(sidebarLinkClassname)} />}
+      />
+      <SidebarLink
+        name="user engagement"
         toggle={toggle}
         toggler={setToggle}
         icon={<RiSurveyFill className={classNames(sidebarLinkClassname)} />}
       />
-      <hr className="mx-2 border-secondary" />
       <SidebarLink
         name="incident reports"
         toggle={toggle}

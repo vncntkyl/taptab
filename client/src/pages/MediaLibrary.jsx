@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import PageHeader from "../fragments/PageHeader";
 import { Button, FileInput, Label, Modal, TextInput } from "flowbite-react";
-import { mainButton, modalTheme, textTheme } from "../context/CustomThemes";
+import { useAuth } from "../context/AuthContext";
+import PageHeader from "../fragments/PageHeader";
 import { useStorage } from "../context/StorageContext";
 import MediaLibraryTable from "../tables/MediaLibraryTable";
 import { values as useFunction } from "../context/Functions";
 import MediaUploadDropdown from "../fragments/MediaUploadDropdown";
-import { useAuth } from "../context/AuthContext";
 import VideoUploadForm from "../components/mediaLibrary/VideoUploadForm";
+import { mainButton, modalTheme, textTheme } from "../context/CustomThemes";
+
 function MediaLibrary() {
   const { getMedia, uploadMedia } = useStorage();
   const { capitalize } = useFunction();
@@ -97,38 +98,41 @@ function MediaLibrary() {
   };
 
   useEffect(() => {
+    setIsLoading(true);
+  }, [setIsLoading]);
+
+  useEffect(() => {
     const setup = async () => {
       const response = await getMedia();
       setMediaFiles(
-        response.filter((res) => res.contentType.includes("video"))
+        response.filter((res) => !res.fileName.startsWith("thumbnail"))
       );
-      setThumbnails(
-        response.filter((res) => res.contentType.includes("image"))
-      );
+      setThumbnails(response.filter((res) => res._urlID.includes("tmb")));
+      setIsLoading(false);
     };
     setup();
     const realtimeData = setInterval(setup, 3000);
-
     return () => {
       clearInterval(realtimeData);
     };
   }, []);
-  return mediaFiles ? (
+  return (
     <>
-      {setIsLoading(false)}
       <div className="transition-all w-full flex flex-col gap-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
           <PageHeader>Manage Media Library</PageHeader>
           <MediaUploadDropdown triggerModal={triggerModal} />
         </div>
-        <div className="w-full overflow-x-auto rounded-md shadow-md">
-          <MediaLibraryTable
-            media={mediaFiles}
-            thumbnails={thumbnails}
-            setItem={setMediaItem}
-            setModal={setModal}
-          />
-        </div>
+        {mediaFiles && (
+          <div className="w-full overflow-x-auto rounded-md shadow-md">
+            <MediaLibraryTable
+              media={mediaFiles}
+              thumbnails={thumbnails}
+              setItem={setMediaItem}
+              setModal={setModal}
+            />
+          </div>
+        )}
       </div>
       <Modal
         position="center"
@@ -236,8 +240,6 @@ function MediaLibrary() {
         </Modal.Body>
       </Modal>
     </>
-  ) : (
-    setIsLoading(true)
   );
 }
 

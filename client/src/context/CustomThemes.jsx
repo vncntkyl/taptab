@@ -10,6 +10,12 @@ export const textTheme = {
     },
   },
 };
+export const textareaTheme = {
+  base: "block w-full rounded-sm border disabled:cursor-not-allowed disabled:opacity-50 text-sm",
+  colors: {
+    gray: "bg-gray-50 border-gray-300 text-gray-900 focus:border-secondary focus:ring-secondary dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-secondary dark:focus:ring-secondary",
+  },
+};
 export const selectTheme = {
   field: {
     select: {

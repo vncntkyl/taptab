@@ -10,6 +10,7 @@ import { RiInformationFill } from "react-icons/ri";
 import { Alert } from "flowbite-react";
 import Loader from "../fragments/Loader";
 import MediaLibrary from "./MediaLibrary";
+import StaticAds from "./StaticAds";
 
 function Home() {
   const [onSidebar, toggleSidebar] = useState(false);
@@ -46,8 +47,9 @@ function Home() {
             <Route path="/playlist" element={<>playlist</>} />
             <Route path="/planner" element={<>planner</>} />
             <Route path="/players" element={<>players</>} />
+            <Route path="/static_ads" element={<StaticAds />} />
             <Route
-              path="/surveys_and_feedbacks"
+              path="/user_engagement"
               element={<>surveys and feedbacks management page</>}
             />
             <Route path="/incident_reports" element={<>Incident Reports</>} />

@@ -1,31 +1,25 @@
 import PropTypes from "prop-types";
-import { Badge, Button, Checkbox, Table } from "flowbite-react";
-import { RiDeleteBinFill, RiEditBoxFill } from "react-icons/ri";
+import { Button, Table } from "flowbite-react";
+import {
+  RiDeleteBinFill,
+  RiEditBoxFill,
+  RiExternalLinkFill,
+} from "react-icons/ri";
 import { values as useFunction } from "../context/Functions";
 import { iconButton } from "../context/CustomThemes";
 import { format } from "date-fns";
 
-function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
+function StaticAdsTable({ ads, setItem, setModal }) {
   const { capitalize, convertText } = useFunction();
-  const headers = ["preview", "name", "details", "date_modified"];
+  const headers = ["image", "details", "description", "link", "date_modified"];
 
   const getFileURL = (objectName) => {
     return `https://storage.googleapis.com/tamc_advertisements/${objectName}`;
-  };
-  const convertSize = (size) => {
-    if (size < 1048576) {
-      return (size / 1000).toFixed(2) + "KB";
-    } else {
-      return (size / 1048576).toFixed(2) + "MB";
-    }
   };
 
   return (
     <Table className="border bg-white rounded-md">
       <Table.Head className="shadow-md">
-        <Table.HeadCell className="text-main text-center">
-          <Checkbox />
-        </Table.HeadCell>
         {headers.map((header, index) => {
           return (
             <Table.HeadCell key={index} className="text-main">
@@ -38,48 +32,41 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
         </Table.HeadCell>
       </Table.Head>
       <Table.Body className="divide-y">
-        {media.length > 0 ? (
-          media.map((item, index) => {
-            const tmb = thumbnails.find(
-              (thumbnail) => thumbnail._id == item._id
-            );
-
+        {ads.length > 0 ? (
+          ads.map((item, index) => {
             return (
               <Table.Row key={index} className="text-center">
                 <Table.Cell>
-                  <Checkbox />
-                </Table.Cell>
-                <Table.Cell>
-                  <img src={getFileURL(tmb._urlID)} alt="" loading="lazy" />
+                  <img
+                    src={getFileURL(item._urlID)}
+                    alt=""
+                    loading="lazy"
+                    className="max-w-[250px]"
+                  />
                 </Table.Cell>
                 <Table.Cell>
                   <div className="flex flex-col text-start">
                     <p>
-                      <span>Name: </span>
                       <span className="font-semibold">{item.name}</span>
                     </p>
-                    <p>{capitalize(item.status)}</p>
+                    <p>
+                      <span>Status: </span>
+                      {capitalize(item.status)}
+                    </p>
+                    <p>
+                      <span>{item.views}</span>
+                      <span> Interactions</span>
+                    </p>
                   </div>
                 </Table.Cell>
+                <Table.Cell className="max-w-[250px]">
+                  <p>{item.description || "---"}</p>
+                </Table.Cell>
                 <Table.Cell>
-                  <div className="flex flex-col text-start text-xs">
-                    <p>
-                      <span>Type: </span>
-                      {capitalize(item.type)}
-                    </p>
-                    <p>
-                      <span>Size: </span>
-                      {capitalize(convertSize(item.size))}
-                    </p>
-                    <p>
-                      <span>Duration: </span>
-                      {item.videoDuration}
-                    </p>
-                    <p>
-                      <span>Category: </span>
-                      {capitalize(item.category)}
-                    </p>
-                  </div>
+                  <a href={item.link} target="blank" className="relative group">
+                    {item.name}
+                    <RiExternalLinkFill className="absolute bottom-0 right-0 hidden group-hover:block" />
+                  </a>
                 </Table.Cell>
                 <Table.Cell>
                   <div className="flex flex-col text-start text-xs">
@@ -90,10 +77,6 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
                     <p>
                       <span>Date Updated: </span>
                       {format(new Date(item.timeUpdated), "yyyy-MM-dd h:mm a")}
-                    </p>
-                    <p>
-                      <span>Used: </span>
-                      {item.usage}
                     </p>
                   </div>
                 </Table.Cell>
@@ -107,7 +90,16 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
                       onClick={() => {
                         setModal({
                           toggle: true,
-                          title: "edit",
+                          title: "edit ad",
+                        });
+                        setItem({
+                          _id: item._id,
+                          name: item.name,
+                          image: getFileURL(item._urlID),
+                          category: item.category,
+                          description: item.description,
+                          link: item.link,
+                          imagePath: item.fileName
                         });
                       }}
                     >
@@ -121,8 +113,9 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
                       onClick={() => {
                         setModal({
                           toggle: true,
-                          title: "delete",
+                          title: "delete ad",
                         });
+                        setItem(item);
                       }}
                     >
                       <RiDeleteBinFill className="text-lg text-c-red" />
@@ -134,7 +127,7 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
           })
         ) : (
           <Table.Row>
-            <Table.Cell colSpan={headers.length}>No media found</Table.Cell>
+            <Table.Cell colSpan={headers.length + 1}>No ads found</Table.Cell>
           </Table.Row>
         )}
       </Table.Body>
@@ -142,11 +135,10 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
   );
 }
 
-MediaLibraryTable.propTypes = {
-  media: PropTypes.array,
-  thumbnails: PropTypes.array,
+StaticAdsTable.propTypes = {
+  ads: PropTypes.array,
   setItem: PropTypes.func,
   setModal: PropTypes.func,
 };
 
-export default MediaLibraryTable;
+export default StaticAdsTable;

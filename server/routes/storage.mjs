@@ -16,9 +16,9 @@ router.get("/", async (req, res) => {
   try {
     let collection = db.collection("media");
     let results = await collection.find({}).toArray();
-    const [files] = await bucket.getFiles();
+    let [files] = await bucket.getFiles();
     const items = [];
-
+    files = files.filter((file) => !file.name.startsWith("staticAds"));
     files.forEach((file) => {
       if (file.metadata.contentType === "text/plain") return;
       items.push({
