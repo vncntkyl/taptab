@@ -59,13 +59,13 @@ function StaticAdsTable({ ads, setItem, setModal }) {
                     </p>
                   </div>
                 </Table.Cell>
-                <Table.Cell className="max-w-[250px]">
+                <Table.Cell className="max-w-[250px] text-left">
                   <p>{item.description || "---"}</p>
                 </Table.Cell>
-                <Table.Cell>
-                  <a href={item.link} target="blank" className="relative group">
+                <Table.Cell className="text-left">
+                  <a href={item.link} target="blank" className="relative group text-main">
                     {item.name}
-                    <RiExternalLinkFill className="absolute bottom-0 right-0 hidden group-hover:block" />
+                    <RiExternalLinkFill className="absolute bottom-0 right-0 hidden group-hover:block bg-white" />
                   </a>
                 </Table.Cell>
                 <Table.Cell>

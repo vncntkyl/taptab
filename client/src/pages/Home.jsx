@@ -37,9 +37,9 @@ function Home() {
     return;
   } else {
     return (
-      <div className="min-h-screen relative bg-default">
+      <div className="max-h-screen relative bg-default">
         {isLoading && <Loader />}
-        <div className="absolute top-navbar left-0 px-4 sm:pt-2 lg:left-sidebar transition-all xl:left-sidebar-xl w-full  lg:w-[calc(100%_-_15rem)] xl:w-[calc(100%_-_18.75rem)]">
+        <div className="absolute max-h-[calc(100vh_-_3.6rem)] sm:max-h-[calc(100vh_-_4rem)] top-navbar left-0 px-4 pb-2 sm:pt-2 lg:left-sidebar transition-all xl:left-sidebar-xl w-full  lg:w-[calc(100%_-_15rem)] xl:w-[calc(100%_-_18.75rem)] overflow-y-auto">
           <Breadcrumb />
           <Routes>
             <Route exact path="/" element={<Dashboard />} />
