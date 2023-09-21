@@ -41,11 +41,6 @@ router.get("/", async (req, res) => {
       }
       return result; // If no match is found, use the result from MongoDB
     });
-    items
-      .filter((item) => !results.find((result) => result._id == item._id))
-      .forEach((unmatchedItem) => {
-        library.push(unmatchedItem);
-      });
 
     results
       .filter((result) => !items.find((item) => item._id == result._id))
@@ -152,5 +147,18 @@ router.patch("/:id", upload.single("file"), async (req, res) => {
     console.error("Error uploading: ", error);
     res.status(500).send(error);
   }
+});
+router.delete("/:id", async (req, res) => {
+  const collection = db.collection("staticAds");
+  const query = { _id: new ObjectId(req.params.id) };
+
+  const updates = {
+    $set: {
+      status: "deleted",
+    },
+  };
+  let result = await collection.updateOne(query, updates);
+
+  res.send(result).status(200);
 });
 export default router;

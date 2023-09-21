@@ -10,4 +10,5 @@ export const developmentRoutes = {
   uploadMedia: "http://" + host + ":5050/storage/upload",
   staticAds: "http://" + host + ":5050/staticAds/",
   staticAdsCreation: "http://" + host + ":5050/staticAds/create",
+  staticAdsDelete: "http://" + host + ":5050/staticAds/hide",
 };

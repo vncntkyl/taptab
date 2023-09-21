@@ -56,11 +56,25 @@ const updateStaticAd = async (adData) => {
     console.error(error);
   }
 };
-
+const deleteStaticAd = async (_id) => {
+  try {
+    const response = await axios.delete(url.staticAds + _id, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 export const useStaticAds = () => {
   return {
     getStaticAds,
     createStaticAds,
     updateStaticAd,
+    deleteStaticAd,
   };
 };

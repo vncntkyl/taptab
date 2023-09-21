@@ -11,6 +11,7 @@ import { Alert } from "flowbite-react";
 import Loader from "../fragments/Loader";
 import MediaLibrary from "./MediaLibrary";
 import StaticAds from "./StaticAds";
+import UserEngagement from "./UserEngagement";
 
 function Home() {
   const [onSidebar, toggleSidebar] = useState(false);
@@ -32,6 +33,14 @@ function Home() {
       }, 3000);
     }
   }, [onAlert]);
+
+  useEffect(() => {
+    if (!window.location.pathname.includes("user_engagement")) {
+      if (localStorage.getItem("activeTab")) {
+        localStorage.removeItem("activeTab");
+      }
+    }
+  }, [window.location.pathname]);
   if (!localStorage.getItem("user")) {
     navigate("/login");
     return;
@@ -48,10 +57,7 @@ function Home() {
             <Route path="/planner" element={<>planner</>} />
             <Route path="/players" element={<>players</>} />
             <Route path="/static_ads" element={<StaticAds />} />
-            <Route
-              path="/user_engagement"
-              element={<>surveys and feedbacks management page</>}
-            />
+            <Route path="/user_engagement/*" element={<UserEngagement />} />
             <Route path="/incident_reports" element={<>Incident Reports</>} />
             <Route path="/user_accounts" element={<UserAccounts />} />
           </Routes>

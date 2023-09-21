@@ -23,8 +23,9 @@ import {
 import { RiAddFill } from "react-icons/ri";
 
 function StaticAds() {
-  const { setIsLoading } = useAuth();
-  const { getStaticAds, createStaticAds, updateStaticAd } = useStaticAds();
+  const { setIsLoading, setAlert } = useAuth();
+  const { getStaticAds, createStaticAds, updateStaticAd, deleteStaticAd } =
+    useStaticAds();
   const { capitalize } = useFunction();
 
   const [staticAds, setStaticAds] = useState(null);
@@ -70,6 +71,18 @@ function StaticAds() {
     const response = await createStaticAds(file, adData);
     console.log(response);
     setIsLoading(false);
+    const alert = {
+      isOn: true,
+      type: "success",
+      message: "You have successfully uploaded " + adData.name + ".",
+    };
+    if (response.acknowledged) {
+      setAlert(alert);
+    } else {
+      alert.type = "failure";
+      alert.message = response;
+      setAlert(alert);
+    }
   };
   const handleAdEdit = async (e) => {
     e.preventDefault();
@@ -82,6 +95,36 @@ function StaticAds() {
     const response = await updateStaticAd(adData);
     console.log(response);
     setIsLoading(false);
+    const alert = {
+      isOn: true,
+      type: "success",
+      message: "You have successfully updated " + adData.name + ".",
+    };
+    if (response.acknowledged) {
+      setAlert(alert);
+    } else {
+      alert.type = "failure";
+      alert.message = response;
+      setAlert(alert);
+    }
+  };
+  const handleAdDelete = async () => {
+    const adData = { ...adItem };
+    resetDefaults();
+    const response = await deleteStaticAd(adData._id);
+    console.log(response);
+    const alert = {
+      isOn: true,
+      type: "success",
+      message: "You have successfully deleted " + adData.name + ".",
+    };
+    if (response.acknowledged) {
+      setAlert(alert);
+    } else {
+      alert.type = "failure";
+      alert.message = response;
+      setAlert(alert);
+    }
   };
   const onInputChange = (e, key) => {
     setAdItem((current) => {
@@ -190,6 +233,7 @@ function StaticAds() {
               <Button
                 className="mt-4 w-fit float-right"
                 color="transparent"
+                onClick={() => handleAdDelete()}
                 theme={redMainButton}
               >
                 Delete
