@@ -14,7 +14,7 @@ function AdsPlayer({ isFullScreen, toggleFullScreen }) {
       <div
         className={classNames(
           "transition-all bg-black aspect-video",
-          isFullScreen ? "max-w-full h-[70%]" : "max-w-[80%] h-full"
+          isFullScreen ? "max-w-full h-[72%]" : "max-w-[80%] h-full"
         )}
       ></div>
       <Button
