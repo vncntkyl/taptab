@@ -23,7 +23,7 @@ function AdsPlayer({ isFullScreen, toggleFullScreen }) {
         onClick={() => toggleFullScreen((current) => !current)}
         className="absolute bottom-0 right-0 focus:ring-0"
       >
-        <MdFullscreen className="text-xl" />
+        <MdFullscreen className="text-4xl" />
       </Button>
     </section>
   );
