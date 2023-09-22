@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import { Button, ToggleSwitch, Tooltip } from "flowbite-react";
 import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { iconButton } from "../../../context/CustomThemes";
-function Options({ index, content, setModal, toggleRequired, addField }) {
+function Options({ size, index, content, setModal, toggleRequired, addField }) {
   return (
     <div className="flex items-center gap-1 justify-end">
       <Tooltip content="Delete field" arrow={false}>
@@ -11,6 +11,7 @@ function Options({ index, content, setModal, toggleRequired, addField }) {
           color="transparent"
           size="sm"
           theme={iconButton}
+          disabled={size <= 1}
           onClick={() =>
             setModal({
               toggle: true,
@@ -29,12 +30,7 @@ function Options({ index, content, setModal, toggleRequired, addField }) {
           size="sm"
           theme={iconButton}
           onClick={() => {
-            addField();
-            setModal({
-              toggle: false,
-              title: null,
-              id: index,
-            });
+            addField(index);
           }}
         >
           <MdAdd className="text-lg text-gray-600" />
@@ -62,6 +58,7 @@ function Options({ index, content, setModal, toggleRequired, addField }) {
 }
 
 Options.propTypes = {
+  size: PropTypes.number,
   index: PropTypes.number,
   content: PropTypes.object,
   setModal: PropTypes.func,

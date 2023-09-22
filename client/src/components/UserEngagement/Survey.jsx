@@ -6,6 +6,7 @@ import { Badge, Button, Modal, TextInput } from "flowbite-react";
 import {
   bottomOnlyBorderText,
   iconButton,
+  mainButton,
   modalTheme,
   redMainButton,
 } from "../../context/CustomThemes";
@@ -13,8 +14,16 @@ import SurveyTypeDropdown from "../../fragments/SurveyTypeDropdown";
 import Fields from "./Surveys/Fields";
 import Options from "./Surveys/Options";
 import { MdSave } from "react-icons/md";
+import { useAuth } from "../../context/AuthContext";
+import { useEngagements } from "../../context/EngagementContext";
+import { useParams } from "react-router-dom";
+import { values as useFunction } from "../../context/Functions";
 
-function Survey(props) {
+function Survey() {
+  const { _id } = useParams();
+  const { setAlert, navigate } = useAuth();
+  const { convertText, capitalize } = useFunction();
+  const { uploadSurvey, updateSurvey } = useEngagements();
   const [modal, setModal] = useState({
     toggle: false,
     title: null,
@@ -23,7 +32,6 @@ function Survey(props) {
   const [settings, setSettings] = useState({
     title: "",
     description: "",
-    date_validity: "",
   });
   const [contents, setContents] = useState([
     {
@@ -39,10 +47,7 @@ function Survey(props) {
     updatedContent[index].type = optionName;
 
     if (optionName === "multiple choice" || optionName === "checkboxes") {
-      updatedContent[index].answer = [
-        { value: "option 1", selected: false },
-        { value: "option 2", selected: false },
-      ];
+      updatedContent[index].answer = [{ value: "option 1", selected: false }];
     } else {
       updatedContent[index].answer = "";
     }
@@ -61,9 +66,9 @@ function Survey(props) {
 
     setContents(updatedContent);
   };
-  const addDeleteField = () => {
-    const index = modal.id;
+  const addDeleteField = (idx) => {
     if (modal.toggle) {
+      const index = modal.id;
       //DELETE FIELD
       setModal({
         toggle: false,
@@ -78,7 +83,7 @@ function Survey(props) {
     } else {
       //ADD FIELD
       const updatedContents = [...contents];
-      updatedContents.splice(index + 1, 0, {
+      updatedContents.splice(idx + 1, 0, {
         type: "short text",
         question: "",
         answer: "",
@@ -117,6 +122,62 @@ function Survey(props) {
     localStorage.setItem("survey_progress", progress);
     const settings = JSON.stringify(contents);
     localStorage.setItem("settings_progress", settings);
+  };
+  const updateOption = (index, optIndex, isDelete = false) => {
+    const updatedContents = [...contents];
+
+    if (typeof updatedContents[index].answer !== "string") {
+      if (isDelete) {
+        updatedContents[index].answer.splice(optIndex, 1);
+      } else {
+        updatedContents[index].answer.push({
+          value: `option ${optIndex + 2}`,
+          selected: false,
+        });
+      }
+    }
+
+    setContents(updatedContents);
+  };
+  const onOptionChange = (index, optIndex, e) => {
+    const value = e.target.value;
+    const updatedContents = [...contents];
+    const options = updatedContents[index].answer;
+    options[optIndex].value = value;
+
+    setContents(updatedContents);
+  };
+
+  const handleFormSubmission = async (e) => {
+    e.preventDefault();
+    const surveyData = { ...settings };
+    surveyData.type = "survey";
+    surveyData.status = "active";
+    surveyData.questions = [...contents];
+    let response = {};
+    if (_id) {
+      response = await updateSurvey(surveyData);
+    } else {
+      response = await uploadSurvey(surveyData);
+    }
+    console.log(response);
+    const alert = {
+      isOn: true,
+      type: "success",
+      message: `You have successfully ${
+        _id ? "updated" : "uploaded"
+      } the survey.`,
+    };
+    if (response.acknowledged) {
+      setAlert(alert);
+      localStorage.removeItem("settings_progress");
+      localStorage.removeItem("survey_progress");
+      navigate("./user_engagement");
+    } else {
+      alert.type = "failure";
+      alert.message = response;
+      setAlert(alert);
+    }
   };
 
   useEffect(() => {
@@ -182,7 +243,11 @@ function Survey(props) {
     <>
       <div className="w-full max-w-4xl mx-auto">
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center pb-2">
-          <PageHeader className="mr-auto">Create New Survey</PageHeader>
+          <PageHeader className="mr-auto">
+            {_id
+              ? `Edit '${capitalize(convertText(_id))}' Survey`
+              : "Create New Survey"}
+          </PageHeader>
           <Badge
             color={status === "Progress saved" ? "success" : "warning"}
             className="w-fit  font-semibold"
@@ -203,7 +268,7 @@ function Survey(props) {
             </Button>
           )}
         </div>
-        <form className="flex flex-col gap-2">
+        <form className="flex flex-col gap-2" onSubmit={handleFormSubmission}>
           <Settings settings={settings} setSettings={setSettings} />
           <h4 className="text-secondary-dark font-bold text-sm uppercase mr-auto">
             Questions
@@ -232,9 +297,15 @@ function Survey(props) {
                         type={content.type}
                       />
                     </div>
-                    <Fields content={content} />
+                    <Fields
+                      content={content}
+                      idx={index}
+                      updateOption={updateOption}
+                      onChange={onOptionChange}
+                    />
                     <Options
                       content={content}
+                      size={contents.length}
                       index={index}
                       setModal={setModal}
                       addField={addDeleteField}
@@ -245,6 +316,14 @@ function Survey(props) {
               })}
             </div>
           </section>
+          <Button
+            className="mt-2 w-full disabled:bg-black md:max-w-fit md:float-right md:ml-auto"
+            type="submit"
+            color="transparent"
+            theme={mainButton}
+          >
+            {_id ? "Save Changes" : "Upload Survey"}
+          </Button>
         </form>
       </div>
       <Modal

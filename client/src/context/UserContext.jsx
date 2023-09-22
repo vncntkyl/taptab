@@ -16,6 +16,7 @@ const getUsers = async () => {
   }
 };
 
+
 export const useUsers = () => {
   return {
     getUsers,
