@@ -6,7 +6,7 @@ import StaticsAds from "./components/StaticsAds";
 function App() {
   const [isFullScreen, toggleFullScreen] = useState(false);
   return (
-    <div className="bg-gradient-to-br from-main to-white w-screen h-screen flex flex-row gap-2 p-2">
+    <div className="bg-gradient-to-br from-main to-white w-screen max-h-screen flex flex-row gap-2 p-2 overflow-hidden">
       <section className="w-[1550px] flex flex-col gap-2">
         <AdsPlayer
           isFullScreen={isFullScreen}
@@ -14,7 +14,7 @@ function App() {
         />
         <RelatedAds isFullScreen={isFullScreen} />
       </section>
-      <section className="bg-default w-[450px] rounded">
+      <section className="bg-default w-[450px] rounded p-2">
         <StaticsAds />
       </section>
     </div>
