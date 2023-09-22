@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { Button } from "flowbite-react";
-import { MdFullscreen } from "react-icons/md";
+import { MdFullscreen, MdFullscreenExit } from "react-icons/md";
 import { iconButton } from "../functions/CustomThemes";
 import classNames from "classnames";
 function AdsPlayer({ isFullScreen, toggleFullScreen }) {
@@ -23,7 +23,11 @@ function AdsPlayer({ isFullScreen, toggleFullScreen }) {
         onClick={() => toggleFullScreen((current) => !current)}
         className="absolute bottom-0 right-0 focus:ring-0"
       >
-        <MdFullscreen className="text-4xl" />
+        {isFullScreen ? (
+          <MdFullscreenExit className="animate-fade text-4xl" />
+        ) : (
+          <MdFullscreen className="animate-fade text-4xl" />
+        )}
       </Button>
     </section>
   );
