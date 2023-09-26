@@ -8,6 +8,14 @@ export default defineConfig({
     react(),
     VitePWA({
       manifest: {
+        name: "Taptab Application",
+        short_name: "Taptab App",
+        description: "Taptab Application",
+        background_color: "#eaecef",
+        theme_color: "#eaecef",
+        display: "standalone",
+        orientation: "landscape",
+        start_url: "/",
         icons: [
           {
             src: "/icon-512.png",
