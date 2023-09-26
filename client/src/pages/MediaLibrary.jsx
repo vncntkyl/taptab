@@ -8,11 +8,12 @@ import { values as useFunction } from "../context/Functions";
 import MediaUploadDropdown from "../fragments/MediaUploadDropdown";
 import VideoUploadForm from "../components/mediaLibrary/VideoUploadForm";
 import { mainButton, modalTheme, textTheme } from "../context/CustomThemes";
+import { format } from "date-fns";
 
 function MediaLibrary() {
   const { getMedia, uploadMedia } = useStorage();
   const { capitalize } = useFunction();
-  const { setIsLoading } = useAuth();
+  const { setIsLoading, setAlert } = useAuth();
   const [modal, setModal] = useState({
     toggle: false,
     title: null,
@@ -33,31 +34,75 @@ function MediaLibrary() {
 
   const handleMediaUpload = async (e) => {
     e.preventDefault();
-    const fileData = {
-      ...mediaItem,
-      height: videoFeed.current.videoHeight,
-      width: videoFeed.current.videoWidth,
-      videoDuration: videoFeed.current.duration,
-    };
+    let response = null;
+    setIsLoading((previous) => !previous);
+    setModal({
+      toggle: false,
+      title: null,
+    });
+    if (mediaItem.type === "image") {
+      const fileData = {
+        ...mediaItem,
+        height: videoFeed.current.height,
+        width: videoFeed.current.width,
+        status: "pending approval",
+        usage: 0,
+      };
 
-    if (videoFeed.current.readyState >= 2) {
-      videoFeed.current.currentTime = 2;
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(videoFeed.current, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob(async (blob) => {
-        if (blob) {
-          // Create a File object from the Blob
-          const screenshotFile = new File([blob], `${fileData.name}_tmb.png`, {
-            type: "image/png",
-          });
-          const mediaFile = [screenshotFile, file];
-          const response = await uploadMedia(mediaFile, fileData);
-          console.log(response);
-        } else {
-          console.log("Failed to create Blob from canvas");
-        }
-      }, "image/png");
+      response = await uploadMedia([file], fileData);
+    } else if (mediaItem.type === "link") {
+      const fileData = {
+        ...mediaItem,
+        status: "pending approval",
+        usage: 0,
+        link: media,
+        timeCreated: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
+        timeUpdated: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
+      };
+      response = await uploadMedia(null, fileData);
+    } else {
+      const fileData = {
+        ...mediaItem,
+        height: videoFeed.current.videoHeight,
+        width: videoFeed.current.videoWidth,
+        videoDuration: videoFeed.current.duration,
+      };
+
+      if (videoFeed.current.readyState >= 2) {
+        videoFeed.current.currentTime = 2;
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(videoFeed.current, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(async (blob) => {
+          if (blob) {
+            // Create a File object from the Blob
+            const screenshotFile = new File(
+              [blob],
+              `${fileData.name}_tmb.png`,
+              {
+                type: "image/png",
+              }
+            );
+            const mediaFile = [screenshotFile, file];
+            response = await uploadMedia(mediaFile, fileData);
+          } else {
+            console.log("Failed to create Blob from canvas");
+          }
+        }, "image/png");
+      }
+    }
+    setIsLoading((previous) => !previous);
+    const alert = {
+      isOn: true,
+      type: "success",
+      message: "You have successfully added new media item.",
+    };
+    if (response.acknowledged) {
+      setAlert(alert);
+    } else {
+      alert.type = "failure";
+      alert.message = response;
+      setAlert(alert);
     }
   };
 
@@ -105,17 +150,30 @@ function MediaLibrary() {
     const setup = async () => {
       const response = await getMedia();
       setMediaFiles(
-        response.filter((res) => !res.fileName.startsWith("thumbnail"))
+        response.filter((res) => {
+          // Check if the object has a fileName key, and if it doesn't, consider it as a link
+          if (!res.fileName) {
+            return res.type === "link";
+          }
+          // Include files that don't start with "thumbnail" or have a type of "link"
+          return !res.fileName.startsWith("thumbnail") || res.type === "link";
+        })
       );
-      setThumbnails(response.filter((res) => res._urlID.includes("tmb")));
+      setThumbnails(
+        response.filter((res) => {
+          if (res.contentType) {
+            return res.contentType.includes("image");
+          }
+        })
+      );
       setIsLoading(false);
     };
     setup();
-    const realtimeData = setInterval(setup, 3000);
-    return () => {
-      clearInterval(realtimeData);
-    };
-  }, []);
+    // const realtimeData = setInterval(setup, 3000);
+    // return () => {
+    //   clearInterval(realtimeData);
+    // };
+  }, [modal]);
   return (
     <>
       <div className="transition-all w-full flex flex-col gap-4">
@@ -181,7 +239,7 @@ function MediaLibrary() {
               <div>
                 {media && (
                   <>
-                    <img src={media} alt="" />
+                    <img src={media} alt="" ref={videoFeed} />
                     <br />
                   </>
                 )}

@@ -18,8 +18,10 @@ const getMedia = async () => {
 const uploadMedia = async (files, mediaData) => {
   try {
     const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append("files", files[i]);
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i]);
+      }
     }
     formData.append("mediaData", JSON.stringify(mediaData));
 

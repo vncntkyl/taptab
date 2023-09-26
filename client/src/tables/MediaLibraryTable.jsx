@@ -43,14 +43,17 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
             const tmb = thumbnails.find(
               (thumbnail) => thumbnail._id == item._id
             );
-
             return (
               <Table.Row key={index} className="text-center">
                 <Table.Cell>
                   <Checkbox />
                 </Table.Cell>
-                <Table.Cell>
-                  <img src={getFileURL(tmb._urlID)} alt="" loading="lazy" />
+                <Table.Cell align="left">
+                  {tmb ? (
+                    <img src={getFileURL(tmb._urlID)} alt="" loading="lazy" className="w-full max-w-[300px]"/>
+                  ) : (
+                    <>No preview available</>
+                  )}
                 </Table.Cell>
                 <Table.Cell>
                   <div className="flex flex-col text-start">
@@ -67,14 +70,20 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
                       <span>Type: </span>
                       {capitalize(item.type)}
                     </p>
-                    <p>
-                      <span>Size: </span>
-                      {capitalize(convertSize(item.size))}
-                    </p>
-                    <p>
-                      <span>Duration: </span>
-                      {item.videoDuration}
-                    </p>
+                    {item.type !== "link" && (
+                      <>
+                        <p>
+                          <span>Size: </span>
+                          {capitalize(convertSize(item.size))}
+                        </p>
+                        {item.type === "video" && (
+                          <p>
+                            <span>Duration: </span>
+                            {item.videoDuration}
+                          </p>
+                        )}
+                      </>
+                    )}
                     <p>
                       <span>Category: </span>
                       {capitalize(item.category)}

@@ -55,7 +55,9 @@ router.get("/", async (req, res) => {
     results
       .filter((result) => !items.find((item) => item._id == result._id))
       .forEach((unmatchedResult) => {
-        library.push(unmatchedResult);
+        if (!library.find((item) => item._id === unmatchedResult._id)) {
+          library.push(unmatchedResult);
+        }
       });
 
     res.send(library).status(200);
@@ -71,34 +73,59 @@ router.post("/upload", upload.array("files", 5), async (req, res) => {
     const data = JSON.parse(req.body.mediaData);
     let collection = await db.collection("media");
     let result = await collection.insertOne(data);
-    if (!files || files.length === 0) {
-      // return res.status(400).send("No files uploaded.");
+
+    if (data.type === "image") {
+      if (!files || files.length === 0) {
+        return res.status(400).send("No files uploaded.");
+      }
+      files.forEach(async (file) => {
+        const fileUpload = bucket.file(file.originalname);
+        const stream = fileUpload.createWriteStream({
+          metadata: {
+            contentType: file.mimetype,
+            metadata: {
+              dbID: result.insertedId,
+            },
+          },
+        });
+        stream.on("error", (error) => {
+          res.status(400).send(error);
+          console.error(`Error uploading ${file.originalname}:`, error);
+        });
+        // Upload the file
+        stream.end(file.buffer);
+        await new Promise((resolve) => stream.on("finish", resolve));
+      });
+    } else if (data.type === "video") {
+      if (!files || files.length === 0) {
+        return res.status(400).send("No files uploaded.");
+      }
+
+      files.forEach(async (file) => {
+        if (file.originalname.includes("tmb")) {
+          file.originalname = "thumbnail/" + file.originalname;
+        }
+        const fileUpload = bucket.file(file.originalname);
+        const stream = fileUpload.createWriteStream({
+          metadata: {
+            contentType: file.mimetype,
+            metadata: {
+              dbID: result.insertedId,
+            },
+          },
+        });
+        stream.on("error", (error) => {
+          res.status(400).send(error);
+          console.error(`Error uploading ${file.originalname}:`, error);
+        });
+
+        // Upload the file
+        stream.end(file.buffer);
+        await new Promise((resolve) => stream.on("finish", resolve));
+      });
     }
 
-    files.forEach(async (file) => {
-      if (file.originalname.includes("tmb")) {
-        file.originalname = "thumbnail/" + file.originalname;
-      }
-      const fileUpload = bucket.file(file.originalname);
-      const stream = fileUpload.createWriteStream({
-        metadata: {
-          contentType: file.mimetype,
-          metadata: {
-            dbID: result.insertedId,
-          },
-        },
-      });
-      stream.on("error", (error) => {
-        res.status(400).send(error);
-        console.error(`Error uploading ${file.originalname}:`, error);
-      });
-
-      // Upload the file
-      stream.end(file.buffer);
-      await new Promise((resolve) => stream.on("finish", resolve));
-    });
-
-    res.status(200).send("Files uploaded successfully.");
+    res.status(200).send({ acknowledged: true });
   } catch (error) {
     console.error("Error uploading: ", error);
     res.status(500).send(error);
