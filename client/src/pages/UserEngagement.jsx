@@ -130,7 +130,7 @@ function UserEngagement() {
           />
           <Route
             path="/:_id"
-            element={survey ? <Survey data={survey} /> : <>Forms</>}
+            element={survey || localStorage.getItem("survey") ? <Survey data={survey} /> : <>Forms</>}
           />
           <Route path="/new_survey" element={<Survey />} />
           <Route path="/new_form" element={<>New Forms</>} />

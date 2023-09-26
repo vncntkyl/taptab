@@ -63,6 +63,7 @@ function SurveyTable({ data, setItem, setModal }) {
                         };
                         const questions = [...item.questions];
                         setItem(item);
+                        localStorage.setItem("survey", item);
                         localStorage.setItem(
                           "settings_progress",
                           JSON.stringify(settings)
