@@ -169,11 +169,11 @@ function MediaLibrary() {
       setIsLoading(false);
     };
     setup();
-    // const realtimeData = setInterval(setup, 3000);
-    // return () => {
-    //   clearInterval(realtimeData);
-    // };
-  }, [modal]);
+    const realtimeData = setInterval(setup, 3000);
+    return () => {
+      clearInterval(realtimeData);
+    };
+  }, []);
   return (
     <>
       <div className="transition-all w-full flex flex-col gap-4">

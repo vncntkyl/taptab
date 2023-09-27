@@ -1,5 +1,6 @@
 import express from "express";
 import db from "../db/conn.mjs";
+import { ObjectId } from "mongodb";
 import { Storage } from "@google-cloud/storage";
 import multer from "multer";
 
@@ -66,7 +67,17 @@ router.get("/", async (req, res) => {
     res.status(500).send(error);
   }
 });
+router.get("/playlist/", async (req, res) => {
+  try {
+    let collection = db.collection("playlist");
+    let results = await collection.find({}).toArray();
 
+    res.send(results).status(200);
+  } catch (error) {
+    console.error("Error listing bucket contents:", error);
+    res.status(500).send(error);
+  }
+});
 router.post("/upload", upload.array("files", 5), async (req, res) => {
   try {
     const files = req.files;
@@ -131,5 +142,4 @@ router.post("/upload", upload.array("files", 5), async (req, res) => {
     res.status(500).send(error);
   }
 });
-
 export default router;

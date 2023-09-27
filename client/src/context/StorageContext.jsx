@@ -15,6 +15,20 @@ const getMedia = async () => {
     console.error(error);
   }
 };
+const getPlaylist = async () => {
+  try {
+    const response = await axios.get(url.storage + "playlist", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 const uploadMedia = async (files, mediaData) => {
   try {
     const formData = new FormData();
@@ -42,6 +56,7 @@ const uploadMedia = async (files, mediaData) => {
 export const useStorage = () => {
   return {
     getMedia,
+    getPlaylist,
     uploadMedia,
   };
 };

@@ -12,6 +12,7 @@ import Loader from "../fragments/Loader";
 import MediaLibrary from "./MediaLibrary";
 import StaticAds from "./StaticAds";
 import UserEngagement from "./UserEngagement";
+import Playlist from "./Playlist";
 
 function Home() {
   const [onSidebar, toggleSidebar] = useState(false);
@@ -53,7 +54,7 @@ function Home() {
           <Routes>
             <Route exact path="/" element={<Dashboard />} />
             <Route path="/media_library" element={<MediaLibrary />} />
-            <Route path="/playlist" element={<>playlist</>} />
+            <Route path="/playlist" element={<Playlist />} />
             <Route path="/planner" element={<>planner</>} />
             <Route path="/players" element={<>players</>} />
             <Route path="/static_ads" element={<StaticAds />} />
