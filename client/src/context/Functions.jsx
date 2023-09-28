@@ -31,6 +31,10 @@ function convertText(text) {
     return text.toLowerCase().split("_").join(" ");
   }
 }
+
+function removeUnderscore(text) {
+  return text.replace(/_/g, " ");
+}
 function getPath() {
   return window.location.pathname;
 }
@@ -40,5 +44,11 @@ function createBreadCrumb(path = "") {
 }
 
 export const values = () => {
-  return { capitalize, convertText, getPath, createBreadCrumb };
+  return {
+    capitalize,
+    convertText,
+    getPath,
+    createBreadCrumb,
+    removeUnderscore,
+  };
 };

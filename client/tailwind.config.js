@@ -53,6 +53,7 @@ export default {
         "c-yellow": "#efd615",
         default: "#eaecef",
         "default-dark": "#e1e1e1",
+        "default-dark-2": "#a4a5a7",
       },
       width: {
         sidebar: "15rem",

@@ -3,11 +3,20 @@ import PageHeader from "../fragments/PageHeader";
 import { useStorage } from "../context/StorageContext";
 import { useAuth } from "../context/AuthContext";
 import PlaylistTable from "../tables/PlaylistTable";
+import { Button } from "flowbite-react";
+import { lightButton } from "../context/CustomThemes";
+import { RiAddFill } from "react-icons/ri";
+import { Link, Route, Routes } from "react-router-dom";
+import AddPlaylist from "../components/Playlist/AddPlaylist";
 
 function Playlist() {
   const { setIsLoading } = useAuth();
   const { getPlaylist, getMedia } = useStorage();
   const [playlist, setPlaylists] = useState(null);
+  const [modal, setModal] = useState({
+    toggle: false,
+    title: null,
+  });
 
   useEffect(() => {
     setIsLoading(true);
@@ -52,15 +61,37 @@ function Playlist() {
   return (
     <>
       <div className="transition-all w-full flex flex-col gap-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
-          <PageHeader>Manage Playlists</PageHeader>
-        </div>
-        {playlist && (
-          <div className="w-full overflow-x-auto rounded-md shadow-md">
-            <PlaylistTable data={playlist} />
-          </div>
-        )}
-        <pre>{JSON.stringify(playlist, null, 3)}</pre>
+        <Routes>
+          <Route
+            exact
+            path="/"
+            element={
+              <>
+                <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
+                  <PageHeader>Manage Playlists</PageHeader>
+                  <Button
+                    as={Link}
+                    to="./new_playlist"
+                    className="focus:ring-0 w-fit bg-white"
+                    color="transparent"
+                    theme={lightButton}
+                  >
+                    <RiAddFill />
+                    <p>New Playlist</p>
+                  </Button>
+                </div>
+                {playlist && (
+                  <div className="w-full overflow-x-auto rounded-md shadow-md">
+                    <PlaylistTable data={playlist} />
+                  </div>
+                )}
+                <pre>{JSON.stringify(playlist, null, 3)}</pre>
+              </>
+            }
+          />
+          <Route path="/:_id" element={<AddPlaylist />} />
+          <Route path="/new_playlist" element={<AddPlaylist />} />
+        </Routes>
       </div>
     </>
   );
