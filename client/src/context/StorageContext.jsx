@@ -53,10 +53,26 @@ const uploadMedia = async (files, mediaData) => {
   }
 };
 
+const uploadPlaylist = async (data) => {
+  try {
+    const response = await axios.post(url.storage + "playlist/upload", data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const useStorage = () => {
   return {
     getMedia,
     getPlaylist,
     uploadMedia,
+    uploadPlaylist,
   };
 };

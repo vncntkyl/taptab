@@ -10,7 +10,7 @@ import { Link, Route, Routes } from "react-router-dom";
 import AddPlaylist from "../components/Playlist/AddPlaylist";
 
 function Playlist() {
-  const { setIsLoading } = useAuth();
+  const { setIsLoading, onAlert } = useAuth();
   const { getPlaylist, getMedia } = useStorage();
   const [playlist, setPlaylists] = useState(null);
   const [modal, setModal] = useState({
@@ -57,7 +57,7 @@ function Playlist() {
     // return () => {
     //   clearInterval(realtimeData);
     // };
-  }, []);
+  }, [window.location.pathname, onAlert]);
   return (
     <>
       <div className="transition-all w-full flex flex-col gap-4">
@@ -75,6 +75,9 @@ function Playlist() {
                     className="focus:ring-0 w-fit bg-white"
                     color="transparent"
                     theme={lightButton}
+                    onClick={() => {
+                      localStorage.removeItem("playlistData");
+                    }}
                   >
                     <RiAddFill />
                     <p>New Playlist</p>
@@ -85,7 +88,6 @@ function Playlist() {
                     <PlaylistTable data={playlist} />
                   </div>
                 )}
-                <pre>{JSON.stringify(playlist, null, 3)}</pre>
               </>
             }
           />

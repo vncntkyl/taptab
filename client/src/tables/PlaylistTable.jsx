@@ -1,9 +1,11 @@
 import PropTypes from "prop-types";
-import { Table } from "flowbite-react";
+import { Button, Table } from "flowbite-react";
 import { values as useFunction } from "../context/Functions";
 import PlaylistImage from "../components/Playlist/PlaylistImage";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
+import { iconButton } from "../context/CustomThemes";
+import { RiDeleteBinFill, RiEditBoxFill } from "react-icons/ri";
 
 function PlaylistTable({ data }) {
   const { capitalize, convertText } = useFunction();
@@ -14,7 +16,7 @@ function PlaylistTable({ data }) {
       <Table.Head className="shadow-md">
         {headers.map((header, index) => {
           return (
-            <Table.HeadCell key={index} className="text-main">
+            <Table.HeadCell key={index} className="text-main" align="center">
               {convertText(header)}
             </Table.HeadCell>
           );
@@ -29,9 +31,15 @@ function PlaylistTable({ data }) {
                 <Table.Cell align="left">
                   <div className="flex items-center gap-2">
                     <PlaylistImage media={media} mediaFiles={mediaFiles} />
-                    <Link to="/" className="text-main">
-                      {media.playlist_name}
-                    </Link>
+                    <div>
+                      <Link to="/" className="text-main">
+                        {media.playlist_name}
+                      </Link>
+                      <p>
+                        <span>Usage: </span>
+                        {media.usage}
+                      </p>
+                    </div>
                   </div>
                 </Table.Cell>
                 <Table.Cell>
@@ -45,10 +53,47 @@ function PlaylistTable({ data }) {
                   </p>
                   <p>
                     <span>Date Modified: </span>
-                    {format(new Date(media.time_created),"MMMM dd, yyy',' h:mm a")}
+                    {format(
+                      new Date(media.time_created),
+                      "MMMM dd, yyy',' h:mm a"
+                    )}
                   </p>
                 </Table.Cell>
-                <Table.Cell></Table.Cell>
+                <Table.Cell>
+                  <div className="flex items-center justify-center gap-1">
+                    <Button
+                      as={Link}
+                      to={`./${convertText(media.playlist_name)}`}
+                      className="focus:ring-0 w-fit bg-white"
+                      color="transparent"
+                      size="sm"
+                      theme={iconButton}
+                      onClick={() => {
+                        localStorage.setItem(
+                          "playlistData",
+                          JSON.stringify(media)
+                        );
+                      }}
+                    >
+                      <RiEditBoxFill className="text-lg" />
+                    </Button>
+                    <Button
+                      className="focus:ring-0 w-fit bg-white"
+                      color="transparent"
+                      size="sm"
+                      theme={iconButton}
+                      onClick={() => {
+                        // setModal({
+                        //   toggle: true,
+                        //   title: "delete survey",
+                        // });
+                        // setItem(item);
+                      }}
+                    >
+                      <RiDeleteBinFill className="text-lg text-c-red" />
+                    </Button>
+                  </div>
+                </Table.Cell>
               </Table.Row>
             );
           })

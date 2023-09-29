@@ -4,9 +4,8 @@ import PageHeader from "../../fragments/PageHeader";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { values as useFunction } from "../../context/Functions";
-import { Badge, Button } from "flowbite-react";
-import { iconButton, mainButton } from "../../context/CustomThemes";
-import { MdSave } from "react-icons/md";
+import { Button } from "flowbite-react";
+import { mainButton } from "../../context/CustomThemes";
 import PlaylistDetails from "./PlaylistDetails";
 
 import { useStorage } from "../../context/StorageContext";
@@ -15,26 +14,42 @@ import MediaSelection from "./MediaSelection";
 function AddPlaylist(props) {
   const { _id } = useParams();
   const { setAlert, navigate, setIsLoading } = useAuth();
-  const { getMedia } = useStorage();
+  const { getMedia, uploadPlaylist } = useStorage();
   const { convertText, capitalize } = useFunction();
-  const [modal, setModal] = useState({
-    toggle: false,
-    title: null,
-    id: null,
-  });
   const [details, setDetails] = useState({
-    name: "",
+    playlist_name: "",
     category: "",
   });
-  const [status, setStatus] = useState("Changes are not yet saved");
-  const [library, setLibrary] = useState();
+  const [library, setLibrary] = useState([]);
 
-  const handleFormSubmission = (e) => {
+  const handleFormSubmission = async (e) => {
     e.preventDefault();
 
-    console.log(library.filter((item) => item.container === "playlist"));
+    const items = library
+      .filter((item) => item.container === "playlist")
+      .map((item) => item._id);
+    const playlistData = {
+      ...details,
+      media_items: items,
+    };
+    const response = await uploadPlaylist(playlistData);
+    console.log(response);
+    const alert = {
+      isOn: true,
+      type: "success",
+      message: `You have successfully ${
+        _id ? "updated" : "created new"
+      } playlist.`,
+    };
+    if (response.acknowledged) {
+      setAlert(alert);
+      navigate("./playlist");
+    } else {
+      alert.type = "failure";
+      alert.message = response;
+      setAlert(alert);
+    }
   };
-  const saveProgress = () => {};
 
   useEffect(() => {
     setIsLoading(true);
@@ -42,6 +57,15 @@ function AddPlaylist(props) {
 
   useEffect(() => {
     const setup = async () => {
+      let data;
+      if (_id) {
+        const playlistData = localStorage.getItem("playlistData");
+        data = JSON.parse(playlistData);
+        setDetails({
+          playlist_name: data.playlist_name,
+          category: data.category,
+        });
+      }
       const response = await getMedia();
       setLibrary(
         response
@@ -56,14 +80,19 @@ function AddPlaylist(props) {
           })
           .map((item) => ({
             ...item,
-            container: "media",
+            container: _id
+              ? data.media_items.find((plData) => plData._id == item._id)
+                ? "playlist"
+                : "media"
+              : "media",
           }))
       );
 
       setIsLoading(false);
     };
     setup();
-  }, []);
+  }, [_id, getMedia, setIsLoading]);
+
   return (
     <>
       <div className="w-full max-w-7xl mx-auto">
@@ -73,25 +102,6 @@ function AddPlaylist(props) {
               ? `Edit '${capitalize(convertText(_id))}' Playlist`
               : "Create New Playlist"}
           </PageHeader>
-          <Badge
-            color={status === "Progress saved" ? "success" : "warning"}
-            className="w-fit  font-semibold"
-            size="xs"
-          >
-            {status}
-          </Badge>
-          {status === "Changes are not yet saved" && (
-            <Button
-              className="focus:ring-0 w-fit bg-white"
-              color="transparent"
-              size="sm"
-              theme={iconButton}
-              onClick={saveProgress}
-            >
-              <MdSave className="text-lg text-gray-600" />
-              Save Progress
-            </Button>
-          )}
         </div>
         <form className="flex flex-col gap-2" onSubmit={handleFormSubmission}>
           <PlaylistDetails details={details} setDetails={setDetails} />

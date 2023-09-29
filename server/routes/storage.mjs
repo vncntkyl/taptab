@@ -3,6 +3,7 @@ import db from "../db/conn.mjs";
 import { ObjectId } from "mongodb";
 import { Storage } from "@google-cloud/storage";
 import multer from "multer";
+import { format } from "date-fns";
 
 const storage = new Storage({
   projectId: process.env.GCLOUD_PROJECT_ID,
@@ -76,6 +77,35 @@ router.get("/playlist/", async (req, res) => {
   } catch (error) {
     console.error("Error listing bucket contents:", error);
     res.status(500).send(error);
+  }
+});
+router.post("/playlist/upload", async (req, res) => {
+  try {
+    const newPlaylist = {
+      ...req.body,
+      usage: 0,
+      time_created: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
+    };
+    let collection = db.collection("playlist");
+
+    const { media_items } = newPlaylist;
+
+    const result = await collection.insertOne(newPlaylist);
+    if (result.acknowledged) {
+      const IDs = media_items.map((id) => new ObjectId(id));
+      collection = db.collection("media");
+      const query = { _id: { $in: IDs } };
+      const updates = {
+        $inc: {
+          usage: 1,
+        },
+      };
+      let result = await collection.updateMany(query, updates);
+      res.send(result).status(204);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
   }
 });
 router.post("/upload", upload.array("files", 5), async (req, res) => {

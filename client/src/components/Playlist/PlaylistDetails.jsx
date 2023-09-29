@@ -20,16 +20,20 @@ function PlaylistDetails({ details, setDetails }) {
       <h4 className="text-secondary-dark font-bold text-lg uppercase">
         Details
       </h4>
-      <label htmlFor="title" className="text-secondary-light font-semibold ">
-        Title
+      <label
+        htmlFor="playlist_name"
+        className="text-secondary-light font-semibold"
+      >
+        Playlist Name
       </label>
       <TextInput
         theme={bottomOnlyBorderText}
-        id="title"
+        id="playlist_name"
         className="ring-none outline-none focus:outline-none"
         placeholder="Ex. Shampoo"
         onChange={updateSettings}
-        value={details.title}
+        value={details.playlist_name}
+        required
       />
       <label htmlFor="category" className="text-secondary-light font-semibold ">
         Category
@@ -41,6 +45,7 @@ function PlaylistDetails({ details, setDetails }) {
         placeholder="Ex. Hair Products"
         onChange={updateSettings}
         value={details.category}
+        required
       />
     </section>
   );

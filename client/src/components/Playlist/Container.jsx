@@ -26,7 +26,6 @@ function Container({ title, items }) {
         {capitalize(convertText(title))}
       </header>
       <main className="p-2 overflow-y-auto flex flex-col gap-2 cursor-auto">
-        <input type="text" name="" id="" />
         <SortableContext items={IDs}>
           {items.length > 0 ? (
             items

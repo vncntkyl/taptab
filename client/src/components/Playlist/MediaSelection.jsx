@@ -25,22 +25,6 @@ function MediaSelection({ mediaLibrary, updateMedia }) {
       type: e.active.data.current.type,
     });
   };
-  const onDragEnd = (e) => {
-    const { active, over } = e;
-    if (!over) return;
-    const activeColumnID = active.id;
-    const overColumnID = over.id;
-
-    console.log(activeColumnID, overColumnID);
-
-    // setColumns((columns) => {
-    //   const activeColumnIndex = columns.findIndex(
-    //     (col) => col === activeColumnID
-    //   );
-    //   const overColumnIndex = columns.findIndex((col) => col === overColumnID);
-    //   return arrayMove(columns, activeColumnIndex, overColumnIndex);
-    // });
-  };
 
   const onDragOver = (e) => {
     const { active, over } = e;
