@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function useData(func, isRealtime) {
+function useData(func, isRealtime = false) {
   const [data, setData] = useState([]);
   useEffect(() => {
     const setup = async () => {

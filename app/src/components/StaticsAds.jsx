@@ -14,7 +14,7 @@ function StaticsAds() {
         {data &&
           data.map((item) => {
             return (
-              <div key={item._id}>
+              <div key={item._id} className="min-h-[300px]">
                 <AdContainer ad={item} />
               </div>
             );
