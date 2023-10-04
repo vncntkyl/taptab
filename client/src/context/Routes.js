@@ -12,4 +12,5 @@ export const developmentRoutes = {
   staticAdsCreation: "http://" + host + ":5050/staticAds/create",
   staticAdsDelete: "http://" + host + ":5050/staticAds/hide",
   engagements: "http://" + host + ":5050/surveys/",
+  planner: "http://" + host + ":5050/planner/",
 };

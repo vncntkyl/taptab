@@ -6,6 +6,7 @@ import users from "./routes/users.mjs";
 import storage from "./routes/storage.mjs";
 import staticAds from "./routes/staticAds.mjs";
 import surveys from "./routes/surveys.mjs";
+import planners from "./routes/planner.mjs";
 
 const PORT = process.env.PORT || 5050;
 const app = express();
@@ -18,6 +19,7 @@ app.use("/users", users);
 app.use("/storage", storage);
 app.use("/staticAds", staticAds);
 app.use("/surveys", surveys);
+app.use("/planner", planners);
 
 // start the Express server
 app.listen(PORT, () => {

@@ -3,7 +3,15 @@
 @tailwind components;
 @tailwind utilities;
 
-*{
-    font-family: 'Nunito Sans', sans-serif;
-    -webkit-tap-highlight-color: transparent;
+* {
+  font-family: "Nunito Sans", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+.rbc-header {
+  background-color: #fff;
+  color: #119dd8;
+  text-transform: uppercase;
+}
+.rbc-day-bg{
+    cursor: pointer;
 }

@@ -5,7 +5,7 @@ import AdContainer from "./StaticAds/AdContainer";
 
 function StaticsAds() {
   const { getStaticAds } = useStaticAds();
-  const [data] = useData(getStaticAds);
+  const [data] = useData(getStaticAds, true);
 
   return (
     <>

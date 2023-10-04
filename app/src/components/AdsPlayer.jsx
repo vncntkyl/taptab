@@ -33,6 +33,8 @@ function AdsPlayer({ isFullScreen, toggleFullScreen }) {
     }
   };
 
+  
+
   useEffect(() => {
     if (videoRef.current != null) {
       // Add an event listener for the 'timeupdate' event
@@ -51,22 +53,23 @@ function AdsPlayer({ isFullScreen, toggleFullScreen }) {
     playlist.length > 0 && (
       <section
         className={classNames(
-          "transition-all relative bg-matte-black rounded text-white w-full flex items-center justify-center",
+          "transition-all relative bg-[#000] rounded text-white w-full flex items-center justify-center",
           isFullScreen ? "h-[100%]" : "h-[65%]"
         )}
       >
         <div
           className={classNames(
-            "relative transition-all bg-black aspect-video overflow-hidden",
+            "relative transition-all bg-[#000] aspect-video overflow-hidden",
             isFullScreen ? "max-w-full h-[72%]" : "max-w-[80%] h-full"
           )}
         >
-          <video
-            src={getFileURL(playlist[1]._urlID)}
+          {/* <video
+            src={getFileURL(playlist[5]._urlID)}
             ref={videoRef}
             className="min-h-full min-w-full"
             autoPlay
-          ></video>
+          ></video> */}
+          <img src={getFileURL(playlist[3]._urlID)} alt="" />
         </div>
         <div
           id="controls"
