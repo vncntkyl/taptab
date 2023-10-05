@@ -108,6 +108,25 @@ router.post("/playlist/upload", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+router.patch("/playlist/:id", async (req, res) => {
+  try {
+    let collection = db.collection("playlist");
+    const playlistData = req.body;
+    const query = { _id: new ObjectId(req.params.id) };
+    const updates = {
+      $set: {
+        ...playlistData,
+      },
+    };
+    const results = await collection.updateOne(query, updates);
+
+    res.status(200).send(results);
+  } catch (error) {
+    console.error("Error uploading: ", error);
+    res.status(500).send(error);
+  }
+});
+
 router.post("/upload", upload.array("files", 5), async (req, res) => {
   try {
     const files = req.files;

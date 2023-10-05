@@ -30,6 +30,21 @@ const getMedia = async () => {
   }
 };
 
+const getPlannerData = async () => {
+  try {
+    const response = await axios.get(url.planner, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const getFileURL = (objectName) => {
   return `https://storage.googleapis.com/tamc_advertisements/${objectName}`;
 };
@@ -38,5 +53,6 @@ export const useVideos = () => {
     getFileURL,
     getPlaylist,
     getMedia,
+    getPlannerData,
   };
 };

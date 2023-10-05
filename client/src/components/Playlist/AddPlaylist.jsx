@@ -14,7 +14,7 @@ import MediaSelection from "./MediaSelection";
 function AddPlaylist(props) {
   const { _id } = useParams();
   const { setAlert, navigate, setIsLoading } = useAuth();
-  const { getMedia, uploadPlaylist } = useStorage();
+  const { getMedia, uploadPlaylist, updatePlaylist } = useStorage();
   const { convertText, capitalize } = useFunction();
   const [details, setDetails] = useState({
     playlist_name: "",
@@ -32,7 +32,12 @@ function AddPlaylist(props) {
       ...details,
       media_items: items,
     };
-    const response = await uploadPlaylist(playlistData);
+    let response = {};
+    if (_id) {
+      response = await updatePlaylist(playlistData);
+    } else {
+      response = await uploadPlaylist(playlistData);
+    }
     console.log(response);
     const alert = {
       isOn: true,
@@ -64,6 +69,7 @@ function AddPlaylist(props) {
         setDetails({
           playlist_name: data.playlist_name,
           category: data.category,
+          _id: data._id,
         });
       }
       const response = await getMedia();

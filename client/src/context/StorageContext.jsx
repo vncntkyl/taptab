@@ -68,11 +68,29 @@ const uploadPlaylist = async (data) => {
   }
 };
 
+const updatePlaylist = async (data) => {
+  try {
+    const playlistID = data._id;
+    delete data._id;
+    const response = await axios.patch(
+      url.storage + `playlist/${playlistID}`,
+      data
+    );
+
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const useStorage = () => {
   return {
     getMedia,
     getPlaylist,
     uploadMedia,
     uploadPlaylist,
+    updatePlaylist,
   };
 };

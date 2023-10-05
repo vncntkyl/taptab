@@ -3,4 +3,5 @@ export const developmentRoutes = {
   storage: "http://" + host + ":5050/storage/",
   staticAds: "http://" + host + ":5050/staticAds/",
   engagements: "http://" + host + ":5050/surveys/",
+  planner: "http://" + host + ":5050/planner/",
 };

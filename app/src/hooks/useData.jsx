@@ -10,7 +10,7 @@ function useData(func, isRealtime = false) {
     setup();
 
     if (isRealtime) {
-      const realtimeData = setInterval(setup, 5000);
+      const realtimeData = setInterval(setup, 60000);
 
       return () => {
         clearInterval(realtimeData);

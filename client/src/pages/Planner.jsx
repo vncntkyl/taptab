@@ -59,7 +59,7 @@ function Planner() {
   //   end: new Date(date.getTime() + 90 * 60 * 1000), // End time for this occurrence (90 minutes later)
   // }));
 
-  const [schedules, setSchedules] = useState([]);
+  const [schedules, setSchedules] = useState(null);
   const eventPropGetter = (event) => {
     const defaultbackground = "#119dd8";
     const style = {
@@ -139,7 +139,7 @@ function Planner() {
     <>
       <div className="transition-all w-full flex flex-col gap-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
-          <PageHeader>Manage User Accounts</PageHeader>
+          <PageHeader>Manage Schedules</PageHeader>
           {/* <Button
             className="focus:ring-0 w-fit bg-white"
             onClick={() =>
@@ -266,21 +266,25 @@ function Planner() {
           </section>
           <section className="w-full xl:w-2/3">
             <h1 className="font-bold text-lg">Calendar</h1>
-            <Calendar
-              localizer={localizer}
-              events={schedules}
-              views={["month", "week", "day"]}
-              startAccessor="start"
-              endAccessor="end"
-              eventPropGetter={eventPropGetter}
-              onSelectEvent={(e) => setSchedule({ ...e, edit: true })}
-              selectable
-              onSelectSlot={(e) => console.log(e)}
-              style={{ height: "600px" }}
-              components={{
-                toolbar: CustomToolbar, // Use your custom toolbar component
-              }}
-            />
+            {schedules ? (
+              <Calendar
+                localizer={localizer}
+                events={schedules}
+                views={["month", "week", "day"]}
+                startAccessor="start"
+                endAccessor="end"
+                eventPropGetter={eventPropGetter}
+                onSelectEvent={(e) => setSchedule({ ...e, edit: true })}
+                selectable
+                onSelectSlot={(e) => console.log(e)}
+                style={{ height: "600px" }}
+                components={{
+                  toolbar: CustomToolbar, // Use your custom toolbar component
+                }}
+              />
+            ) : (
+              <>Loading...</>
+            )}
           </section>
         </div>
       </div>

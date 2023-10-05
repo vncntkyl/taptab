@@ -12,6 +12,7 @@ export default {
       animation: {
         "fade-fr-t": "fade-fr-t 750ms ease-in-out",
         fade: "fade 200ms ease-in-out",
+        "pop-up": "popUp 0.3s ease-in-out",
       },
       keyframes: {
         fade: {
@@ -19,6 +20,16 @@ export default {
             opacity: 0,
           },
           "100%": {
+            opacity: 1,
+          },
+        },
+        popUp: {
+          "0%": {
+            transform: "scale(0.5)",
+            opacity: 0,
+          },
+          "100%": {
+            transform: "scale(1)",
             opacity: 1,
           },
         },

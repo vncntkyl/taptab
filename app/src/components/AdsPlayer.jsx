@@ -1,127 +1,172 @@
 import PropTypes from "prop-types";
 import { Button, Progress } from "flowbite-react";
-import { MdFullscreen, MdFullscreenExit, MdPause } from "react-icons/md";
+import {
+  MdFullscreen,
+  MdFullscreenExit,
+  MdPause,
+  MdPlayArrow,
+  MdAnnouncement,
+} from "react-icons/md";
 import { iconButton } from "../functions/CustomThemes";
 import classNames from "classnames";
 import useData from "../hooks/useData";
 import { useVideos } from "../functions/VideoFunctions";
-import { MdPlayArrow } from "react-icons/md";
 import { useEffect, useRef, useState } from "react";
 
-function AdsPlayer({ isFullScreen, toggleFullScreen }) {
-  const { getMedia, getFileURL } = useVideos();
-  const [playlist] = useData(getMedia);
+function AdsPlayer({ isFullScreen, toggleFullScreen, links, showSurvey }) {
+  const { getFileURL } = useVideos();
   const videoRef = useRef(null);
 
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [duration, setDuration] = useState(0);
+  const [isLastVideo, setIsLastVideo] = useState(false);
 
   const togglePlayPause = () => {
-    setIsPlaying((current) => !current);
-
-    if (videoRef.current.paused) {
-      videoRef.current.play();
-    } else {
-      videoRef.current.pause();
+    if (videoRef.current) {
+      setIsPlaying((current) => !current);
+      if (videoRef.current.paused) {
+        videoRef.current.play();
+      } else {
+        videoRef.current.pause();
+      }
     }
   };
 
   const handleTimeUpdate = () => {
-    if (videoRef.current != null) {
+    if (videoRef.current) {
       setCurrentTime(videoRef.current.currentTime);
     }
   };
 
-  
-
   useEffect(() => {
-    if (videoRef.current != null) {
-      // Add an event listener for the 'timeupdate' event
+    if (videoRef.current) {
       videoRef.current.addEventListener("timeupdate", handleTimeUpdate);
       setDuration(videoRef.current.duration);
     }
 
-    // Cleanup the event listener when the component unmounts
     return () => {
-      if (videoRef.current != null) {
+      if (videoRef.current) {
         videoRef.current.removeEventListener("timeupdate", handleTimeUpdate);
       }
     };
   }, []);
-  return (
-    playlist.length > 0 && (
-      <section
-        className={classNames(
-          "transition-all relative bg-[#000] rounded text-white w-full flex items-center justify-center",
-          isFullScreen ? "h-[100%]" : "h-[65%]"
-        )}
-      >
-        <div
-          className={classNames(
-            "relative transition-all bg-[#000] aspect-video overflow-hidden",
-            isFullScreen ? "max-w-full h-[72%]" : "max-w-[80%] h-full"
-          )}
-        >
-          {/* <video
-            src={getFileURL(playlist[5]._urlID)}
-            ref={videoRef}
-            className="min-h-full min-w-full"
-            autoPlay
-          ></video> */}
-          <img src={getFileURL(playlist[3]._urlID)} alt="" />
-        </div>
-        <div
-          id="controls"
-          className="absolute bottom-0 w-full flex items-center justify-between"
-        >
-          <Button
-            color="transparent"
-            theme={iconButton}
-            className="focus:ring-0"
-            onClick={togglePlayPause}
-          >
-            {isPlaying ? (
-              <MdPlayArrow className="text-4xl" />
-            ) : (
-              <MdPause className="text-4xl" />
-            )}
-          </Button>
-          <div className="w-full">
-            <Progress
-              size="md"
-              progress={
-                currentTime == 0
-                  ? 0
-                  : (currentTime / videoRef.current.duration) * 100
-              }
-            />
-          </div>
 
-          <div className="bg-white text-black">
-            {console.log(currentTime, duration)}
-          </div>
-          <Button
-            color="transparent"
-            theme={iconButton}
-            onClick={() => toggleFullScreen((current) => !current)}
-            className="focus:ring-0"
-          >
-            {isFullScreen ? (
-              <MdFullscreenExit className="animate-fade text-4xl" />
-            ) : (
-              <MdFullscreen className="animate-fade text-4xl" />
+  useEffect(() => {
+    const videoElement = document.getElementById("video-player");
+
+    if (videoElement) {
+      const handleVideoEnd = () => {
+        if (currentVideoIndex < links.length - 1) {
+          setCurrentVideoIndex(currentVideoIndex + 1);
+          setIsLoading(true);
+        } else {
+          setCurrentVideoIndex(0);
+          setIsLoading(true);
+          setIsLastVideo(true);
+        }
+      };
+
+      const loadData = () => {
+        setIsLoading(false);
+      };
+
+      videoElement.addEventListener("loadeddata", loadData);
+      videoElement.addEventListener("ended", handleVideoEnd);
+
+      return () => {
+        videoElement.removeEventListener("loadeddata", loadData);
+        videoElement.removeEventListener("ended", handleVideoEnd);
+      };
+    }
+  }, [currentVideoIndex, links]);
+
+  return (
+    <section
+      className={classNames(
+        "transition-all relative bg-[#000] rounded text-white w-full flex items-center justify-center group",
+        isFullScreen ? "h-[100%]" : "h-[65%]"
+      )}
+    >
+      {links.length > 0 && (
+        <>
+          <div
+            className={classNames(
+              "relative transition-all bg-[#000] aspect-video overflow-hidden",
+              isFullScreen ? "max-w-full h-[72%]" : "max-w-[90%] h-full"
             )}
-          </Button>
-        </div>
-      </section>
-    )
+          >
+            <video
+              id="video-player"
+              src={getFileURL(links[currentVideoIndex])}
+              ref={videoRef}
+              className="h-full w-full"
+              autoPlay
+            ></video>
+          </div>
+          {isLastVideo && (
+            <Button
+              color="transparent"
+              theme={iconButton}
+              className="absolute focus:ring-0 top-0 right-0 animate-pulse"
+              onClick={() => showSurvey({toggle: true, title: "Quick Survey!"})}
+            >
+              <MdAnnouncement className="text-3xl" />
+            </Button>
+          )}
+          <div
+            id="controls"
+            className="absolute bottom-0 w-full animate-fade hidden group-hover:flex items-center justify-between"
+          >
+            <Button
+              color="transparent"
+              theme={iconButton}
+              className="focus:ring-0"
+              onClick={togglePlayPause}
+            >
+              {isPlaying ? (
+                <MdPlayArrow className="text-4xl" />
+              ) : (
+                <MdPause className="text-4xl" />
+              )}
+            </Button>
+            <div className="w-full">
+              <Progress
+                size="md"
+                progress={
+                  currentTime === 0 ? 0 : (currentTime / (duration || 1)) * 100 // Added a fallback to avoid division by zero
+                }
+              />
+            </div>
+            <div className="bg-white text-black">
+              {/* {console.log(currentTime, duration)} */}
+            </div>
+            <Button
+              color="transparent"
+              theme={iconButton}
+              onClick={() => toggleFullScreen((current) => !current)}
+              className="focus:ring-0"
+            >
+              {isFullScreen ? (
+                <MdFullscreenExit className="animate-fade text-4xl" />
+              ) : (
+                <MdFullscreen className="animate-fade text-4xl" />
+              )}
+            </Button>
+          </div>
+        </>
+      )}
+    </section>
   );
 }
 
 AdsPlayer.propTypes = {
   isFullScreen: PropTypes.bool,
   toggleFullScreen: PropTypes.func,
+  links: PropTypes.array,
+  showSurvey: PropTypes.func,
 };
 
 export default AdsPlayer;

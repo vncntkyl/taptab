@@ -4,6 +4,7 @@ import { ObjectId } from "mongodb";
 
 const router = express.Router();
 let collection = db.collection("planner");
+let results;
 
 //GET SCHEDULES
 router.get("/", async (req, res) => {
@@ -11,7 +12,37 @@ router.get("/", async (req, res) => {
     let query = {
       status: { $not: { $eq: "deleted" } },
     };
-    let results = await collection.find(query).toArray();
+    results = await collection
+      .aggregate([
+        {
+          $lookup: {
+            from: "playlist",
+            localField: "playlist_id",
+            foreignField: "_id",
+            as: "playlist",
+          },
+        },
+        {
+          $unwind: {
+            path: "$playlist",
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            start_date: 1,
+            end_date: 1,
+            backgroundColor: 1,
+            status: 1,
+            playlist_id: 1,
+            playlist_media: "$playlist.media_items",
+          },
+        },
+        {
+          $match: query,
+        },
+      ])
+      .toArray();
     res.send(results).status(200);
   } catch (error) {
     console.error(error);
@@ -24,14 +55,28 @@ router.post("/add", async (req, res) => {
   try {
     const schedule = req.body;
     const newSchedule = {
-      playlist_id: schedule.title,
+      playlist_id: new ObjectId(schedule.title),
       start_date: schedule.start,
       end_date: schedule.end,
       backgroundColor: schedule.backgroundColor,
       status: "active",
     };
-    result = await collection.insertOne(newSchedule);
-    res.send(result).status(204);
+    results = await collection.insertOne(newSchedule);
+
+    if (results.acknowledged) {
+      let collection = db.collection("playlist");
+      results = await collection.findOne({ _id: new ObjectId(schedule.title) });
+      const updates = {
+        $inc: {
+          usage: 1,
+        },
+      };
+      results = await collection.updateOne(
+        { _id: new ObjectId(results._id) },
+        updates
+      );
+      res.send(results).status(200);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
