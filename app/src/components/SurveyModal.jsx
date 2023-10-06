@@ -17,7 +17,7 @@ function SurveyModal({ modal, setModal }) {
         show={modal.toggle}
         dismissible
         onClose={handleClose}
-        size="xl"
+        size="5xl"
         theme={modalTheme}
       >
         <Modal.Header className="border-b-default-dark p-3 px-4 capitalize">

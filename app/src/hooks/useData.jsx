@@ -2,23 +2,37 @@ import { useEffect, useState } from "react";
 
 function useData(func, isRealtime = false) {
   const [data, setData] = useState([]);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    const setup = async () => {
-      const response = await func();
-      setData(response);
+    let isMounted = true; // Flag to check if the component is still mounted
+
+    const fetchData = async () => {
+      try {
+        const response = await func();
+        if (isMounted) {
+          setData(response);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err);
+        }
+      }
     };
-    setup();
+
+    fetchData();
 
     if (isRealtime) {
-      const realtimeData = setInterval(setup, 60000);
+      const realtimeData = setInterval(fetchData, 30000);
 
       return () => {
         clearInterval(realtimeData);
+        isMounted = false; // Component is unmounting, so set isMounted to false
       };
     }
-  }, []);
+  }, [isRealtime]);
 
-  return [data];
+  return [data, error];
 }
 
 export default useData;

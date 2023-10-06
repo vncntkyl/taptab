@@ -28,6 +28,7 @@ function Planner() {
   const { capitalize } = useFunction();
   const { getPlaylist } = useStorage();
   const { getPlannerData, addSchedule } = usePlanner();
+  const [refresh, doRefresh] = useState(false);
 
   const [modal, setModal] = useState({
     toggle: false,
@@ -108,6 +109,7 @@ function Planner() {
       alert.message = response;
       setAlert(alert);
     }
+    doRefresh((current) => !current);
   };
 
   useEffect(() => {
@@ -133,7 +135,7 @@ function Planner() {
     // return () => {
     //   clearInterval(realtimeData);
     // };
-  }, [getPlaylist, setIsLoading]);
+  }, [getPlaylist, setIsLoading, refresh]);
 
   return (
     <>

@@ -113,7 +113,7 @@ function AdsPlayer({ isFullScreen, toggleFullScreen, links, showSurvey }) {
               className="absolute focus:ring-0 top-0 right-0 animate-pulse"
               onClick={() => showSurvey({toggle: true, title: "Quick Survey!"})}
             >
-              <MdAnnouncement className="text-3xl" />
+              <MdAnnouncement className="text-4xl" />
             </Button>
           )}
           <div

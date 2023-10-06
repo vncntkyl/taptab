@@ -27,6 +27,12 @@ router.get("/", async (req, res) => {
         _id: file.metadata.metadata.dbID,
         _urlID: file.id,
         fileName: file.name,
+        category: results.find((result) =>
+          result._id.equals(file.metadata.metadata.dbID)
+        ).category,
+        name: results.find((result) =>
+          result._id.equals(file.metadata.metadata.dbID)
+        ).name,
         contentType: file.metadata.contentType,
         size: file.metadata.size,
         bucket: file.metadata.bucket,

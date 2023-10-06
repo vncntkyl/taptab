@@ -40,6 +40,13 @@ function MediaLibrary() {
       toggle: false,
       title: null,
     });
+    setFile(null);
+    setMedia(null);
+    setMediaItem({
+      name: "",
+      category: "",
+      type: "",
+    });
     if (mediaItem.type === "image") {
       const fileData = {
         ...mediaItem,
@@ -50,6 +57,19 @@ function MediaLibrary() {
       };
 
       response = await uploadMedia([file], fileData);
+      const alert = {
+        isOn: true,
+        type: "success",
+        message: "You have successfully added new media item.",
+      };
+      console.log(response);
+      if (response.acknowledged) {
+        setAlert(alert);
+      } else {
+        alert.type = "failure";
+        alert.message = response;
+        setAlert(alert);
+      }
     } else if (mediaItem.type === "link") {
       const fileData = {
         ...mediaItem,
@@ -60,11 +80,25 @@ function MediaLibrary() {
         timeUpdated: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
       };
       response = await uploadMedia(null, fileData);
+      const alert = {
+        isOn: true,
+        type: "success",
+        message: "You have successfully added new media item.",
+      };
+      console.log(response);
+      if (response.acknowledged) {
+        setAlert(alert);
+      } else {
+        alert.type = "failure";
+        alert.message = response;
+        setAlert(alert);
+      }
     } else {
       const fileData = {
         ...mediaItem,
         height: videoFeed.current.videoHeight,
         width: videoFeed.current.videoWidth,
+        status: "pending approval",
         videoDuration: videoFeed.current.duration,
       };
 
@@ -85,6 +119,19 @@ function MediaLibrary() {
             );
             const mediaFile = [screenshotFile, file];
             response = await uploadMedia(mediaFile, fileData);
+            const alert = {
+              isOn: true,
+              type: "success",
+              message: "You have successfully added new media item.",
+            };
+            console.log(response);
+            if (response.acknowledged) {
+              setAlert(alert);
+            } else {
+              alert.type = "failure";
+              alert.message = response;
+              setAlert(alert);
+            }
           } else {
             console.log("Failed to create Blob from canvas");
           }
@@ -92,18 +139,6 @@ function MediaLibrary() {
       }
     }
     setIsLoading((previous) => !previous);
-    const alert = {
-      isOn: true,
-      type: "success",
-      message: "You have successfully added new media item.",
-    };
-    if (response.acknowledged) {
-      setAlert(alert);
-    } else {
-      alert.type = "failure";
-      alert.message = response;
-      setAlert(alert);
-    }
   };
 
   const onFileChange = (evt) => {

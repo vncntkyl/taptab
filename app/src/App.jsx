@@ -12,6 +12,7 @@ function App() {
   const [media] = useData(getMedia, true);
   const [schedules] = useData(getPlannerData, true);
   const [playingSchedule, setPlayingSchedule] = useState();
+  const [relatedAds, setRelatedAds] = useState(null);
   const [showSurvey, toggleSurvey] = useState({
     toggle: false,
     title: null,
@@ -33,14 +34,30 @@ function App() {
       });
 
       const updatePlayingSchedule = () => {
-        console.log("checking...");
         const currentTime = new Date();
         const currentSchedule = planner.find((schedule) => {
           const startDate = new Date(schedule.start_date);
           const endDate = new Date(schedule.end_date);
           return startDate <= currentTime && currentTime <= endDate;
         });
-        setPlayingSchedule(currentSchedule);
+        if (currentSchedule) {
+          setPlayingSchedule(currentSchedule);
+          // if (currentSchedule) console.log(currentSchedule);
+          const categories = [
+            ...new Set(
+              currentSchedule.playlist_media.map((media) =>
+                media.category.toLowerCase()
+              )
+            ),
+          ];
+          setRelatedAds(
+            media.filter(
+              (item) =>
+                categories.includes(item.category.toLowerCase()) &&
+                item.contentType.startsWith("image")
+            )
+          );
+        }
       };
 
       // Set an interval to update the playingSchedule periodically (e.g., every minute)
@@ -56,7 +73,7 @@ function App() {
 
   return (
     <div className="relative bg-gradient-to-br from-main to-white w-screen max-h-screen flex flex-row gap-2 p-2 overflow-hidden">
-      <section className="w-[1550px] flex flex-col gap-2">
+      <section className="w-[75%] flex flex-col gap-2">
         <AdsPlayer
           isFullScreen={isFullScreen}
           toggleFullScreen={toggleFullScreen}
@@ -68,9 +85,9 @@ function App() {
           }
         />
 
-        <RelatedAds isFullScreen={isFullScreen} />
+        <RelatedAds isFullScreen={isFullScreen} ads={relatedAds} />
       </section>
-      <section className="bg-default w-[450px] rounded p-2">
+      <section className="bg-default w-[25%] rounded p-2">
         <StaticsAds />
       </section>
       <SurveyModal modal={showSurvey} setModal={toggleSurvey} />
