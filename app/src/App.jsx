@@ -87,7 +87,7 @@ function App() {
 
         <RelatedAds isFullScreen={isFullScreen} ads={relatedAds} />
       </section>
-      <section className="bg-default w-[25%] rounded p-2">
+      <section className="bg-default w-[25%] rounded p-2 overflow-hidden">
         <StaticsAds />
       </section>
       <SurveyModal modal={showSurvey} setModal={toggleSurvey} />

@@ -10,11 +10,11 @@ function StaticsAds() {
   return (
     <>
       <PageHeader className="px-2 pb-2">Discover More</PageHeader>
-      <div className="flex flex-col gap-4 overflow-y-scroll max-h-screen px-2 scroll-smooth">
+      <div className="flex flex-col gap-4 overflow-y-scroll h-full p-2 pb-8 scroll-smooth">
         {data &&
           data.map((item) => {
             return (
-              <div key={item._id} className="min-h-[300px]">
+              <div key={item._id} className="">
                 <AdContainer ad={item} />
               </div>
             );
