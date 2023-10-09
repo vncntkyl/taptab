@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import PageHeader from "../fragments/PageHeader";
-import { Badge, Button } from "flowbite-react";
-import { iconButton, lightButton } from "../context/CustomThemes";
+import { Badge, Button, Label, Modal, TextInput } from "flowbite-react";
+import {
+  iconButton,
+  lightButton,
+  mainButton,
+  modalTheme,
+  textTheme,
+} from "../context/CustomThemes";
 import { MdAdd, MdTableRows } from "react-icons/md";
 import { GoDotFill } from "react-icons/go";
 import classNames from "classnames";
@@ -10,7 +16,7 @@ import { BiSolidGridAlt } from "react-icons/bi";
 import { usePlayers } from "../context/PlayersContext";
 
 function Players() {
-  const { getPlayers } = usePlayers();
+  const { getPlayers, addPlayer } = usePlayers();
   const { capitalize, convertText } = useFunction();
   const [modal, setModal] = useState({
     toggle: false,
@@ -18,7 +24,54 @@ function Players() {
   });
   const [defaultView, setDefaultView] = useState("grid");
   const [players, setPlayers] = useState(null);
-  const [player, setPlayer] = useState(null);
+  const [player, setPlayer] = useState({
+    device_name: "",
+    isOnline: false,
+    status: "available",
+    date_created: new Date(),
+    last_location: {
+      long: 0,
+      lat: 0,
+    },
+    driver: {
+      name: "",
+      contact_no: "",
+      vehicle: "",
+      vehicle_model: "",
+      plate_number: "",
+    },
+  });
+
+  const handleSubmission = async (e) => {
+    e.preventDefault();
+    const response = await addPlayer(player);
+    console.log(response);
+  };
+
+  const onInputChange = (e) => {
+    const key = e.target.id;
+    const value = e.target.value;
+
+    setPlayer((current) => {
+      if (key.includes("driver")) {
+        // Handle nested object
+        const id = key.split("-")[1];
+        return {
+          ...current,
+          driver: {
+            ...current.driver,
+            [id]: value,
+          },
+        };
+      } else {
+        // Handle other keys
+        return {
+          ...current,
+          [key]: value,
+        };
+      }
+    });
+  };
 
   useEffect(() => {
     const setup = async () => {
@@ -26,7 +79,12 @@ function Players() {
       setPlayers(response);
     };
     setup();
-  }, []);
+    const realtimeData = setInterval(setup, 5000);
+
+    return () => {
+      clearInterval(realtimeData);
+    };
+  }, [getPlayers]);
   return (
     <>
       <div className="transition-all w-full flex flex-col gap-4">
@@ -37,14 +95,14 @@ function Players() {
             onClick={() =>
               setModal({
                 toggle: true,
-                title: "New Schedule",
+                title: "New Player",
               })
             }
             color="transparent"
             theme={lightButton}
           >
             <MdAdd />
-            <p>New Device</p>
+            <p>New Player</p>
           </Button>
         </div>
         <div className="bg-white rounded p-2 flex flex-col gap-4 ">
@@ -156,53 +214,126 @@ function Players() {
           )}
         </div>
       </div>
-      {/* <pre>
-        {JSON.stringify(
-          [
-            {
-              _id: "2ejc94jedad03duf6icz0w8",
-              device_name: "player_01",
-              status: "online",
-              date_created: "2023-05-29T10:40:29.00Z",
-              driver: {
-                name: "Jose Mari Chan",
-                contact_no: "639490376783",
-                vehicle: "car",
-                vehicle_model: "honda civic",
-                plate_number: "HYVGI3",
-              },
+      <Modal
+        position="center"
+        show={modal.toggle}
+        dismissible
+        onClose={() => {
+          setModal({
+            toggle: false,
+            title: null,
+          });
+
+          setPlayer({
+            device_name: "",
+            isOnline: false,
+            status: "available",
+            date_created: new Date(),
+            last_location: {
+              long: 0,
+              lat: 0,
             },
-            {
-              _id: "3gskl238dheuwhdc8fie01",
-              device_name: "player_02",
-              status: "offline",
-              date_created: "2023-06-15T14:20:15.00Z",
-              driver: {
-                name: "Maria Cruz",
-                contact_no: "639512345678",
-                vehicle: "motorcycle",
-                vehicle_model: "yamaha",
-                plate_number: "XYZ123",
-              },
+            driver: {
+              name: "",
+              contact_no: "",
+              vehicle: "",
+              vehicle_model: "",
+              plate_number: "",
             },
-            {
-              _id: "kjsdf39djaf9c3984jc3c8",
-              device_name: "player_03",
-              status: "online",
-              date_created: "2023-07-03T09:15:42.00Z",
-              driver: {
-                name: "John Smith",
-                contact_no: "639577788899",
-                vehicle: "truck",
-                vehicle_model: "ford",
-                plate_number: "ABC789",
-              },
-            },
-          ],
-          null,
-          4
-        )}
-      </pre> */}
+          });
+        }}
+        size="lg"
+        theme={modalTheme}
+      >
+        <Modal.Header className="border-b-default-dark p-3 px-4">
+          {modal.toggle && "Add New " + capitalize(modal.title)}
+        </Modal.Header>
+        <Modal.Body>
+          <form className="flex flex-col gap-1" onSubmit={handleSubmission}>
+            <div>
+              <Label htmlFor="device_name" value="Device Name" />
+              <TextInput
+                id="device_name"
+                onChange={(e) => onInputChange(e, "device_name")}
+                type="text"
+                sizing="sm"
+                value={player.device_name}
+                required
+                theme={textTheme}
+              />
+            </div>
+            <h1 className="font-bold pt-2">Driver Details</h1>
+            <div>
+              <Label htmlFor="driver-name" value="Name" />
+              <TextInput
+                id="driver-name"
+                onChange={(e) => onInputChange(e, "driver-name")}
+                type="text"
+                sizing="sm"
+                value={player.driver.name}
+                required
+                theme={textTheme}
+              />
+            </div>
+            <div>
+              <Label htmlFor="driver-contact_no" value="Contact Number" />
+              <TextInput
+                id="driver-contact_no"
+                onChange={(e) => onInputChange(e, "driver-contact_no")}
+                type="text"
+                sizing="sm"
+                value={player.driver.contact_no}
+                required
+                theme={textTheme}
+              />
+            </div>
+            <div>
+              <Label htmlFor="driver-vehicle" value="Vehicle" />
+              <TextInput
+                id="driver-vehicle"
+                onChange={(e) => onInputChange(e, "driver-vehicle")}
+                type="text"
+                sizing="sm"
+                value={player.driver.vehicle}
+                required
+                theme={textTheme}
+              />
+            </div>
+            <div>
+              <Label htmlFor="driver-vehicle_model" value="Vehicle Model" />
+              <TextInput
+                id="driver-vehicle_model"
+                onChange={(e) => onInputChange(e, "driver-vehicle_model")}
+                type="text"
+                sizing="sm"
+                value={player.driver.vehicle_model}
+                required
+                theme={textTheme}
+              />
+            </div>
+            <div>
+              <Label htmlFor="driver-plate_number" value="Plate Number" />
+              <TextInput
+                id="driver-plate_number"
+                onChange={(e) => onInputChange(e, "driver-plate_number")}
+                type="text"
+                sizing="sm"
+                value={player.driver.plate_number}
+                required
+                theme={textTheme}
+              />
+            </div>
+            <Button
+              className="mt-4 w-full disabled:bg-black"
+              type="submit"
+              color="transparent"
+              theme={mainButton}
+            >
+              Save
+            </Button>
+          </form>
+        </Modal.Body>
+      </Modal>
     </>
   );
 }
