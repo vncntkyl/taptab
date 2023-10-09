@@ -14,6 +14,7 @@ import StaticAds from "./StaticAds";
 import UserEngagement from "./UserEngagement";
 import Playlist from "./Playlist";
 import Planner from "./Planner";
+import Players from "./Players";
 
 function Home() {
   const [onSidebar, toggleSidebar] = useState(false);
@@ -57,7 +58,7 @@ function Home() {
             <Route path="/media_library" element={<MediaLibrary />} />
             <Route path="/playlist/*" element={<Playlist />} />
             <Route path="/planner" element={<Planner />} />
-            <Route path="/players" element={<>players</>} />
+            <Route path="/players" element={<Players />} />
             <Route path="/static_ads" element={<StaticAds />} />
             <Route path="/user_engagement/*" element={<UserEngagement />} />
             <Route path="/incident_reports" element={<>Incident Reports</>} />

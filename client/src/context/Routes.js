@@ -13,4 +13,5 @@ export const developmentRoutes = {
   staticAdsDelete: "http://" + host + ":5050/staticAds/hide",
   engagements: "http://" + host + ":5050/surveys/",
   planner: "http://" + host + ":5050/planner/",
+  players: "http://" + host + ":5050/players/",
 };

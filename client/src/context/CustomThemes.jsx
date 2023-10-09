@@ -62,6 +62,10 @@ export const lightButton = {
 
 export const iconButton = {
   base: "group flex h-min items-center justify-center p-0 text-center font-medium relative focus:z-10 focus:outline-none",
+  size: {
+    xs: "text-xs p-1",
+    sm: "text-sm p-1.5",
+  },
 };
 export const modalTheme = {
   root: {
