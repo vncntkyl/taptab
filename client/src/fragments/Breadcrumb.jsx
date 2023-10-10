@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { GrNext } from "react-icons/gr";
-import { values as useFunction } from "../context/Functions";
+import { useFunction } from "../context/Functions";
 import { Link } from "react-router-dom";
 function Breadcrumb() {
   const { createBreadCrumb, capitalize, convertText, getPath } = useFunction();

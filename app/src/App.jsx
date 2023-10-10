@@ -5,6 +5,7 @@ import StaticsAds from "./components/StaticsAds";
 import { useVideos } from "./functions/VideoFunctions";
 import useData from "./hooks/useData";
 import SurveyModal from "./components/SurveyModal";
+import AccessForm from "./components/AccessForm";
 
 function App() {
   const [isFullScreen, toggleFullScreen] = useState(false);
@@ -17,6 +18,10 @@ function App() {
     toggle: false,
     title: null,
   });
+
+  function sendIncidentReportToDatabase(report) {
+    console.log(alert);
+  }
 
   useEffect(() => {
     if (media.length > 0 && schedules.length > 0) {
@@ -71,6 +76,52 @@ function App() {
     }
   }, [media, schedules]);
 
+  useEffect(() => {
+    const handleOnline = () => {
+      const pendingIncidentReports =
+        JSON.parse(localStorage.getItem("pendingIncidentReports")) || [];
+
+      pendingIncidentReports.forEach((report) => {
+        sendIncidentReportToDatabase(report);
+      });
+
+      localStorage.removeItem("pendingIncidentReports");
+    };
+    const handleOffline = () => {
+      const incidentReport = {
+        timestamp: new Date(),
+        message: "Network connection lost",
+        details: "Additional incident details",
+      };
+
+      // Store the incident report in local storage or an array
+      const pendingIncidentReports =
+        JSON.parse(localStorage.getItem("pendingIncidentReports")) || [];
+      pendingIncidentReports.push(incidentReport);
+      localStorage.setItem(
+        "pendingIncidentReports",
+        JSON.stringify(pendingIncidentReports)
+      );
+    };
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  useEffect(() => {
+    const updateLocation = async () => {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          console.log(position.coords.latitude, position.coords.longitude);
+        });
+      }
+    };
+    updateLocation();
+  }, []);
+
   return (
     <div className="relative bg-gradient-to-br from-main to-white w-screen max-h-screen flex flex-row gap-2 p-2 overflow-hidden">
       <section className="w-[75%] flex flex-col gap-2">
@@ -91,6 +142,7 @@ function App() {
         <StaticsAds />
       </section>
       <SurveyModal modal={showSurvey} setModal={toggleSurvey} />
+      <AccessForm />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import classNames from "classnames";
-import { values as useFunction } from "../../context/Functions";
+import { useFunction } from "../../context/Functions";
 
 function SidebarLink({ name, icon, count = null, toggle, toggler }) {
   const { capitalize, convertText } = useFunction();

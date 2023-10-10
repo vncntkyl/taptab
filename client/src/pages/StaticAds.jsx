@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useStaticAds } from "../context/StaticAdsContext";
-import { values as useFunction } from "../context/Functions";
+import { useFunction } from "../context/Functions";
 import PageHeader from "../fragments/PageHeader";
 import StaticAdsTable from "../tables/StaticAdsTable";
 import {

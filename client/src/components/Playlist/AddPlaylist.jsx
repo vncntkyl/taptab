@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import PageHeader from "../../fragments/PageHeader";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { values as useFunction } from "../../context/Functions";
+import { useFunction } from "../../context/Functions";
 import { Button } from "flowbite-react";
 import { mainButton } from "../../context/CustomThemes";
 import PlaylistDetails from "./PlaylistDetails";

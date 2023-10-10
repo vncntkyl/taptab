@@ -1,5 +1,5 @@
 import { useSortable } from "@dnd-kit/sortable";
-import { values as useFunction } from "../../context/Functions";
+import { useFunction } from "../../context/Functions";
 import PropTypes from "prop-types";
 import { BsImageAlt } from "react-icons/bs";
 import { CSS } from "@dnd-kit/utilities";

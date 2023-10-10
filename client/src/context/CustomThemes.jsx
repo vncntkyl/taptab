@@ -10,6 +10,18 @@ export const textTheme = {
     },
   },
 };
+export const codeTheme = {
+  field: {
+    input: {
+      colors: {
+        gray: "bg-gray-50 border-gray-300 text-gray-900 focus:border-secondary focus:ring-secondary dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-secondary dark:focus:ring-secondary",
+      },
+      withAddon: {
+        off: "rounded-sm",
+      },
+    },
+  },
+};
 export const bottomOnlyBorderText = {
   field: {
     input: {

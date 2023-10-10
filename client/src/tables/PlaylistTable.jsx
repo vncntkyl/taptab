@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { Button, Table } from "flowbite-react";
-import { values as useFunction } from "../context/Functions";
+import { useFunction } from "../context/Functions";
 import PlaylistImage from "../components/Playlist/PlaylistImage";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";

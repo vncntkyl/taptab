@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { values as useFunction } from "../../context/Functions";
+import { useFunction } from "../../context/Functions";
 import { useMemo } from "react";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import MediaItem from "./MediaItem";

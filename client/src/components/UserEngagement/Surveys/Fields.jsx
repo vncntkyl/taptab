@@ -5,7 +5,7 @@ import {
   iconButton,
 } from "../../../context/CustomThemes";
 import { Button, Label, TextInput, Textarea, Tooltip } from "flowbite-react";
-import { values as useFunction } from "../../../context/Functions";
+import { useFunction } from "../../../context/Functions";
 import {
   MdAdd,
   MdCheckBoxOutlineBlank,

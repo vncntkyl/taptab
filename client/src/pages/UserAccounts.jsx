@@ -4,7 +4,7 @@ import { BsPersonFillAdd } from "react-icons/bs";
 import { useUsers } from "../context/UserContext";
 import PageHeader from "../fragments/PageHeader";
 import UsersTable from "../tables/UsersTable";
-import { values as useFunction } from "../context/Functions";
+import { useFunction } from "../context/Functions";
 import {
   lightButton,
   mainButton,

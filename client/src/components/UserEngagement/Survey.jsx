@@ -17,7 +17,7 @@ import { MdSave } from "react-icons/md";
 import { useAuth } from "../../context/AuthContext";
 import { useEngagements } from "../../context/EngagementContext";
 import { useParams } from "react-router-dom";
-import { values as useFunction } from "../../context/Functions";
+import { useFunction } from "../../context/Functions";
 
 function Survey() {
   const { _id } = useParams();

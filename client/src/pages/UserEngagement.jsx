@@ -15,7 +15,7 @@ import Survey from "../components/UserEngagement/Survey";
 import SurveyTable from "../tables/SurveysTable";
 import { useEngagements } from "../context/EngagementContext";
 import { useAuth } from "../context/AuthContext";
-import { values as useFunction } from "../context/Functions";
+import { useFunction } from "../context/Functions";
 
 function UserEngagement() {
   const { retrieveEngagements, deleteSurvey } = useEngagements();

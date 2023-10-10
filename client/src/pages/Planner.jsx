@@ -16,7 +16,7 @@ import {
   selectTheme,
   textTheme,
 } from "../context/CustomThemes";
-import { values as useFunction } from "../context/Functions";
+import { useFunction } from "../context/Functions";
 import { MdAdd } from "react-icons/md";
 import { usePlanner } from "../context/PlannerContext";
 import { format } from "date-fns";

@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import PageHeader from "../fragments/PageHeader";
 import { useStorage } from "../context/StorageContext";
 import MediaLibraryTable from "../tables/MediaLibraryTable";
-import { values as useFunction } from "../context/Functions";
+import { useFunction } from "../context/Functions";
 import MediaUploadDropdown from "../fragments/MediaUploadDropdown";
 import VideoUploadForm from "../components/mediaLibrary/VideoUploadForm";
 import { mainButton, modalTheme, textTheme } from "../context/CustomThemes";

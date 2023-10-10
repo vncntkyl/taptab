@@ -22,6 +22,18 @@ export const bottomOnlyBorderText = {
     },
   },
 };
+export const noBorderText = {
+  field: {
+    input: {
+      colors: {
+        gray: "transition-all bg-transparent ring-none outline-none focus:outline-none border-0 text-gray-900 focus:border-b-light focus:ring-0",
+      },
+      withAddon: {
+        off: "rounded-sm",
+      },
+    },
+  },
+};
 export const textareaTheme = {
   base: "block w-full rounded-sm border disabled:cursor-not-allowed disabled:opacity-50 text-sm",
   colors: {
@@ -63,7 +75,7 @@ export const lightButton = {
 export const iconButton = {
   base: "group flex h-min items-center justify-center p-0.5 text-center font-medium relative focus:z-10 focus:outline-none",
   size: {
-    md: "text-sm px-2 py-2",
+    md: "text-sm px-2 py-2 rounded-full",
   },
 };
 export const modalTheme = {

@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { Badge, Button, Checkbox, Table } from "flowbite-react";
 import { RiDeleteBinFill, RiEditBoxFill } from "react-icons/ri";
-import { values as useFunction } from "../context/Functions";
+import { useFunction } from "../context/Functions";
 import { iconButton } from "../context/CustomThemes";
 import { format } from "date-fns";
 
