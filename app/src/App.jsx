@@ -12,6 +12,7 @@ function App() {
   const { getMedia, getPlannerData } = useVideos();
   const [media] = useData(getMedia, true);
   const [schedules] = useData(getPlannerData, true);
+  const [coordinates, setCoordinates] = useState([0, 0]);
   const [playingSchedule, setPlayingSchedule] = useState();
   const [relatedAds, setRelatedAds] = useState(null);
   const [showSurvey, toggleSurvey] = useState({
@@ -113,13 +114,21 @@ function App() {
 
   useEffect(() => {
     const updateLocation = async () => {
-      if ("geolocation" in navigator) {
+      if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
-          console.log(position.coords.latitude, position.coords.longitude);
+          setCoordinates([position.coords.latitude, position.coords.longitude]);
         });
+      } else {
+        setCoordinates([1, 2]);
       }
     };
     updateLocation();
+
+    const realtimeData = setInterval(updateLocation, 1000);
+
+    return () => {
+      clearInterval(realtimeData);
+    };
   }, []);
 
   return (
@@ -135,7 +144,7 @@ function App() {
               : []
           }
         />
-
+        <div>{coordinates[0] + ", " + coordinates[1]}</div>
         <RelatedAds isFullScreen={isFullScreen} ads={relatedAds} />
       </section>
       <section className="bg-default w-[25%] rounded p-2 overflow-hidden">
