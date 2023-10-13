@@ -59,6 +59,14 @@ function Sidebar({ toggle, setToggle }) {
         }
       />
       <SidebarLink
+        name="players"
+        toggle={toggle}
+        toggler={setToggle}
+        icon={
+          <FaTabletScreenButton className={classNames(sidebarLinkClassname)} />
+        }
+      />
+      <SidebarLink
         name="planner"
         toggle={toggle}
         toggler={setToggle}
@@ -66,14 +74,6 @@ function Sidebar({ toggle, setToggle }) {
           <BsFillCalendarWeekFill
             className={classNames(sidebarLinkClassname)}
           />
-        }
-      />
-      <SidebarLink
-        name="players"
-        toggle={toggle}
-        toggler={setToggle}
-        icon={
-          <FaTabletScreenButton className={classNames(sidebarLinkClassname)} />
         }
       />
       <Divider>Others</Divider>

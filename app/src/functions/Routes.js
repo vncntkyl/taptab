@@ -1,4 +1,4 @@
-const host = "192.168.11.199";
+const host = "192.168.11.17";
 export const developmentRoutes = {
   storage: "http://" + host + ":5050/storage/",
   staticAds: "http://" + host + ":5050/staticAds/",
