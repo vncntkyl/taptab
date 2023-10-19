@@ -1,8 +1,9 @@
-const host = "192.168.11.17";
+// const host = "192.168.11.17";
+const host = "https://taptab-server.onrender.com/";
 export const developmentRoutes = {
-  storage: "http://" + host + ":5050/storage/",
-  staticAds: "http://" + host + ":5050/staticAds/",
-  engagements: "http://" + host + ":5050/surveys/",
-  planner: "http://" + host + ":5050/planner/",
-  players: "http://" + host + ":5050/players/",
+  storage: host + "storage/",
+  staticAds: host + "staticAds/",
+  engagements: host + "surveys/",
+  planner: host + "planner/",
+  players: host + "players/",
 };

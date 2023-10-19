@@ -1,17 +1,18 @@
-const host = "192.168.11.17";
+// const host = "http://192.168.11.154:5050/";
+const host = "https://taptab-server.onrender.com/";
 export const developmentRoutes = {
-  users: "http://" + host + ":5050/users/",
-  userLogin: "http://" + host + ":5050/users/login",
-  userRegistration: "http://" + host + ":5050/users/register",
-  userDeactivate: "http://" + host + ":5050/users/deactivate/",
-  userReactivate: "http://" + host + ":5050/users/reactivate/",
-  userDelete: "http://" + host + ":5050/users/delete/",
-  storage: "http://" + host + ":5050/storage/",
-  uploadMedia: "http://" + host + ":5050/storage/upload",
-  staticAds: "http://" + host + ":5050/staticAds/",
-  staticAdsCreation: "http://" + host + ":5050/staticAds/create",
-  staticAdsDelete: "http://" + host + ":5050/staticAds/hide",
-  engagements: "http://" + host + ":5050/surveys/",
-  planner: "http://" + host + ":5050/planner/",
-  players: "http://" + host + ":5050/players/",
+  users: host + "users/",
+  userLogin: host + "users/login",
+  userRegistration: host + "users/register",
+  userDeactivate: host + "users/deactivate/",
+  userReactivate: host + "users/reactivate/",
+  userDelete: host + "users/delete/",
+  storage: host + "storage/",
+  uploadMedia: host + "storage/upload",
+  staticAds: host + "staticAds/",
+  staticAdsCreation: host + "staticAds/create",
+  staticAdsDelete: host + "staticAds/hide",
+  engagements: host + "surveys/",
+  planner: host + "planner/",
+  players: host + "players/",
 };

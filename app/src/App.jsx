@@ -6,13 +6,15 @@ import { useVideos } from "./functions/VideoFunctions";
 import useData from "./hooks/useData";
 import SurveyModal from "./components/SurveyModal";
 import AccessForm from "./components/AccessForm";
+import { useSurvey } from "./functions/EngagementFunctions";
 
 function App() {
   const [isFullScreen, toggleFullScreen] = useState(false);
   const { getMedia, getPlannerData } = useVideos();
+  const { retrieveTabInfo } = useSurvey();
   const [media] = useData(getMedia, true);
   const [schedules] = useData(getPlannerData, true);
-  const [coordinates, setCoordinates] = useState([0, 0]);
+  const [coordinates, setCoordinates] = useState([null, null]);
   const [playingSchedule, setPlayingSchedule] = useState();
   const [relatedAds, setRelatedAds] = useState(null);
   const [showSurvey, toggleSurvey] = useState({
@@ -22,6 +24,31 @@ function App() {
 
   function sendIncidentReportToDatabase(report) {
     console.log(alert);
+  }
+
+  function calculateDistance(coord1, coord2) {
+    const toRadians = (degrees) => (degrees * Math.PI) / 180;
+
+    const { latitude: lat1, longitude: lon1 } = coord1;
+    const { latitude: lat2, longitude: lon2 } = coord2;
+
+    const earthRadius = 6371000; // Earth's radius in meters
+
+    const dLat = toRadians(lat2 - lat1);
+    const dLon = toRadians(lon2 - lon1);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRadians(lat1)) *
+        Math.cos(toRadians(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    const distance = earthRadius * c;
+
+    return distance;
   }
 
   useEffect(() => {
@@ -76,7 +103,6 @@ function App() {
       return () => clearInterval(interval);
     }
   }, [media, schedules]);
-
   useEffect(() => {
     const handleOnline = () => {
       const pendingIncidentReports =
@@ -113,23 +139,52 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const updateLocation = async () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          setCoordinates([position.coords.latitude, position.coords.longitude]);
-        });
-      } else {
-        setCoordinates([1, 2]);
+    async function successCallback(position) {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      const driverDetails = await retrieveTabInfo();
+
+      const newCoordinate = {
+        latitude: latitude,
+        longitude: longitude,
+      };
+      const previousCoordinate = {
+        latitude: coordinates[0],
+        longitude: coordinates[1],
+      };
+
+      if (Object.values(previousCoordinate).every((val) => val === null)) {
+        setCoordinates([latitude, longitude]);
+        return;
       }
+
+      if (calculateDistance(newCoordinate, previousCoordinate) < 1) {
+        console.log("The position has not changed.");
+      } else {
+        console.log("Position has changed.");
+        console.log(driverDetails);
+        setCoordinates([latitude, longitude]);
+        // update the current location
+      }
+    }
+
+    function errorCallback(error) {
+      console.error("Error getting location:", error.message);
+    }
+
+    const options = {
+      enableHighAccuracy: true,
     };
-    updateLocation();
 
-    const realtimeData = setInterval(updateLocation, 1000);
-
+    const watchId = navigator.geolocation.watchPosition(
+      successCallback,
+      errorCallback,
+      options
+    );
     return () => {
-      clearInterval(realtimeData);
+      navigator.geolocation.clearWatch(watchId);
     };
-  }, []);
+  }, [coordinates]);
 
   return (
     <div className="relative bg-gradient-to-br from-main to-white w-screen max-h-screen flex flex-row gap-2 p-2 overflow-hidden">
