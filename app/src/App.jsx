@@ -11,7 +11,7 @@ import { useSurvey } from "./functions/EngagementFunctions";
 function App() {
   const [isFullScreen, toggleFullScreen] = useState(false);
   const { getMedia, getPlannerData } = useVideos();
-  const { retrieveTabInfo } = useSurvey();
+  const { retrieveTabInfo, updateCurrentLocation } = useSurvey();
   const [media] = useData(getMedia, true);
   const [schedules] = useData(getPlannerData, true);
   const [coordinates, setCoordinates] = useState([null, null]);
@@ -161,10 +161,20 @@ function App() {
       if (calculateDistance(newCoordinate, previousCoordinate) < 1) {
         console.log("The position has not changed.");
       } else {
-        console.log("Position has changed.");
-        console.log(driverDetails);
-        setCoordinates([latitude, longitude]);
+        // if (driverDetails === null) return;
+        const { _id } = driverDetails;
+
+        const newData = {
+          _id: _id,
+          long: longitude,
+          lat: latitude,
+        };
         // update the current location
+
+        const response = await updateCurrentLocation(newData);
+        console.log(response);
+        console.log("Position has changed.");
+        setCoordinates([latitude, longitude]);
       }
     }
 

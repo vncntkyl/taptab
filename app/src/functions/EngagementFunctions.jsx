@@ -44,9 +44,25 @@ const retrieveTabInfo = () => {
     };
   });
 };
+
+const updateCurrentLocation = async (data) => {
+  try {
+    const response = await axios.post(`${url.players}log/${data._id}`, data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 export const useSurvey = () => {
   return {
     getSurveys,
     retrieveTabInfo,
+    updateCurrentLocation,
   };
 };
