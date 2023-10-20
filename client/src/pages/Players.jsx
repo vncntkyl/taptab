@@ -17,7 +17,7 @@ function Players() {
     title: null,
   });
   const { generateRandomString } = useFunction();
-  const [defaultView, setDefaultView] = useState("table");
+  const [defaultView, setDefaultView] = useState("grid");
   const [players, setPlayers] = useState(null);
   const [player, setPlayer] = useState({
     device_name: "",

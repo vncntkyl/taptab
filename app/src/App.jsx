@@ -11,7 +11,8 @@ import { useSurvey } from "./functions/EngagementFunctions";
 function App() {
   const [isFullScreen, toggleFullScreen] = useState(false);
   const { getMedia, getPlannerData } = useVideos();
-  const { retrieveTabInfo, updateCurrentLocation } = useSurvey();
+  const { retrieveTabInfo, updateCurrentLocation, checkConnection } =
+    useSurvey();
   const [media] = useData(getMedia, true);
   const [schedules] = useData(getPlannerData, true);
   const [coordinates, setCoordinates] = useState([null, null]);
@@ -196,6 +197,13 @@ function App() {
     };
   }, [coordinates]);
 
+  useEffect(() => {
+    const ping = async () => {
+      await checkConnection();
+    };
+    ping();
+  }, []);
+
   return (
     <div className="relative bg-gradient-to-br from-main to-white w-screen max-h-screen flex flex-row gap-2 p-2 overflow-hidden">
       <section className="w-[75%] flex flex-col gap-2">
@@ -209,7 +217,6 @@ function App() {
               : []
           }
         />
-        <div>{coordinates[0] + ", " + coordinates[1]}</div>
         <RelatedAds isFullScreen={isFullScreen} ads={relatedAds} />
       </section>
       <section className="bg-default w-[25%] rounded p-2 overflow-hidden">

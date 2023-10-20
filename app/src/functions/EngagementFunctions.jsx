@@ -65,10 +65,41 @@ const updateCurrentLocation = async (data) => {
     console.error(error);
   }
 };
+
+const checkConnection = async () => {
+  try {
+    const response = await axios.get(`${url.players}ping`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      const ID = response.data;
+      const tabInfo = await retrieveTabInfo();
+
+      if (tabInfo) {
+        const validate = await axios.post(
+          `${url.players}ping/${ID._id}`,
+          tabInfo,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log(validate.data); // Assuming you want to log the data from the response
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const useSurvey = () => {
   return {
     getSurveys,
     retrieveTabInfo,
     updateCurrentLocation,
+    checkConnection,
   };
 };
