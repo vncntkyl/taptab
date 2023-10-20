@@ -24,19 +24,25 @@ const retrieveTabInfo = () => {
     request.onsuccess = (event) => {
       const db = event.target.result;
 
-      const transaction = db.transaction(["players"], "readonly");
-      const objectStore = transaction.objectStore("players");
-      const getRequest = objectStore.get("data");
+      if (db.objectStoreNames.contains("players")) {
+        const transaction = db.transaction(["players"], "readonly");
+        const objectStore = transaction.objectStore("players");
+        const getRequest = objectStore.get("data");
 
-      getRequest.onsuccess = (event) => {
-        const data = event.target.result;
-        const result = JSON.parse(data.value);
-        resolve(result);
-      };
+        getRequest.onsuccess = (event) => {
+          const data = event.target.result;
+          if (data) {
+            const result = JSON.parse(data.value);
+            resolve(result);
+          } else {
+            reject("Data not found");
+          }
+        };
 
-      getRequest.onerror = (event) => {
-        reject("Error getting data: " + event.target.error);
-      };
+        getRequest.onerror = (event) => {
+          reject("Error getting data: " + event.target.error);
+        };
+      }
     };
 
     request.onerror = (event) => {

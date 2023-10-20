@@ -161,7 +161,7 @@ function App() {
       if (calculateDistance(newCoordinate, previousCoordinate) < 1) {
         console.log("The position has not changed.");
       } else {
-        // if (driverDetails === null) return;
+        if (driverDetails === null) return;
         const { _id } = driverDetails;
 
         const newData = {
