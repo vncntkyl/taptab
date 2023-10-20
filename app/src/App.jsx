@@ -158,7 +158,7 @@ function App() {
         return;
       }
 
-      if (calculateDistance(newCoordinate, previousCoordinate) < 1) {
+      if (calculateDistance(newCoordinate, previousCoordinate) < 10) {
         console.log("The position has not changed.");
       } else {
         if (driverDetails === null) return;
