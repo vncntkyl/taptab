@@ -7,11 +7,16 @@ import MediaLibraryTable from "../tables/MediaLibraryTable";
 import { useFunction } from "../context/Functions";
 import MediaUploadDropdown from "../fragments/MediaUploadDropdown";
 import VideoUploadForm from "../components/mediaLibrary/VideoUploadForm";
-import { mainButton, modalTheme, textTheme } from "../context/CustomThemes";
+import {
+  mainButton,
+  modalTheme,
+  redMainButton,
+  textTheme,
+} from "../context/CustomThemes";
 import { format } from "date-fns";
 
 function MediaLibrary() {
-  const { getMedia, uploadMedia } = useStorage();
+  const { getMedia, uploadMedia, deleteMediaItem } = useStorage();
   const { capitalize } = useFunction();
   const { setIsLoading, setAlert } = useAuth();
   const [modal, setModal] = useState({
@@ -28,6 +33,7 @@ function MediaLibrary() {
     usage: 0,
   });
   const [media, setMedia] = useState(null);
+  const [search, setSearch] = useState("");
   const [file, setFile] = useState(null);
   const videoFeed = useRef(null);
   const canvasRef = useRef(null);
@@ -177,6 +183,28 @@ function MediaLibrary() {
     setMediaItem((current) => ({ ...current, type: optionName }));
   };
 
+  const handleMediaDeletion = async () => {
+    setIsLoading((previous) => !previous);
+    setModal({
+      toggle: false,
+      title: null,
+    });
+    const response = await deleteMediaItem(mediaItem);
+    console.log(response);
+    const alert = {
+      isOn: true,
+      type: "success",
+      message: `You have successfully deleted ${mediaItem.name}.`,
+    };
+    if (response.acknowledged) {
+      setAlert(alert);
+    } else {
+      alert.type = "failure";
+      alert.message = response;
+      setAlert(alert);
+    }
+    setIsLoading((previous) => !previous);
+  };
   useEffect(() => {
     setIsLoading(true);
   }, [setIsLoading]);
@@ -217,7 +245,19 @@ function MediaLibrary() {
           <MediaUploadDropdown triggerModal={triggerModal} />
         </div>
         {mediaFiles && (
-          <div className="w-full overflow-x-auto rounded-md shadow-md">
+          <div className="w-full overflow-x-auto rounded-md shadow-md flex flex-col gap-2">
+            <form>
+              <TextInput
+                id="search"
+                onChange={(e) => setSearch(e.target.value)}
+                type="text"
+                sizing="sm"
+                placeholder={`Search media`}
+                value={search}
+                required
+                theme={textTheme}
+              />
+            </form>
             <MediaLibraryTable
               media={mediaFiles}
               thumbnails={thumbnails}
@@ -248,88 +288,109 @@ function MediaLibrary() {
         theme={modalTheme}
       >
         <Modal.Header className="border-b-default-dark p-3 px-4">
-          {modal.toggle && "Add New " + capitalize(modal.title)}
+          {modal.toggle &&
+            (modal.title.includes("delete")
+              ? capitalize(modal.title) + " Item"
+              : "Add New " + capitalize(modal.title))}
         </Modal.Header>
         <Modal.Body>
-          <form
-            className="flex flex-col gap-2"
-            encType="multipart/form-data"
-            onSubmit={handleMediaUpload}
-          >
-            {modal.title === "link" ? (
-              <div>
-                <Label htmlFor="media" value="Valid URL" />
-                <TextInput
-                  id="media"
-                  onChange={(e) => setMedia(e.target.value)}
-                  type="text"
-                  sizing="sm"
-                  placeholder="Enter url of advertisement here"
-                  value={media}
-                  required
-                  theme={textTheme}
-                />
-              </div>
-            ) : modal.title === "image" ? (
-              <div>
-                {media && (
-                  <>
-                    <img src={media} alt="" ref={videoFeed} />
-                    <br />
-                  </>
-                )}
-                <Label htmlFor="file" value="Upload Image" />
-                <FileInput
-                  id="file"
-                  type="text"
-                  sizing="sm"
-                  required
-                  accept="image/*"
-                  onChange={(e) => onFileChange(e)}
-                  theme={textTheme}
-                />
-              </div>
+          {modal.toggle &&
+            (modal.title.includes("delete") ? (
+              <>
+                <div>
+                  Are you sure you want to delete{" "}
+                  <strong>{mediaItem.name}</strong> ?
+                </div>
+                <Button
+                  className="mt-4 w-fit float-right"
+                  color="transparent"
+                  onClick={() => handleMediaDeletion()}
+                  theme={redMainButton}
+                >
+                  Delete
+                </Button>
+              </>
             ) : (
-              <VideoUploadForm
-                canvasRef={canvasRef}
-                videoRef={videoFeed}
-                onFileChange={onFileChange}
-                media={media}
-              />
-            )}
-            <div>
-              <Label htmlFor="name" value="Name" />
-              <TextInput
-                id="name"
-                onChange={(e) => onInputChange(e, "name")}
-                type="text"
-                sizing="sm"
-                value={mediaItem.name}
-                required
-                theme={textTheme}
-              />
-            </div>
-            <div>
-              <Label htmlFor="category" value="Category" />
-              <TextInput
-                id="category"
-                onChange={(e) => onInputChange(e, "category")}
-                type="text"
-                sizing="sm"
-                value={mediaItem.category}
-                required
-                theme={textTheme}
-              />
-            </div>
-            <Button
-              className="mt-4 w-full disabled:bg-black"
-              type="submit"
-              color="transparent"
-              theme={mainButton}
-            >
-              Upload
-            </Button>
-          </form>
+              <form
+                className="flex flex-col gap-2"
+                encType="multipart/form-data"
+                onSubmit={handleMediaUpload}
+              >
+                {modal.title === "link" ? (
+                  <div>
+                    <Label htmlFor="media" value="Valid URL" />
+                    <TextInput
+                      id="media"
+                      onChange={(e) => setMedia(e.target.value)}
+                      type="text"
+                      sizing="sm"
+                      placeholder="Enter url of advertisement here"
+                      value={media}
+                      required
+                      theme={textTheme}
+                    />
+                  </div>
+                ) : modal.title === "image" ? (
+                  <div>
+                    {media && (
+                      <>
+                        <img src={media} alt="" ref={videoFeed} />
+                        <br />
+                      </>
+                    )}
+                    <Label htmlFor="file" value="Upload Image" />
+                    <FileInput
+                      id="file"
+                      type="text"
+                      sizing="sm"
+                      required
+                      accept="image/*"
+                      onChange={(e) => onFileChange(e)}
+                      theme={textTheme}
+                    />
+                  </div>
+                ) : (
+                  <VideoUploadForm
+                    canvasRef={canvasRef}
+                    videoRef={videoFeed}
+                    onFileChange={onFileChange}
+                    media={media}
+                  />
+                )}
+                <div>
+                  <Label htmlFor="name" value="Name" />
+                  <TextInput
+                    id="name"
+                    onChange={(e) => onInputChange(e, "name")}
+                    type="text"
+                    sizing="sm"
+                    value={mediaItem.name}
+                    required
+                    theme={textTheme}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="category" value="Category" />
+                  <TextInput
+                    id="category"
+                    onChange={(e) => onInputChange(e, "category")}
+                    type="text"
+                    sizing="sm"
+                    value={mediaItem.category}
+                    required
+                    theme={textTheme}
+                  />
+                </div>
+                <Button
+                  className="mt-4 w-full disabled:bg-black"
+                  type="submit"
+                  color="transparent"
+                  theme={mainButton}
+                >
+                  Upload
+                </Button>
+              </form>
+            ))}
         </Modal.Body>
       </Modal>
     </>

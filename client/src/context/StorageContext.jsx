@@ -85,6 +85,19 @@ const updatePlaylist = async (data) => {
   }
 };
 
+const deleteMediaItem = async (data) => {
+  try {
+    const mediaID = data._id;
+    delete data._id;
+    const response = await axios.patch(url.storage + mediaID, data);
+
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 export const useStorage = () => {
   return {
     getMedia,
@@ -92,5 +105,6 @@ export const useStorage = () => {
     uploadMedia,
     uploadPlaylist,
     updatePlaylist,
+    deleteMediaItem,
   };
 };

@@ -50,7 +50,12 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
                 </Table.Cell>
                 <Table.Cell align="left">
                   {tmb ? (
-                    <img src={getFileURL(tmb._urlID)} alt="" loading="lazy" className="w-full max-w-[300px]"/>
+                    <img
+                      src={getFileURL(tmb._urlID)}
+                      alt=""
+                      loading="lazy"
+                      className="w-full max-w-[300px]"
+                    />
                   ) : (
                     <>No preview available</>
                   )}
@@ -131,6 +136,12 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
                         setModal({
                           toggle: true,
                           title: "delete",
+                        });
+                        setItem({
+                          ...item,
+                          thumbnail_src: thumbnails.find(
+                            (thumbnail) => thumbnail._id == item._id
+                          ).fileName,
                         });
                       }}
                     >
