@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import AdsPlayer from "./components/AdsPlayer";
-import RelatedAds from "./components/RelatedAds";
+import RelatedAds from "./components/RelatedAds/RelatedAds";
 import StaticsAds from "./components/StaticsAds";
 import { useVideos } from "./functions/VideoFunctions";
 import useData from "./hooks/useData";
 import SurveyModal from "./components/SurveyModal";
 import AccessForm from "./components/AccessForm";
 import { useSurvey } from "./functions/EngagementFunctions";
+import Widget from "./components/widgets/Widget";
 
 function App() {
-  const [isFullScreen, toggleFullScreen] = useState(false);
+  // const [isFullScreen, toggleFullScreen] = useState(false);
   const { getMedia, getPlannerData } = useVideos();
   const { retrieveTabInfo, updateCurrentLocation, checkConnection } =
     useSurvey();
@@ -197,32 +198,29 @@ function App() {
     };
   }, [coordinates]);
 
-  useEffect(() => {
-    const ping = async () => {
-      await checkConnection();
-    };
-    ping();
-  }, []);
+  // useEffect(() => {
+  //   const ping = async () => {
+  //     await checkConnection();
+  //   };
+  //   ping();
+  // }, []);
 
   return (
-    <div className="relative bg-gradient-to-br from-main to-white w-screen max-h-screen flex flex-row gap-2 p-2 overflow-hidden">
-      <section className="w-[75%] flex flex-col gap-2">
-        <AdsPlayer
-          isFullScreen={isFullScreen}
-          toggleFullScreen={toggleFullScreen}
-          showSurvey={toggleSurvey}
-          links={
-            playingSchedule
-              ? playingSchedule.playlist_media.map((med) => med._urlID)
-              : []
-          }
-        />
-        <RelatedAds isFullScreen={isFullScreen} ads={relatedAds} />
-      </section>
-      <section className="bg-default w-[25%] rounded p-2 overflow-hidden">
-        <StaticsAds />
-      </section>
-      <SurveyModal modal={showSurvey} setModal={toggleSurvey} />
+    <div className="relative bg-gradient-to-br h-screen from-main to-[#c2c2c2] grid grid-cols-[8fr_2.275fr] grid-rows-[8fr_3fr] box-border gap-2 p-2">
+      <AdsPlayer
+        // isFullScreen={isFullScreen}
+        // toggleFullScreen={toggleFullScreen}
+        className="col-[1/2] row-[1/2] p-2"
+        showSurvey={toggleSurvey}
+        links={
+          playingSchedule
+            ? playingSchedule.playlist_media.map((med) => med._urlID)
+            : []
+        }
+      />
+      <StaticsAds className="col-[1/3] row-[2/3]" />
+      <Widget />
+      {/* <SurveyModal modal={showSurvey} setModal={toggleSurvey} /> */}
       <AccessForm />
     </div>
   );

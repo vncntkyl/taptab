@@ -54,6 +54,7 @@ export default {
         "onyx-black": "#353935",
         main: "#119dd8",
         secondary: "#39b1e5",
+        "main-light": "#a0d8ef",
         light: "#47b8e9",
         dark: "#052f41",
         "secondary-dark": "#1d5973",

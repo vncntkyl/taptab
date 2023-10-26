@@ -1,19 +1,23 @@
 import PropTypes from "prop-types";
 import { Button, Progress } from "flowbite-react";
 import {
-  MdFullscreen,
-  MdFullscreenExit,
+  // MdFullscreen,
+  // MdFullscreenExit,
   MdPause,
   MdPlayArrow,
   MdAnnouncement,
 } from "react-icons/md";
 import { iconButton } from "../functions/CustomThemes";
 import classNames from "classnames";
-import useData from "../hooks/useData";
+// import useData from "../hooks/useData";
 import { useVideos } from "../functions/VideoFunctions";
 import { useEffect, useRef, useState } from "react";
 
-function AdsPlayer({ isFullScreen, toggleFullScreen, links, showSurvey }) {
+function AdsPlayer({
+  /*isFullScreen, toggleFullScreen,*/ links,
+  showSurvey,
+  className,
+}) {
   const { getFileURL } = useVideos();
   const videoRef = useRef(null);
 
@@ -87,7 +91,7 @@ function AdsPlayer({ isFullScreen, toggleFullScreen, links, showSurvey }) {
     <section
       className={classNames(
         "transition-all relative bg-[#000] rounded text-white w-full flex items-center justify-center group",
-        isFullScreen ? "h-[100%]" : "h-[65%]"
+        className
       )}
     >
       {links.length > 0 && (
@@ -95,7 +99,7 @@ function AdsPlayer({ isFullScreen, toggleFullScreen, links, showSurvey }) {
           <div
             className={classNames(
               "relative transition-all bg-[#000] aspect-video overflow-hidden",
-              isFullScreen ? "max-w-full h-[72%]" : "max-w-[90%] h-full"
+              /*isFullScreen ? "max-w-full h-[72%]" :*/ "max-w-[90%] h-full"
             )}
           >
             <video
@@ -111,7 +115,9 @@ function AdsPlayer({ isFullScreen, toggleFullScreen, links, showSurvey }) {
               color="transparent"
               theme={iconButton}
               className="absolute focus:ring-0 top-0 right-0 animate-pulse"
-              onClick={() => showSurvey({toggle: true, title: "Quick Survey!"})}
+              onClick={() =>
+                showSurvey({ toggle: true, title: "Quick Survey!" })
+              }
             >
               <MdAnnouncement className="text-4xl" />
             </Button>
@@ -143,7 +149,7 @@ function AdsPlayer({ isFullScreen, toggleFullScreen, links, showSurvey }) {
             <div className="bg-white text-black">
               {/* {console.log(currentTime, duration)} */}
             </div>
-            <Button
+            {/* <Button
               color="transparent"
               theme={iconButton}
               onClick={() => toggleFullScreen((current) => !current)}
@@ -154,7 +160,7 @@ function AdsPlayer({ isFullScreen, toggleFullScreen, links, showSurvey }) {
               ) : (
                 <MdFullscreen className="animate-fade text-4xl" />
               )}
-            </Button>
+            </Button> */}
           </div>
         </>
       )}
@@ -167,6 +173,7 @@ AdsPlayer.propTypes = {
   toggleFullScreen: PropTypes.func,
   links: PropTypes.array,
   showSurvey: PropTypes.func,
+  className: PropTypes.string,
 };
 
 export default AdsPlayer;

@@ -86,8 +86,7 @@ const checkConnection = async () => {
               "Content-Type": "application/json",
             },
           }
-        );
-        console.log(validate.data); // Assuming you want to log the data from the response
+        ); // Assuming you want to log the data from the response
       }
     }
   } catch (error) {

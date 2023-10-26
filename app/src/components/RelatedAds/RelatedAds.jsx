@@ -1,9 +1,9 @@
 import classNames from "classnames";
 import PropTypes from "prop-types";
-import PageHeader from "./PageHeader";
-import { useVideos } from "../functions/VideoFunctions";
+import PageHeader from "../PageHeader";
+import { useVideos } from "../../functions/VideoFunctions";
 import { Button } from "flowbite-react";
-import { mainButton } from "../functions/CustomThemes";
+import { mainButton } from "../../functions/CustomThemes";
 function RelatedAds({ isFullScreen, ads }) {
   const { getFileURL } = useVideos();
   return (

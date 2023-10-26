@@ -6,7 +6,7 @@ function AdContainer({ ad }) {
   };
   return (
     <>
-      <img src={getFileURL(ad._urlID)} alt="" className="w-full object-cover rounded-md" />
+      <img src={getFileURL(ad._urlID)} alt="" className="w-full object-cover rounded-md h-full" />
       <p className="text-lg">{ad.name}</p>
     </>
   );
