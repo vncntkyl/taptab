@@ -13,6 +13,7 @@ import sunnyWithModClouds from "./sunnyWithModClouds.png";
 import thunder from "./thunder.png";
 import thunderstorm from "./thunderstorm.png";
 import thunderWithSun from "./thunderWithSun.png";
+import fullMoonRaining from "./fullMoonRaining.png";
 
 export {
   patchyRain,
@@ -20,6 +21,7 @@ export {
   fullMoon,
   fullMoonCloudy,
   fullMoonFewClouds,
+  fullMoonRaining,
   night,
   nightWithFewClouds,
   raining,

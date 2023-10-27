@@ -6,7 +6,7 @@ const retrieveWeatherForecast = async (lat, long) => {
 
   try {
     const response = await axios.get(
-      `${APILink}?key=${weatherAPIKey}&q=${lat},${long}&days=7&hour=0`,
+      `${APILink}?key=${weatherAPIKey}&q=${lat},${long}&days=8&hour=0`,
       {
         headers: {
           "Content-Type": "application/json",

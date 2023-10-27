@@ -206,7 +206,7 @@ function App() {
   // }, []);
 
   return (
-    <div className="relative bg-gradient-to-br h-screen from-main to-[#c2c2c2] grid grid-cols-[8fr_2.275fr] grid-rows-[8fr_3fr] box-border gap-2 p-2">
+    <div className="relative bg-gradient-to-br h-screen from-main to-[#c2c2c2] grid grid-cols-[8fr_2.3fr] grid-rows-[8fr_3fr] box-border gap-2 p-2">
       <AdsPlayer
         // isFullScreen={isFullScreen}
         // toggleFullScreen={toggleFullScreen}

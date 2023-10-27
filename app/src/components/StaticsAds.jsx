@@ -13,16 +13,15 @@ function StaticsAds({ className }) {
     <>
       <section
         className={classNames(
-          "bg-default rounded p-2 overflow-x-auto h-full",
+          "bg-default rounded p-2 overflow-x-auto overflow-y-hidden h-full",
           className
         )}
       >
-        <PageHeader className="px-2 pb-2">Discover More</PageHeader>
         <div className="grid grid-cols-5 gap-2">
           {data &&
             data.map((item) => {
               return (
-                <div key={item._id}>
+                <div key={item._id} className="relative group transition-all">
                   <AdContainer ad={item} />
                 </div>
               );
