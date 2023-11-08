@@ -1,42 +1,38 @@
 import classNames from "classnames";
 import PropTypes from "prop-types";
-import PageHeader from "../PageHeader";
 import { useVideos } from "../../functions/VideoFunctions";
-import { Button } from "flowbite-react";
-import { mainButton } from "../../functions/CustomThemes";
-function RelatedAds({ isFullScreen, ads }) {
+function RelatedAds({ ads, show, setVideo }) {
   const { getFileURL } = useVideos();
   return (
     <section
       className={classNames(
-        "bg-default transition-all rounded w-full p-2",
-        isFullScreen ? "h-0" : "h-[35%]"
+        "absolute bottom-0 w-full overflow-x-hidden transition-all duration-300 bg-[#0000009c] backdrop-blur-md scrollbar-none px-2",
+        show
+          ? "translate-y-[1%] opacity-100 pointer-events-auto"
+          : "translate-y-[92.5%] opacity-30 pointer-events-none"
       )}
     >
-      <div className="flex justify-between items-center p-2">
-        <PageHeader>
-          Enjoying what you&lsquo;re seeing? Check these out!
-        </PageHeader>
-        <Button
-          className="disabled:bg-black"
-          type="submit"
-          color="transparent"
-          theme={mainButton}
-          onClick={() => {}}
-        >
-          Share your thoughts with us!
-        </Button>
-      </div>
       {ads && (
-        <div className="flex items-center overflow-x-auto p-2 gap-4 snap-x snap-mandatory rounded-md">
+        <div className="flex items-center overflow-x-auto p-2 gap-4 snap-x snap-mandatory rounded-md scrollbar-none">
+          {/* {console.log(ads)} */}
           {ads.map((ad) => {
             return (
               <div key={ad._id} className="w-full snap-start">
-                <img
-                  src={getFileURL(ad._urlID)}
-                  className="w-full min-w-[550px] rounded-md"
-                />
-                <section>{ad.name}</section>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setVideo(ad._id);
+                  }}
+                >
+                  <img
+                    src={getFileURL(ad._urlID)}
+                    className="min-w-[350px] h-auto object-cover rounded-md"
+                  />
+                </button>
+                <section>
+                  {ad.name.substring(0, 25)}
+                  {ad.name.length >= 25 && "..."}
+                </section>
               </div>
             );
           })}
@@ -46,7 +42,8 @@ function RelatedAds({ isFullScreen, ads }) {
   );
 }
 RelatedAds.propTypes = {
-  isFullScreen: PropTypes.bool,
   ads: PropTypes.array,
+  show: PropTypes.bool,
+  setVideo: PropTypes.func,
 };
 export default RelatedAds;

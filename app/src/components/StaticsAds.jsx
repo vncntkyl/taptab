@@ -5,7 +5,7 @@ import PageHeader from "./PageHeader";
 import AdContainer from "./StaticAds/AdContainer";
 import PropTypes from "prop-types";
 
-function StaticsAds({ className }) {
+function StaticsAds({ className, toggle }) {
   const { getStaticAds } = useStaticAds();
   const [data] = useData(getStaticAds, true);
 
@@ -21,7 +21,11 @@ function StaticsAds({ className }) {
           {data &&
             data.map((item) => {
               return (
-                <div key={item._id} className="relative group transition-all">
+                <div
+                  key={item._id}
+                  className="relative group transition-all cursor-pointer"
+                  onClick={() => toggle(item)}
+                >
                   <AdContainer ad={item} />
                 </div>
               );
@@ -34,6 +38,7 @@ function StaticsAds({ className }) {
 
 StaticsAds.propTypes = {
   className: PropTypes.string,
+  toggle: PropTypes.func,
 };
 
 export default StaticsAds;

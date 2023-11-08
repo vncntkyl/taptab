@@ -1,9 +1,8 @@
 import PropTypes from "prop-types";
+import { useVideos } from "../../functions/VideoFunctions";
 
 function AdContainer({ ad }) {
-  const getFileURL = (objectName) => {
-    return `https://storage.googleapis.com/tamc_advertisements/${objectName}`;
-  };
+  const {getFileURL} = useVideos();
   return (
     <>
       <img

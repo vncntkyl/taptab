@@ -17,6 +17,24 @@ const getSurveys = async () => {
   }
 };
 
+const submitSurvey = async (_id, data) => {
+  try {
+    const response = await axios.post(
+      link + "app",
+      { _id: _id, data: data },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 const retrieveTabInfo = () => {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open("accounts");
@@ -97,6 +115,7 @@ const checkConnection = async () => {
 export const useSurvey = () => {
   return {
     getSurveys,
+    submitSurvey,
     retrieveTabInfo,
     updateCurrentLocation,
     checkConnection,

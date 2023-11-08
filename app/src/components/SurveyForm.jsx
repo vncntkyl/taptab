@@ -1,50 +1,51 @@
-import React from "react";
 import PropTypes from "prop-types";
 import { useSurvey } from "../functions/EngagementFunctions";
-import useData from "../hooks/useData";
 import { useState } from "react";
-import { useEffect } from "react";
 import classNames from "classnames";
-import {
-  Button,
-  TextInput,
-  Textarea,
-  Radio,
-  Label,
-  Checkbox,
-} from "flowbite-react";
-import {
-  mainButton,
-  textTheme,
-  textareaTheme,
-} from "../functions/CustomThemes";
+import { Button, TextInput, Textarea, Label } from "flowbite-react";
+import { textTheme, textareaTheme } from "../functions/CustomThemes";
 import PageHeader from "./PageHeader";
 
-function SurveyForm(props) {
-  const { getSurveys } = useSurvey();
-  const [surveys] = useData(getSurveys);
-  const [survey, setSurvey] = useState();
+function SurveyForm({ survey, setSurvey, closeSurvey }) {
+  const { submitSurvey } = useSurvey();
   const [step, setStep] = useState(0);
 
   const handleSurveySubmit = async (e) => {
     e.preventDefault();
+    const id = survey[0]._id;
+    const answers = survey.slice(1).map((question) => {
+      return typeof question.answer === "string"
+        ? question.answer
+        : question.answer.filter((ans) => ans.selected).map((ans) => ans.value);
+    });
+
+    const response = await submitSurvey(id, answers);
+    console.log(response);
+    if (response.acknowledged) {
+      closeSurvey();
+    }
   };
 
-  useEffect(() => {
-    if (surveys.length > 0) {
-      const sample = { ...surveys[0] };
-      setSurvey([
-        {
-          title: sample.title,
-          description: sample.description,
-        },
-        ...sample.questions,
-      ]);
+  const removeTextSpaces = (text) => {
+    return text.split(" ").join("_");
+  };
+
+  const validateAnswer = (index) => {
+    if (index === 0) return;
+    const answers = survey[index].answer;
+
+    if (typeof answers === "string") {
+      return answers === "";
     }
-  }, [surveys]);
+    return answers.every((ans) => ans.selected === false);
+  };
+
   return (
     survey && (
-      <form onSubmit={handleSurveySubmit}>
+      <form
+        onSubmit={handleSurveySubmit}
+        className="w-full animate-fade duration-500"
+      >
         {survey.map((item, index) => {
           return (
             <div
@@ -56,38 +57,84 @@ function SurveyForm(props) {
             >
               {index === 0 ? (
                 <div>
-                  <PageHeader>{item.title}</PageHeader>
+                  <PageHeader className="text-white">{item.title}</PageHeader>
                   <p className="text-lg px-4">{item.description}</p>
                 </div>
               ) : (
                 <div className="text-xl flex flex-col gap-2">
-                  <p>{`${index}. ${item.question}`}</p>
+                  <p className="font-semibold">{`${index}. ${item.question}`}</p>
                   <div>
                     {item.type === "short text" ? (
-                      <TextInput theme={textTheme} />
+                      <TextInput
+                        theme={textTheme}
+                        onChange={(e) => {
+                          const updatedSurvey = survey.map((question, idx) => {
+                            if (idx === index) {
+                              question.answer = e.target.value;
+                            }
+                            return question;
+                          });
+                          setSurvey(updatedSurvey);
+                        }}
+                      />
                     ) : item.type === "paragraph" ? (
-                      <Textarea theme={textareaTheme} />
+                      <Textarea
+                        theme={textareaTheme}
+                        onChange={(e) => {
+                          const updatedSurvey = survey.map((question, idx) => {
+                            if (idx === index) {
+                              question.answer = e.target.value;
+                            }
+                            return question;
+                          });
+                          setSurvey(updatedSurvey);
+                        }}
+                      />
                     ) : item.type === "multiple choice" ? (
                       <>
-                        <div className="flex flex-col gap-2">
+                        <div className="grid grid-cols-2 gap-4">
                           {item.answer.map((opt, idx) => {
                             return (
                               <div
                                 key={idx}
-                                className="flex items-center gap-2 pl-8"
+                                className="flex items-center justify-center gap-2"
                               >
-                                <Radio
-                                  id={opt.value.toLowerCase()}
-                                  name="sample"
-                                  value={opt.value.toLowerCase()}
-                                  // checked={admin[label] === "male"}
-                                  required
-                                  // onChange={(e) => handleInputChange(e, label)}
+                                <input
+                                  type="radio"
+                                  name={`question${index}_choice${idx}`}
+                                  id={removeTextSpaces(opt.value).toLowerCase()}
+                                  value={opt.value}
+                                  checked={opt.selected}
+                                  onChange={(e) => {
+                                    const updatedSurvey = survey.map(
+                                      (question, idx) => {
+                                        if (idx === index) {
+                                          const updatedAnswers =
+                                            question.answer.map((ans) => {
+                                              return {
+                                                ...ans,
+                                                selected:
+                                                  ans.value === e.target.value,
+                                              };
+                                            });
+                                          return {
+                                            ...question,
+                                            answer: updatedAnswers,
+                                          };
+                                        }
+                                        return question;
+                                      }
+                                    );
+                                    setSurvey(updatedSurvey);
+                                  }}
+                                  className="peer hidden"
                                 />
                                 <Label
-                                  htmlFor={opt.value.toLowerCase()}
+                                  htmlFor={removeTextSpaces(
+                                    opt.value
+                                  ).toLowerCase()}
                                   value={opt.value}
-                                  className="text-xl"
+                                  className="text-2xl font-bold text-white capitalize p-2 px-4 transition-all border-2 border-gray-500 rounded-md w-full text-center peer-checked:bg-gray-500"
                                 />
                               </div>
                             );
@@ -96,25 +143,53 @@ function SurveyForm(props) {
                       </>
                     ) : (
                       <>
-                        <div className="flex flex-col gap-2">
+                        <div className="grid grid-cols-2 gap-4">
                           {item.answer.map((opt, idx) => {
                             return (
                               <div
                                 key={idx}
-                                className="flex items-center gap-2 pl-8"
+                                className="flex items-center justify-center gap-2"
                               >
-                                <Checkbox
-                                  id={opt.value.toLowerCase()}
-                                  name="sample"
-                                  value={opt.value.toLowerCase()}
-                                  // checked={admin[label] === "male"}
-                                  required
-                                  // onChange={(e) => handleInputChange(e, label)}
+                                <input
+                                  type="checkbox"
+                                  name={`question${index}_choice${idx}`}
+                                  id={removeTextSpaces(opt.value).toLowerCase()}
+                                  value={opt.value}
+                                  checked={opt.selected}
+                                  className="peer hidden"
+                                  onChange={(e) => {
+                                    const updatedSurvey = survey.map(
+                                      (question, idx) => {
+                                        if (idx === index) {
+                                          const updatedAnswers =
+                                            question.answer.map((ans) => {
+                                              if (
+                                                ans.value === e.target.value
+                                              ) {
+                                                return {
+                                                  ...ans,
+                                                  selected: e.target.checked,
+                                                };
+                                              }
+                                              return ans;
+                                            });
+                                          return {
+                                            ...question,
+                                            answer: updatedAnswers,
+                                          };
+                                        }
+                                        return question;
+                                      }
+                                    );
+                                    setSurvey(updatedSurvey);
+                                  }}
                                 />
                                 <Label
-                                  htmlFor={opt.value.toLowerCase()}
+                                  htmlFor={removeTextSpaces(
+                                    opt.value
+                                  ).toLowerCase()}
                                   value={opt.value}
-                                  className="text-xl"
+                                  className="text-2xl font-bold text-white capitalize p-2 px-4 transition-all border-2 border-gray-500 rounded-md w-full text-center peer-checked:bg-gray-500"
                                 />
                               </div>
                             );
@@ -125,23 +200,44 @@ function SurveyForm(props) {
                   </div>
                 </div>
               )}
-              <div>
+              <div className="flex justify-end gap-2">
+                {index > 1 && (
+                  <Button
+                    className="disabled:bg-black float-right bg-secondary-dark px-4"
+                    type="button"
+                    color="transparent"
+                    onClick={() => {
+                      if (index < survey.length) {
+                        setStep((current) => {
+                          return current - 1;
+                        });
+                      }
+                    }}
+                  >
+                    <p className="text-xl">Back</p>
+                  </Button>
+                )}
                 <Button
-                  className="disabled:bg-black float-right"
-                  type="button"
+                  className="disabled:bg-black float-right bg-secondary-dark px-4"
+                  type={index === survey.length - 1 ? "submit" : "button"}
                   color="transparent"
-                  theme={mainButton}
                   onClick={() => {
                     if (index < survey.length - 1) {
-                      setStep((current) => {
-                        return current + 1;
-                      });
-                    } else {
-                      alert("Finished!!!");
+                      if (validateAnswer(index)) {
+                        alert(
+                          "Please answer the question to move forward. Thank you."
+                        );
+                      } else {
+                        setStep((current) => {
+                          return current + 1;
+                        });
+                      }
                     }
                   }}
                 >
-                  {index === survey.length - 1 ? "Submit" : "Next"}
+                  <p className="text-xl">
+                    {index === survey.length - 1 ? "Submit" : "Next"}
+                  </p>
                 </Button>
               </div>
             </div>
@@ -152,6 +248,10 @@ function SurveyForm(props) {
   );
 }
 
-SurveyForm.propTypes = {};
+SurveyForm.propTypes = {
+  survey: PropTypes.array,
+  setSurvey: PropTypes.func,
+  closeSurvey: PropTypes.func,
+};
 
 export default SurveyForm;

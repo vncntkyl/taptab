@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import AdsPlayer from "./components/AdsPlayer";
-import RelatedAds from "./components/RelatedAds/RelatedAds";
 import StaticsAds from "./components/StaticsAds";
 import { useVideos } from "./functions/VideoFunctions";
 import useData from "./hooks/useData";
@@ -8,17 +7,18 @@ import SurveyModal from "./components/SurveyModal";
 import AccessForm from "./components/AccessForm";
 import { useSurvey } from "./functions/EngagementFunctions";
 import Widget from "./components/widgets/Widget";
+import Popup from "./components/StaticAds/Popup";
 
 function App() {
   // const [isFullScreen, toggleFullScreen] = useState(false);
   const { getMedia, getPlannerData } = useVideos();
-  const { retrieveTabInfo, updateCurrentLocation, checkConnection } =
-    useSurvey();
+  const { retrieveTabInfo, updateCurrentLocation } = useSurvey();
   const [media] = useData(getMedia, true);
   const [schedules] = useData(getPlannerData, true);
   const [coordinates, setCoordinates] = useState([null, null]);
   const [playingSchedule, setPlayingSchedule] = useState();
   const [relatedAds, setRelatedAds] = useState(null);
+  const [viewAd, toggleAd] = useState(null);
   const [showSurvey, toggleSurvey] = useState({
     toggle: false,
     title: null,
@@ -78,20 +78,33 @@ function App() {
         if (currentSchedule) {
           setPlayingSchedule(currentSchedule);
           // if (currentSchedule) console.log(currentSchedule);
-          const categories = [
+          // const categories = [
+          //   ...new Set(
+          //     currentSchedule.playlist_media.map((media) =>
+          //       media.category.toLowerCase()
+          //     )
+          //   ),
+          // ];
+          const IDs = [
             ...new Set(
-              currentSchedule.playlist_media.map((media) =>
-                media.category.toLowerCase()
-              )
+              currentSchedule.playlist_media.map((media) => {
+                return media._id;
+              })
             ),
           ];
           setRelatedAds(
             media.filter(
               (item) =>
-                categories.includes(item.category.toLowerCase()) &&
-                item.contentType.startsWith("image")
+                IDs.includes(item._id) && item.contentType.startsWith("image")
             )
           );
+          // setRelatedAds(
+          //   media.filter(
+          //     (item) =>
+          //       categories.includes(item.category.toLowerCase()) &&
+          //       item.contentType.startsWith("image")
+          //   )
+          // );
         }
       };
 
@@ -198,6 +211,17 @@ function App() {
     };
   }, [coordinates]);
 
+  useEffect(() => {
+    const preventContextMenu = (event) => {
+      event.preventDefault();
+    };
+
+    document.addEventListener("contextmenu", preventContextMenu);
+
+    return () => {
+      document.removeEventListener("contextmenu", preventContextMenu);
+    };
+  }, []);
   // useEffect(() => {
   //   const ping = async () => {
   //     await checkConnection();
@@ -206,21 +230,24 @@ function App() {
   // }, []);
 
   return (
-    <div className="relative bg-gradient-to-br h-screen from-main to-[#c2c2c2] grid grid-cols-[8fr_2.3fr] grid-rows-[8fr_3fr] box-border gap-2 p-2">
+    <div className="relative bg-gradient-to-br h-screen from-main to-[#c2c2c2] grid grid-cols-[8fr_2.3fr] grid-rows-[8fr_2.3fr] box-border gap-2 p-2">
       <AdsPlayer
         // isFullScreen={isFullScreen}
         // toggleFullScreen={toggleFullScreen}
-        className="col-[1/2] row-[1/2] p-2"
+        relatedAds={relatedAds}
+        className="col-[1/2] row-[1/2]"
         showSurvey={toggleSurvey}
+        playlist={playingSchedule ? playingSchedule.playlist_media : []}
         links={
           playingSchedule
             ? playingSchedule.playlist_media.map((med) => med._urlID)
             : []
         }
       />
-      <StaticsAds className="col-[1/3] row-[2/3]" />
+      <StaticsAds className="col-[1/3] row-[2/3]" toggle={toggleAd} />
       <Widget />
       {/* <SurveyModal modal={showSurvey} setModal={toggleSurvey} /> */}
+      <Popup viewAd={viewAd} toggleAd={toggleAd} />
       <AccessForm />
     </div>
   );
