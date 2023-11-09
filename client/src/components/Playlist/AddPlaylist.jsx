@@ -78,9 +78,7 @@ function AddPlaylist(props) {
           .filter((item) => {
             if (item != null) {
               if (item.contentType) {
-                return !item.contentType.includes("video");
-              } else {
-                return item;
+                return item.contentType.startsWith("image");
               }
             }
           })

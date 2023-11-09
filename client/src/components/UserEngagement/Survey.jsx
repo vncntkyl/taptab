@@ -18,12 +18,14 @@ import { useAuth } from "../../context/AuthContext";
 import { useEngagements } from "../../context/EngagementContext";
 import { useParams } from "react-router-dom";
 import { useFunction } from "../../context/Functions";
+import { useStorage } from "../../context/StorageContext";
 
 function Survey() {
   const { _id } = useParams();
   const { setAlert, navigate } = useAuth();
   const { convertText, capitalize } = useFunction();
   const { uploadSurvey, updateSurvey } = useEngagements();
+  const { getMedia } = useStorage();
   const [modal, setModal] = useState({
     toggle: false,
     title: null,
@@ -32,6 +34,7 @@ function Survey() {
   const [settings, setSettings] = useState({
     title: "",
     description: "",
+    play_after: "",
   });
   const [contents, setContents] = useState([
     {
@@ -42,6 +45,7 @@ function Survey() {
     },
   ]);
   const [status, setStatus] = useState("Changes are not yet saved");
+  const [media, setMedia] = useState([]);
   const triggerModal = (optionName, index) => {
     const updatedContent = [...contents];
     updatedContent[index].type = optionName;
@@ -153,6 +157,7 @@ function Survey() {
     const surveyData = { ...settings };
     surveyData.type = "survey";
     surveyData.status = "active";
+
     surveyData.questions = [...contents];
     let response = {};
     if (_id) {
@@ -187,6 +192,18 @@ function Survey() {
     if (localStorage.getItem("settings_progress")) {
       setSettings(JSON.parse(localStorage.getItem("settings_progress")));
     }
+    const setup = async () => {
+      const response = await getMedia();
+      setMedia(
+        response
+          .filter((res) => res.type)
+          .map((res) => ({
+            _id: res._id,
+            name: res.name,
+          }))
+      );
+    };
+    setup();
   }, []);
 
   useEffect(() => {
@@ -269,7 +286,13 @@ function Survey() {
           )}
         </div>
         <form className="flex flex-col gap-2" onSubmit={handleFormSubmission}>
-          <Settings settings={settings} setSettings={setSettings} />
+          {media.length !== 0 && (
+            <Settings
+              settings={settings}
+              setSettings={setSettings}
+              media={media}
+            />
+          )}
           <h4 className="text-secondary-dark font-bold text-sm uppercase mr-auto">
             Questions
           </h4>

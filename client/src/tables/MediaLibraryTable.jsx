@@ -76,18 +76,16 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
                       {capitalize(item.type)}
                     </p>
                     {item.type !== "link" && (
-                      <>
-                        <p>
-                          <span>Size: </span>
-                          {capitalize(convertSize(item.size))}
-                        </p>
-                        {item.type === "video" && (
-                          <p>
-                            <span>Duration: </span>
-                            {item.videoDuration}
-                          </p>
-                        )}
-                      </>
+                      <p>
+                        <span>Size: </span>
+                        {capitalize(convertSize(item.size))}
+                      </p>
+                    )}
+                    {item.videoDuration && (
+                      <p>
+                        <span>Duration: </span>
+                        {item.videoDuration}
+                      </p>
                     )}
                     <p>
                       <span>Category: </span>
@@ -141,7 +139,7 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
                           ...item,
                           thumbnail_src: thumbnails.find(
                             (thumbnail) => thumbnail._id == item._id
-                          ).fileName,
+                          )?.fileName,
                         });
                       }}
                     >

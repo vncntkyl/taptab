@@ -57,11 +57,26 @@ const deleteSurvey = async (_id) => {
     console.error(error);
   }
 };
+const retrieveResponses = async (_id) => {
+  try {
+    const response = await axios.get(url.engagements + "responses/" + _id, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 export const useEngagements = () => {
   return {
     uploadSurvey,
     updateSurvey,
     deleteSurvey,
     retrieveEngagements,
+    retrieveResponses,
   };
 };

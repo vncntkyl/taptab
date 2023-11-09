@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { Button, FileInput, Label, Modal, TextInput } from "flowbite-react";
+import {
+  Badge,
+  Button,
+  FileInput,
+  Label,
+  Modal,
+  TextInput,
+} from "flowbite-react";
 import { useAuth } from "../context/AuthContext";
 import PageHeader from "../fragments/PageHeader";
 import { useStorage } from "../context/StorageContext";
@@ -37,7 +44,32 @@ function MediaLibrary() {
   const [file, setFile] = useState(null);
   const videoFeed = useRef(null);
   const canvasRef = useRef(null);
+  const videoLink = useRef(null);
 
+  const isVideoLink = (link) => {
+    const videoExtensions = [
+      ".3g2",
+      ".3gp",
+      ".avi",
+      ".flv",
+      ".h264",
+      ".m4v",
+      ".mkv",
+      ".mov",
+      ".mp4",
+      ".mpeg",
+      ".mpg",
+      ".rm",
+      ".swf",
+      ".vob",
+      ".webm",
+      ".wmv",
+    ];
+
+    return videoExtensions.some(
+      (ext) => link.endsWith(ext) || link.includes(ext)
+    );
+  };
   const handleMediaUpload = async (e) => {
     e.preventDefault();
     let response = null;
@@ -82,22 +114,46 @@ function MediaLibrary() {
         status: "pending approval",
         usage: 0,
         link: media,
+        height: videoLink.current.videoHeight,
+        width: videoLink.current.videoWidth,
+        videoDuration: videoLink.current.duration,
         timeCreated: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
         timeUpdated: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
       };
-      response = await uploadMedia(null, fileData);
-      const alert = {
-        isOn: true,
-        type: "success",
-        message: "You have successfully added new media item.",
-      };
-      console.log(response);
-      if (response.acknowledged) {
-        setAlert(alert);
-      } else {
-        alert.type = "failure";
-        alert.message = response;
-        setAlert(alert);
+      if (videoLink.current.readyState >= 2) {
+        videoLink.current.currentTime = 2;
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(videoLink.current, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(async (blob) => {
+          if (blob) {
+            // Create a File object from the Blob
+            const screenshotFile = new File(
+              [blob],
+              `${fileData.name}_tmb.png`,
+              {
+                type: "image/png",
+              }
+            );
+            const mediaFile = [screenshotFile, file];
+            response = await uploadMedia(mediaFile, fileData);
+            const alert = {
+              isOn: true,
+              type: "success",
+              message: "You have successfully added new media item.",
+            };
+            console.log(response);
+            if (response.acknowledged) {
+              setAlert(alert);
+            } else {
+              alert.type = "failure";
+              alert.message = response;
+              setAlert(alert);
+            }
+          } else {
+            console.log("Failed to create Blob from canvas");
+          }
+        }, "image/png");
       }
     } else {
       const fileData = {
@@ -318,10 +374,34 @@ function MediaLibrary() {
               >
                 {modal.title === "link" ? (
                   <div>
+                    {media !== null &&
+                      (isVideoLink(media) ? (
+                        <>
+                          <video
+                            width={320}
+                            height={160}
+                            controls
+                            ref={videoLink}
+                            crossOrigin="anonymous"
+                          >
+                            <source src={media} />
+                          </video>
+                          <br />
+                          <canvas className="hidden" ref={canvasRef}></canvas>
+                        </>
+                      ) : (
+                        <>
+                          <Badge size="md" color="failure">
+                            You have entered an invalid link.
+                          </Badge>
+                        </>
+                      ))}
                     <Label htmlFor="media" value="Valid URL" />
                     <TextInput
                       id="media"
-                      onChange={(e) => setMedia(e.target.value)}
+                      onChange={(e) => {
+                        setMedia(e.target.value);
+                      }}
                       type="text"
                       sizing="sm"
                       placeholder="Enter url of advertisement here"

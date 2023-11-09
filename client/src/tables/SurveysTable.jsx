@@ -4,9 +4,12 @@ import { RiDeleteBinFill, RiEditBoxFill } from "react-icons/ri";
 import { useFunction } from "../context/Functions";
 import { iconButton } from "../context/CustomThemes";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function SurveyTable({ data, setItem, setModal }) {
   const { capitalize, convertText } = useFunction();
+  const { setAlert } = useAuth();
+
   const headers = ["title", "description", "responses", "status", "actions"];
   return (
     <Table className="border bg-white rounded-md">
@@ -35,7 +38,26 @@ function SurveyTable({ data, setItem, setModal }) {
                   <p>{item.description || "---"}</p>
                 </Table.Cell>
                 <Table.Cell className="max-w-[250px] text-center">
-                  <p>0</p>
+                  <Link
+                    to={`./responses/${convertText(item.title)}`}
+                    className="text-main underline"
+                    onClick={(e) => {
+                      if (item.responseCount === 0) {
+                        e.preventDefault();
+                        const alert = {
+                          isOn: true,
+                          type: "warning",
+                          message:
+                            "There are no responses available for this survey.",
+                        };
+                        setAlert(alert);
+                      } else {
+                        localStorage.setItem("survey", JSON.stringify(item));
+                      }
+                    }}
+                  >
+                    {item.responseCount}
+                  </Link>
                 </Table.Cell>
                 <Table.Cell align="center">
                   <Badge

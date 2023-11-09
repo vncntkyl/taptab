@@ -10,15 +10,17 @@ import { RiAddFill, RiSurveyFill } from "react-icons/ri";
 import { MdFeedback } from "react-icons/md";
 import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
-import { Link, Route, Routes } from "react-router-dom";
+import { Link, Route, Routes, useNavigate } from "react-router-dom";
 import Survey from "../components/UserEngagement/Survey";
 import SurveyTable from "../tables/SurveysTable";
 import { useEngagements } from "../context/EngagementContext";
 import { useAuth } from "../context/AuthContext";
 import { useFunction } from "../context/Functions";
+import SurveyResponses from "../components/UserEngagement/SurveyResponses";
 
 function UserEngagement() {
   const { retrieveEngagements, deleteSurvey } = useEngagements();
+  const navigate = useNavigate();
   const { capitalize } = useFunction();
   const { setIsLoading, setAlert } = useAuth();
   const [modal, setModal] = useState({
@@ -62,6 +64,9 @@ function UserEngagement() {
       const tab = parseInt(localStorage.getItem("activeTab"));
       setTab(tab);
       tabs.current?.setActiveTab(tab);
+    }
+    if (window.location.pathname === "/user_engagement/responses") {
+      navigate("/user_engagement");
     }
   }, [window.location.pathname]);
 
@@ -130,8 +135,15 @@ function UserEngagement() {
           />
           <Route
             path="/:_id"
-            element={survey || localStorage.getItem("survey") ? <Survey data={survey} /> : <>Forms</>}
+            element={
+              survey || localStorage.getItem("survey") ? (
+                <Survey data={survey} />
+              ) : (
+                <>Forms</>
+              )
+            }
           />
+          <Route path="/responses/:_id" element={<SurveyResponses />} />
           <Route path="/new_survey" element={<Survey />} />
           <Route path="/new_form" element={<>New Forms</>} />
         </Routes>
