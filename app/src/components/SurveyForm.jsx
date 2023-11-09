@@ -6,7 +6,7 @@ import { Button, TextInput, Textarea, Label } from "flowbite-react";
 import { textTheme, textareaTheme } from "../functions/CustomThemes";
 import PageHeader from "./PageHeader";
 
-function SurveyForm({ survey, setSurvey, closeSurvey }) {
+function SurveyForm({ survey, setSurvey, closeSurvey, toggleSkip }) {
   const { submitSurvey } = useSurvey();
   const [step, setStep] = useState(0);
 
@@ -222,6 +222,7 @@ function SurveyForm({ survey, setSurvey, closeSurvey }) {
                   type={index === survey.length - 1 ? "submit" : "button"}
                   color="transparent"
                   onClick={() => {
+                    toggleSkip(false);
                     if (index < survey.length - 1) {
                       if (validateAnswer(index)) {
                         alert(
@@ -252,6 +253,7 @@ SurveyForm.propTypes = {
   survey: PropTypes.array,
   setSurvey: PropTypes.func,
   closeSurvey: PropTypes.func,
+  toggleSkip: PropTypes.func,
 };
 
 export default SurveyForm;

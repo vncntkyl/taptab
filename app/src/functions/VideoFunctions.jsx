@@ -49,6 +49,9 @@ const getFileURL = (objectName) => {
   return `https://storage.googleapis.com/tamc_advertisements/${objectName}`;
 };
 const getType = (link) => {
+  if (link.includes("http")) {
+    return "video";
+  }
   const imageFormats = ["jpeg", "jpg", "jfif", "png", "webp"];
   const videoFormats = ["mp4", "mov", "avi", "webm"];
 

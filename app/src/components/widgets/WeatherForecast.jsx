@@ -49,79 +49,85 @@ function WeatherForecast() {
     };
   }, [coordinates.latitude, coordinates.longitude, retrieveWeatherForecast]);
 
-  return forecast.length !== 0 ? (
-    <div
-      className={classNames(
-        "bg-gradient-to-br  rounded-md p-4 flex flex-col gap-3 transition-all",
-        forecast.current.is_day
-          ? "from-[#87ceeb] to-[#ffe2bc]"
-          : "from-secondary-dark to-[#330091]"
-      )}
-    >
-      <p className="text-white flex justify-between">
-        <span>
-          {format(new Date(forecast.location.localtime), "MMM dd, yyyy")}
-        </span>
-        <span>{`${forecast.location.name}, ${forecast.location.country}`}</span>
-      </p>
-      <div className="flex gap-2">
-        <WeatherIcon current={forecast.current} className="w-2/5" />
-        <div className="flex flex-col text-white">
-          <div className="flex gap-2 items-start">
-            <p className="text-white text-6xl font-bold">
-              {tempUnit === "C"
-                ? forecast.current.temp_c
-                : forecast.current.temp_f}
-            </p>
-            <div className="flex gap-2 items-start justify-center text-white">
-              <button
-                type="button"
-                onClick={() => setTempUnit("C")}
-                className={classNames(
-                  "text-lg",
-                  tempUnit === "C" && "font-bold"
-                )}
-              >
-                &deg;C
-              </button>
-              <span>|</span>
-              <button
-                type="button"
-                onClick={() => setTempUnit("F")}
-                className={classNames(
-                  "text-lg",
-                  tempUnit === "F" && "font-bold"
-                )}
-              >
-                &deg;F
-              </button>
+  return (
+    forecast &&
+    (forecast.length !== 0 ? (
+      <div
+        className={classNames(
+          "bg-gradient-to-br  rounded-md p-4 flex flex-col gap-3 transition-all h-full",
+          forecast.current.is_day
+            ? "from-[#87ceeb] to-[#ffe2bc]"
+            : "from-secondary-dark to-[#330091]"
+        )}
+      >
+        <p className="text-white flex justify-between">
+          <span>
+            {format(new Date(forecast.location.localtime), "MMM dd, yyyy")}
+          </span>
+          <span>{`${forecast.location.name}, ${forecast.location.country}`}</span>
+        </p>
+        <div className="flex items-center justify-start gap-2 pb-2">
+          <WeatherIcon
+            current={forecast.current}
+            className="w-[40%] object-fit"
+          />
+          <div className="flex flex-col text-white">
+            <div className="flex gap-2 items-start">
+              <p className="text-white text-6xl font-bold">
+                {tempUnit === "C"
+                  ? forecast.current.temp_c
+                  : forecast.current.temp_f}
+              </p>
+              <div className="flex gap-2 items-start justify-center text-white">
+                <button
+                  type="button"
+                  onClick={() => setTempUnit("C")}
+                  className={classNames(
+                    "text-lg",
+                    tempUnit === "C" && "font-bold"
+                  )}
+                >
+                  &deg;C
+                </button>
+                <span>|</span>
+                <button
+                  type="button"
+                  onClick={() => setTempUnit("F")}
+                  className={classNames(
+                    "text-lg",
+                    tempUnit === "F" && "font-bold"
+                  )}
+                >
+                  &deg;F
+                </button>
+              </div>
+            </div>
+            <span>{forecast.current.condition.text}</span>
+            <div className="flex items-center gap-2">
+              <WeatherDetails
+                icon={<TbWind />}
+                text={`${forecast.current.wind_mph}m/h`}
+              />
+              <WeatherDetails
+                icon={<BsCloudRain />}
+                text={`${forecast.current.precip_in}"`}
+              />
+              <WeatherDetails
+                icon={<TbDroplets />}
+                text={`${forecast.current.humidity}%`}
+              />
             </div>
           </div>
-          <span>{forecast.current.condition.text}</span>
-          <div className="flex items-center gap-2">
-            <WeatherDetails
-              icon={<TbWind />}
-              text={`${forecast.current.wind_mph}m/h`}
-            />
-            <WeatherDetails
-              icon={<BsCloudRain />}
-              text={`${forecast.current.precip_in}"`}
-            />
-            <WeatherDetails
-              icon={<TbDroplets />}
-              text={`${forecast.current.humidity}%`}
-            />
-          </div>
         </div>
+        {/* <hr className="bg-white border" />
+      <WeeklyForecast weatherForecast={forecast} tempUnit={tempUnit} /> */}
+        {/* <pre>{JSON.stringify(forecast, null, 2)}</pre> */}
       </div>
-      <hr className="bg-white border" />
-      <WeeklyForecast weatherForecast={forecast} tempUnit={tempUnit} />
-      {/* <pre>{JSON.stringify(forecast, null, 2)}</pre> */}
-    </div>
-  ) : (
-    <div className="bg-gradient-to-br from-[#87ceeb] to-[#ffe2bc] w-full h-[289px] rounded-md p-4 flex flex-col gap-3 transition-all">
-      Loading...
-    </div>
+    ) : (
+      <div className="bg-gradient-to-br from-[#87ceeb] to-[#ffe2bc] w-full h-full rounded-md p-4 flex flex-col gap-3 transition-all">
+        Loading...
+      </div>
+    ))
   );
 }
 

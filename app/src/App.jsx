@@ -8,6 +8,7 @@ import AccessForm from "./components/AccessForm";
 import { useSurvey } from "./functions/EngagementFunctions";
 import Widget from "./components/widgets/Widget";
 import Popup from "./components/StaticAds/Popup";
+import ArticlePopup from "./components/ArticlePopup";
 
 function App() {
   // const [isFullScreen, toggleFullScreen] = useState(false);
@@ -19,10 +20,7 @@ function App() {
   const [playingSchedule, setPlayingSchedule] = useState();
   const [relatedAds, setRelatedAds] = useState(null);
   const [viewAd, toggleAd] = useState(null);
-  const [showSurvey, toggleSurvey] = useState({
-    toggle: false,
-    title: null,
-  });
+  const [showArticle, toggleArticle] = useState(null);
 
   function sendIncidentReportToDatabase(report) {
     console.log(alert);
@@ -53,6 +51,9 @@ function App() {
     return distance;
   }
 
+  function closeArticle() {
+    toggleArticle(null);
+  }
   useEffect(() => {
     if (media.length > 0 && schedules.length > 0) {
       const planner = schedules.map((schedule) => {
@@ -77,14 +78,7 @@ function App() {
         });
         if (currentSchedule) {
           setPlayingSchedule(currentSchedule);
-          // if (currentSchedule) console.log(currentSchedule);
-          // const categories = [
-          //   ...new Set(
-          //     currentSchedule.playlist_media.map((media) =>
-          //       media.category.toLowerCase()
-          //     )
-          //   ),
-          // ];
+
           const IDs = [
             ...new Set(
               currentSchedule.playlist_media.map((media) => {
@@ -95,7 +89,9 @@ function App() {
           setRelatedAds(
             media.filter(
               (item) =>
-                IDs.includes(item._id) && item.contentType.startsWith("image")
+                IDs.includes(item._id) &&
+                item.type !== "link" &&
+                item.contentType.startsWith("image")
             )
           );
           // setRelatedAds(
@@ -173,9 +169,7 @@ function App() {
         return;
       }
 
-      if (calculateDistance(newCoordinate, previousCoordinate) < 10) {
-        console.log("The position has not changed.");
-      } else {
+      if (calculateDistance(newCoordinate, previousCoordinate) > 10) {
         if (driverDetails === null) return;
         const { _id } = driverDetails;
 
@@ -230,25 +224,31 @@ function App() {
   // }, []);
 
   return (
-    <div className="relative bg-gradient-to-br h-screen from-main to-[#c2c2c2] grid grid-cols-[8fr_2.3fr] grid-rows-[8fr_2.3fr] box-border gap-2 p-2">
+    <div className="relative bg-gradient-to-br h-screen from-main to-[#c2c2c2] grid grid-cols-[8fr_3.2fr] grid-rows-[8fr_2.3fr] box-border gap-2 p-2">
+      {/* {playingSchedule && console.log(playingSchedule)} */}
       <AdsPlayer
         // isFullScreen={isFullScreen}
         // toggleFullScreen={toggleFullScreen}
         relatedAds={relatedAds}
         className="col-[1/2] row-[1/2]"
-        showSurvey={toggleSurvey}
         playlist={playingSchedule ? playingSchedule.playlist_media : []}
         links={
           playingSchedule
-            ? playingSchedule.playlist_media.map((med) => med._urlID)
+            ? playingSchedule.playlist_media.map((med) =>
+                med._urlID ? med._urlID : med.link
+              )
             : []
         }
       />
       <StaticsAds className="col-[1/3] row-[2/3]" toggle={toggleAd} />
-      <Widget />
+      <Widget setArticle={toggleArticle} />
       {/* <SurveyModal modal={showSurvey} setModal={toggleSurvey} /> */}
       <Popup viewAd={viewAd} toggleAd={toggleAd} />
+      <ArticlePopup article={showArticle} closeArticle={closeArticle} />
       <AccessForm />
+      <p className="absolute bottom-0 bg-[#0000006c] text-xs px-2 text-white">
+        Version 1.3.0
+      </p>
     </div>
   );
 }

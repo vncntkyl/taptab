@@ -16,6 +16,8 @@ import RelatedAds from "./RelatedAds/RelatedAds";
 import SurveyForm from "./SurveyForm";
 import { useSurvey } from "../functions/EngagementFunctions";
 import useData from "../hooks/useData";
+import Counter from "./Counter";
+import Countdown from "./Countdown";
 
 function AdsPlayer({
   /*isFullScreen, toggleFullScreen,*/ links,
@@ -34,10 +36,11 @@ function AdsPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [duration, setDuration] = useState(0);
-  const [isLastVideo, setIsLastVideo] = useState(false);
   const [xDown, setXDown] = useState(null);
   const [showRelatedAds, toggleRelatedAds] = useState(false);
   const [showSurvey, toggleSurvey] = useState(null);
+  const [showSkipCounter, closeSkipCounter] = useState(false);
+  const [showSkipButton, toggleSkipButton] = useState(true);
 
   const togglePlayPause = () => {
     if (videoRef.current) {
@@ -61,9 +64,12 @@ function AdsPlayer({
 
     const item = playlist.find((item) => item._id === _id);
     const previousItem = playlist[currentVideoIndex];
+    const prevURL = previousItem._urlID
+      ? previousItem._urlID
+      : previousItem.link;
     const index = playlist.indexOf(item);
 
-    if (getType(previousItem._urlID) === "image") {
+    if (getType(prevURL) === "image") {
       //increment usage by 1
       await recordAdViews(previousItem._id, 1);
     } else {
@@ -90,13 +96,18 @@ function AdsPlayer({
     const imagePlayer = document.getElementById("image-player");
 
     const handleVideoEnd = async () => {
+      console.log("ended");
       const item = playlist.find(
-        (item) => item._urlID === links[currentVideoIndex]
+        (item) =>
+          item?._urlID === links[currentVideoIndex] ||
+          item?.link === links[currentVideoIndex]
       );
       //ichecheck yung survey array if yung play after ID dun is same sa ID ng nag end na video so if true, show survey else tuloy
       const survey = surveys.find((survey) => survey.play_after == item._id);
 
       if (survey) {
+        closeSkipCounter(false);
+        toggleSkipButton(true);
         toggleSurvey([
           {
             _id: survey._id,
@@ -106,20 +117,22 @@ function AdsPlayer({
           ...survey.questions,
         ]);
       }
+      console.log(typeof currentVideoIndex, typeof (links.length - 1));
+      if (currentVideoIndex < links.length - 1) {
+        setCurrentVideoIndex(currentVideoIndex + 1);
+        setIsLoading(true);
+        console.log(links.length - 1, currentVideoIndex);
+      } else if (currentVideoIndex === links.length - 1) {
+        setCurrentVideoIndex(0);
+        setIsLoading(true);
+        console.log("End of playlist. Restarting from index 0.");
+        console.log("Current Video Index after resetting:", currentVideoIndex);
+      }
 
       if (item.type === "video") {
         await recordAdViews(item._id, item.videoDuration);
       } else {
         await recordAdViews(item._id, 1);
-      }
-      if (currentVideoIndex < links.length - 1) {
-        setCurrentVideoIndex((prevIndex) => prevIndex + 1);
-        setIsLoading(true);
-        console.log("running");
-      } else {
-        setCurrentVideoIndex(0);
-        setIsLoading(true);
-        setIsLastVideo(true);
       }
     };
     if (videoElement) {
@@ -129,19 +142,25 @@ function AdsPlayer({
 
       videoElement.addEventListener("loadeddata", loadData);
       videoElement.addEventListener("ended", handleVideoEnd);
+      // videoElement.addEventListener("timeupdate", () => {
+      //   console.log(videoElement.currentTime);
+      // });
 
       return () => {
         videoElement.removeEventListener("loadeddata", loadData);
         videoElement.removeEventListener("ended", handleVideoEnd);
+        // videoElement.removeEventListener("timeupdate", () => {
+        //   console.log(videoElement.currentTime);
+        // });
       };
     } else if (imagePlayer) {
-      const timeout = setTimeout(handleVideoEnd, 10000);
+      const timeout = setTimeout(handleVideoEnd, 5000);
 
       return () => {
         clearTimeout(timeout);
       };
     }
-  }, [currentVideoIndex, links]);
+  }, [currentVideoIndex, links, playlist, recordAdViews, surveys]);
 
   const closeSurvey = () => {
     toggleSurvey(null);
@@ -181,9 +200,10 @@ function AdsPlayer({
   useEffect(() => {
     if (showSurvey) {
       const timeout = setTimeout(closeSurvey, 30000);
-
+      const skipTimeout = setTimeout(() => closeSkipCounter(true), 5000);
       return () => {
         clearTimeout(timeout);
+        clearTimeout(skipTimeout);
       };
     }
   }, [showSurvey]);
@@ -198,15 +218,39 @@ function AdsPlayer({
       {links.length > 0 && (
         <>
           {showSurvey ? (
-            <div className="bg-matte-black w-full h-full flex items-center justify-center p-4 transition-all">
-              <SurveyForm setSurvey={toggleSurvey} survey={showSurvey} />
+            <div className="relative bg-matte-black w-full h-full flex items-center justify-center p-4 transition-all">
+              <SurveyForm
+                setSurvey={toggleSurvey}
+                survey={showSurvey}
+                closeSurvey={closeSurvey}
+                toggleSkip={toggleSkipButton}
+              />
+              <Countdown max={30} />
+              {showSkipButton && (
+                <Button
+                  className="absolute bottom-10 right-0 disabled:bg-black float-right bg-[#00000062] px-4 rounded-none disabled:pointer-events-none"
+                  type={"button"}
+                  color="transparent"
+                  onClick={() => toggleSurvey(null)}
+                  disabled={!showSkipCounter}
+                >
+                  <p className="text-xl">
+                    Skip{" "}
+                    {!showSkipCounter && (
+                      <>
+                        in <Counter max={5} /> seconds
+                      </>
+                    )}
+                  </p>
+                </Button>
+              )}
             </div>
           ) : (
             <>
               <div
                 className={classNames(
                   "relative transition-all bg-[#000] aspect-video overflow-hidden",
-                  /*isFullScreen ? "max-w-full h-[72%]" :*/ "max-w-[90%] h-full"
+                  /*isFullScreen ? "max-w-full h-[72%]" :*/ "max-w-[100%] h-full"
                 )}
               >
                 {getType(links[currentVideoIndex]) === "image" ? (
@@ -218,7 +262,11 @@ function AdsPlayer({
                 ) : (
                   <video
                     id="video-player"
-                    src={getFileURL(links[currentVideoIndex])}
+                    src={
+                      links[currentVideoIndex].includes("http")
+                        ? links[currentVideoIndex]
+                        : getFileURL(links[currentVideoIndex])
+                    }
                     ref={videoRef}
                     className="h-full w-full"
                     autoPlay

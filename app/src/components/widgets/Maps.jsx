@@ -33,7 +33,7 @@ function Maps() {
 
   return (
     currentLocation.lat !== null && (
-      <div className="w-full h-[300px] shadow-md rounded-md overflow-hidden">
+      <div className="w-full h-full shadow-md rounded-md overflow-hidden">
         <GoogleMapReact
           bootstrapURLKeys={{
             key: "AIzaSyBgdBRaOqyGeoc4E4cWlP8N_wlILEFdgtQ",
