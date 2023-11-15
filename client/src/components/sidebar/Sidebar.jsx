@@ -89,12 +89,12 @@ function Sidebar({ toggle, setToggle }) {
         toggler={setToggle}
         icon={<RiSurveyFill className={classNames(sidebarLinkClassname)} />}
       />
-      <SidebarLink
+      {/* <SidebarLink
         name="incident reports"
         toggle={toggle}
         toggler={setToggle}
         icon={<MdWarning className={classNames(sidebarLinkClassname)} />}
-      />
+      /> */}
       <SidebarLink
         name="user accounts"
         toggle={toggle}

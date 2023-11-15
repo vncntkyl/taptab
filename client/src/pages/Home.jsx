@@ -61,7 +61,7 @@ function Home() {
             <Route path="/players" element={<Players />} />
             <Route path="/static_ads" element={<StaticAds />} />
             <Route path="/user_engagement/*" element={<UserEngagement />} />
-            <Route path="/incident_reports" element={<>Incident Reports</>} />
+            {/* <Route path="/incident_reports" element={<>Incident Reports</>} /> */}
             <Route path="/user_accounts" element={<UserAccounts />} />
           </Routes>
         </div>
