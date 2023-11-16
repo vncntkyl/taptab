@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import QuickLinks from "../components/Dashboard/QuickLinks";
+import Analytics from "../components/Dashboard/Analytics";
 function Dashboard() {
   return (
     <div>
@@ -10,9 +11,9 @@ function Dashboard() {
         <PageHeader>Dashboard Overview</PageHeader>
         <Today />
       </div>
-      <div>
+      <div className="flex flex-col gap-2">
         <QuickLinks />
-        <SubTitle>Taptab Overview</SubTitle>
+        <Analytics />
       </div>
     </div>
   );

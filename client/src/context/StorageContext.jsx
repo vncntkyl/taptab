@@ -98,10 +98,25 @@ const deleteMediaItem = async (data) => {
     console.error(error);
   }
 };
+const getAnalytics = async () => {
+  try {
+    const response = await axios.get(url.storage + "analytics", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 export const useStorage = () => {
   return {
     getMedia,
     getPlaylist,
+    getAnalytics,
     uploadMedia,
     uploadPlaylist,
     updatePlaylist,

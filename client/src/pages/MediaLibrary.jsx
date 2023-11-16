@@ -38,6 +38,11 @@ function MediaLibrary() {
     type: "",
     status: "pending approval",
     usage: 0,
+    analytics: {
+      clicks: 0,
+      
+      logs: [],
+    },
   });
   const [media, setMedia] = useState(null);
   const [search, setSearch] = useState("");

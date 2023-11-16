@@ -38,11 +38,12 @@ function QuickLinks(props) {
           return res.type === "link";
         }
         return !res.fileName.startsWith("thumbnail") || res.type === "link";
-      }).length;
+      });
       const summary = [
         {
           title: "Media Library",
-          count: filteredMediaAds,
+          count: filteredMediaAds.length,
+          link: "media_library",
           icon: (
             <FaPhotoVideo className="font-bold text-secondary-dark tracking-wider text-2xl" />
           ),
@@ -50,6 +51,7 @@ function QuickLinks(props) {
         {
           title: "Static Ads",
           count: staticAds.length,
+          link: "static_ads",
           icon: (
             <BsMegaphoneFill className="font-bold text-secondary-dark tracking-wider text-2xl -rotate-45" />
           ),
@@ -57,6 +59,7 @@ function QuickLinks(props) {
         {
           title: "Players",
           count: players.length,
+          link: "players",
           icon: (
             <FaTabletScreenButton className="font-bold text-secondary-dark tracking-wider text-2xl" />
           ),
@@ -67,6 +70,7 @@ function QuickLinks(props) {
             (sum, survey) => sum + parseInt(survey.responseCount),
             0
           ),
+          link: "user_engagement",
           icon: (
             <RiSurveyFill className="font-bold text-secondary-dark tracking-wider text-2xl" />
           ),
@@ -74,6 +78,7 @@ function QuickLinks(props) {
         {
           title: "Users",
           count: users.length,
+          link: "user_accounts",
           icon: (
             <FaUsers className="font-bold text-secondary-dark tracking-wider text-2xl" />
           ),
@@ -88,14 +93,7 @@ function QuickLinks(props) {
   return count ? (
     <div className="flex gap-2 w-full overflow-x-auto snap-mandatory snap-x pt-2">
       {count.map((item, index) => {
-        return (
-          <Card
-            key={index}
-            title={item.title}
-            count={item.count}
-            icon={item.icon}
-          />
-        );
+        return <Card key={index} {...item} />;
       })}
     </div>
   ) : (

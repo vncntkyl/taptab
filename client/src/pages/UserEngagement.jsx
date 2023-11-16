@@ -100,7 +100,15 @@ function UserEngagement() {
                   <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
                     <PageHeader>Manage Surveys and Forms</PageHeader>
                   </div>
-                  <Tabs.Group
+                  <div className="flex flex-col gap-2">
+                    <ButtonLink name="New Survey" link="./new_survey" />
+                    <SurveyTable
+                      data={engagements.filter((eng) => eng.type === "survey")}
+                      setItem={setSurvey}
+                      setModal={setModal}
+                    />
+                  </div>
+                  {/* <Tabs.Group
                     ref={tabs}
                     style="default"
                     className="w-full bg-white p-2 border-b-2 border-default"
@@ -126,7 +134,7 @@ function UserEngagement() {
                       <ButtonLink name="New Form" link="./new_form" />
                       Forms Table
                     </Tabs.Item>
-                  </Tabs.Group>
+                  </Tabs.Group> */}
                 </>
               ) : (
                 <></>

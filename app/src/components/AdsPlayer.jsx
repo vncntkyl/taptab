@@ -18,6 +18,7 @@ import { useSurvey } from "../functions/EngagementFunctions";
 import useData from "../hooks/useData";
 import Counter from "./Counter";
 import Countdown from "./Countdown";
+import { format } from "date-fns";
 
 function AdsPlayer({
   /*isFullScreen, toggleFullScreen,*/ links,
@@ -41,7 +42,13 @@ function AdsPlayer({
   const [showSurvey, toggleSurvey] = useState(null);
   const [showSkipCounter, closeSkipCounter] = useState(false);
   const [showSkipButton, toggleSkipButton] = useState(true);
+  const imageTimerRef = useRef(Date.now());
 
+  let adData = {
+    duration: 0,
+    has_finished: false,
+    log_date: "",
+  };
   const togglePlayPause = () => {
     if (videoRef.current) {
       setIsPlaying((current) => !current);
@@ -68,14 +75,19 @@ function AdsPlayer({
       ? previousItem._urlID
       : previousItem.link;
     const index = playlist.indexOf(item);
-
     if (getType(prevURL) === "image") {
       //increment usage by 1
-      await recordAdViews(previousItem._id, 1);
+      const elapsedTimeInSeconds = (Date.now() - imageTimerRef.current) / 1000;
+      adData.duration = elapsedTimeInSeconds;
     } else {
       const durationBeforeSwitching = currentTime;
-      await recordAdViews(previousItem._id, durationBeforeSwitching);
+      adData.duration = durationBeforeSwitching;
     }
+    adData.log_date = format(new Date(), "yyyy-MM-dd'T'HH:mm:ssXXX");
+    console.log(adData, `media_id: ${previousItem._id}`);
+    imageTimerRef.current = Date.now();
+    await recordAdViews(previousItem._id, adData);
+
     setCurrentVideoIndex(index);
   };
 
@@ -117,41 +129,37 @@ function AdsPlayer({
           ...survey.questions,
         ]);
       }
-      console.log(typeof currentVideoIndex, typeof (links.length - 1));
       if (currentVideoIndex < links.length - 1) {
         setCurrentVideoIndex(currentVideoIndex + 1);
         setIsLoading(true);
-        console.log(links.length - 1, currentVideoIndex);
       } else if (currentVideoIndex === links.length - 1) {
         setCurrentVideoIndex(0);
         setIsLoading(true);
-        console.log("End of playlist. Restarting from index 0.");
-        console.log("Current Video Index after resetting:", currentVideoIndex);
       }
 
-      if (item.type === "video") {
-        await recordAdViews(item._id, item.videoDuration);
+      if (item.type === "image") {
+        const elapsedTimeInSeconds =
+          (Date.now() - imageTimerRef.current) / 1000;
+        adData.duration = elapsedTimeInSeconds;
       } else {
-        await recordAdViews(item._id, 1);
+        adData.duration = item.videoDuration;
       }
+      imageTimerRef.current = Date.now();
+      adData.has_finished = true;
+      adData.log_date = format(new Date(), "yyyy-MM-dd'T'HH:mm:ssXXX");
+
+      await recordAdViews(item._id, adData);
     };
     if (videoElement) {
       const loadData = () => {
         setIsLoading(false);
       };
-
       videoElement.addEventListener("loadeddata", loadData);
       videoElement.addEventListener("ended", handleVideoEnd);
-      // videoElement.addEventListener("timeupdate", () => {
-      //   console.log(videoElement.currentTime);
-      // });
 
       return () => {
         videoElement.removeEventListener("loadeddata", loadData);
         videoElement.removeEventListener("ended", handleVideoEnd);
-        // videoElement.removeEventListener("timeupdate", () => {
-        //   console.log(videoElement.currentTime);
-        // });
       };
     } else if (imagePlayer) {
       const timeout = setTimeout(handleVideoEnd, 5000);
@@ -160,7 +168,7 @@ function AdsPlayer({
         clearTimeout(timeout);
       };
     }
-  }, [currentVideoIndex, links, playlist, recordAdViews, surveys]);
+  }, [currentVideoIndex, links, playlist, recordAdViews, surveys, showSurvey]);
 
   const closeSurvey = () => {
     toggleSurvey(null);

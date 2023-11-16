@@ -63,23 +63,35 @@ const getType = (link) => {
     : null;
 };
 
-const recordAdViews = async (_id, views) => {
-  // try {
-  //   const response = await axios.patch(
-  //     `${url.storage}metrics/${_id}`,
-  //     { views: views },
-  //     {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     }
-  //   );
-  //   if (response.status === 200) {
-  //     console.log(response.data)
-  //   }
-  // } catch (error) {
-  //   console.error(error);
-  // }
+const recordAdViews = async (_id, data) => {
+  try {
+    let adData = [];
+    if (localStorage.getItem(_id)) {
+      adData = JSON.parse(localStorage.getItem(_id));
+    }
+
+    if (adData.length >= 10) {
+      console.log("ID ready for insertion: ", _id);
+      const response = await axios.patch(
+        `${url.storage}analytics/${_id}`,
+        { data: adData },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.status === 200) {
+        console.log(response.data);
+        localStorage.removeItem(_id);
+      }
+    } else {
+      adData.push(data);
+      localStorage.setItem(_id, JSON.stringify(adData));
+    }
+  } catch (error) {
+    console.error(error);
+  }
 };
 export const useVideos = () => {
   return {

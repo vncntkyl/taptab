@@ -55,63 +55,65 @@ function App() {
     toggleArticle(null);
   }
   useEffect(() => {
-    if (media.length > 0 && schedules.length > 0) {
-      const planner = schedules.map((schedule) => {
-        const mediaItems = schedule.playlist_media;
-        const mediaDetails = mediaItems.map((item) => {
+    if (media && schedules) {
+      if (media.length > 0 && schedules.length > 0) {
+        const planner = schedules.map((schedule) => {
+          const mediaItems = schedule.playlist_media;
+          const mediaDetails = mediaItems.map((item) => {
+            return {
+              ...media.find((med) => med._id == item),
+            };
+          });
           return {
-            ...media.find((med) => med._id == item),
+            ...schedule,
+            playlist_media: [...mediaDetails],
           };
         });
-        return {
-          ...schedule,
-          playlist_media: [...mediaDetails],
+
+        const updatePlayingSchedule = () => {
+          const currentTime = new Date();
+          const currentSchedule = planner.find((schedule) => {
+            const startDate = new Date(schedule.start_date);
+            const endDate = new Date(schedule.end_date);
+            return startDate <= currentTime && currentTime <= endDate;
+          });
+          if (currentSchedule) {
+            setPlayingSchedule(currentSchedule);
+
+            const IDs = [
+              ...new Set(
+                currentSchedule.playlist_media.map((media) => {
+                  return media._id;
+                })
+              ),
+            ];
+            setRelatedAds(
+              media.filter(
+                (item) =>
+                  IDs.includes(item._id) &&
+                  item.type !== "link" &&
+                  item.contentType.startsWith("image")
+              )
+            );
+            // setRelatedAds(
+            //   media.filter(
+            //     (item) =>
+            //       categories.includes(item.category.toLowerCase()) &&
+            //       item.contentType.startsWith("image")
+            //   )
+            // );
+          }
         };
-      });
 
-      const updatePlayingSchedule = () => {
-        const currentTime = new Date();
-        const currentSchedule = planner.find((schedule) => {
-          const startDate = new Date(schedule.start_date);
-          const endDate = new Date(schedule.end_date);
-          return startDate <= currentTime && currentTime <= endDate;
-        });
-        if (currentSchedule) {
-          setPlayingSchedule(currentSchedule);
+        // Set an interval to update the playingSchedule periodically (e.g., every minute)
+        const interval = setInterval(updatePlayingSchedule, 60000); // 60000 milliseconds = 1 minute
 
-          const IDs = [
-            ...new Set(
-              currentSchedule.playlist_media.map((media) => {
-                return media._id;
-              })
-            ),
-          ];
-          setRelatedAds(
-            media.filter(
-              (item) =>
-                IDs.includes(item._id) &&
-                item.type !== "link" &&
-                item.contentType.startsWith("image")
-            )
-          );
-          // setRelatedAds(
-          //   media.filter(
-          //     (item) =>
-          //       categories.includes(item.category.toLowerCase()) &&
-          //       item.contentType.startsWith("image")
-          //   )
-          // );
-        }
-      };
+        // Initial update
+        updatePlayingSchedule();
 
-      // Set an interval to update the playingSchedule periodically (e.g., every minute)
-      const interval = setInterval(updatePlayingSchedule, 60000); // 60000 milliseconds = 1 minute
-
-      // Initial update
-      updatePlayingSchedule();
-
-      // Clean up the interval when the component unmounts
-      return () => clearInterval(interval);
+        // Clean up the interval when the component unmounts
+        return () => clearInterval(interval);
+      }
     }
   }, [media, schedules]);
   useEffect(() => {

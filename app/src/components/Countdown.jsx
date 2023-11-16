@@ -10,7 +10,6 @@ function Countdown({ max }) {
       if (count > 0) {
         const percentage = (count / max) * 100;
         setPercentage(Math.ceil(percentage));
-        console.log(percentage);
         count--;
       } else {
         clearInterval(interval);
