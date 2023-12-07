@@ -54,7 +54,8 @@ function StaticAdsTable({ ads, setItem, setModal }) {
                       {capitalize(item.status)}
                     </p>
                     <p>
-                      <span>{item.views}</span>
+                      {/* <pre>{JSON.stringify(item.views)}</pre> */}
+                      <span>{item.views.length}</span>
                       <span> Interactions</span>
                     </p>
                   </div>
@@ -63,7 +64,11 @@ function StaticAdsTable({ ads, setItem, setModal }) {
                   <p>{item.description || "---"}</p>
                 </Table.Cell>
                 <Table.Cell className="text-left">
-                  <a href={item.link} target="blank" className="relative group text-main">
+                  <a
+                    href={item.link}
+                    target="blank"
+                    className="relative group text-main"
+                  >
                     {item.name}
                     <RiExternalLinkFill className="absolute bottom-0 right-0 hidden group-hover:block bg-white" />
                   </a>
@@ -99,7 +104,7 @@ function StaticAdsTable({ ads, setItem, setModal }) {
                           category: item.category,
                           description: item.description,
                           link: item.link,
-                          imagePath: item.fileName
+                          imagePath: item.fileName,
                         });
                       }}
                     >

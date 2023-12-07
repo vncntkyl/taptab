@@ -21,7 +21,7 @@ function Players() {
   const [players, setPlayers] = useState(null);
   const [player, setPlayer] = useState({
     device_name: "",
-    isOnline: false,
+    isOnline: "",
     status: "ready",
     date_created: new Date(),
     last_location: {
@@ -41,6 +41,7 @@ function Players() {
     e.preventDefault();
     const playerData = { ...player };
     playerData.access_code = generateRandomString(6);
+    console.log(playerData);
     const response = await addPlayer(playerData);
     console.log(response);
   };

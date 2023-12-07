@@ -12,7 +12,8 @@ function Popup({ viewAd, toggleAd }) {
   useEffect(() => {
     const setup = async () => {
       if (!viewAd) return;
-      const url = await QRCode.toDataURL(viewAd.link);
+      const outURL = "https://out.tapmediacorp.com/?id=";
+      const url = await QRCode.toDataURL(outURL + viewAd._id);
       setURL(url);
     };
     setup();

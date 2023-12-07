@@ -32,7 +32,10 @@ function PlaylistTable({ data }) {
                   <div className="flex items-center gap-2">
                     <PlaylistImage media={media} mediaFiles={mediaFiles} />
                     <div>
-                      <Link to="/" className="text-main">
+                      <Link
+                        to={`./${convertText(media.playlist_name)}`}
+                        className="text-main"
+                      >
                         {media.playlist_name}
                       </Link>
                       <p>

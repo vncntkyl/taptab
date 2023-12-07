@@ -1,12 +1,11 @@
 import classNames from "classnames";
 import { useStaticAds } from "../functions/staticAdFunctions";
 import useData from "../hooks/useData";
-import PageHeader from "./PageHeader";
 import AdContainer from "./StaticAds/AdContainer";
 import PropTypes from "prop-types";
 
 function StaticsAds({ className, toggle }) {
-  const { getStaticAds } = useStaticAds();
+  const { getStaticAds, updateStaticAdsAnalytics } = useStaticAds();
   const [data] = useData(getStaticAds, true);
 
   return (
@@ -24,7 +23,10 @@ function StaticsAds({ className, toggle }) {
                 <div
                   key={item._id}
                   className="relative group transition-all cursor-pointer"
-                  onClick={() => toggle(item)}
+                  onClick={async () => {
+                    toggle(item);
+                    await updateStaticAdsAnalytics(item);
+                  }}
                 >
                   <AdContainer ad={item} />
                 </div>

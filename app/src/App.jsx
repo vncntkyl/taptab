@@ -3,7 +3,6 @@ import AdsPlayer from "./components/AdsPlayer";
 import StaticsAds from "./components/StaticsAds";
 import { useVideos } from "./functions/VideoFunctions";
 import useData from "./hooks/useData";
-import SurveyModal from "./components/SurveyModal";
 import AccessForm from "./components/AccessForm";
 import { useSurvey } from "./functions/EngagementFunctions";
 import Widget from "./components/widgets/Widget";
@@ -13,7 +12,12 @@ import ArticlePopup from "./components/ArticlePopup";
 function App() {
   // const [isFullScreen, toggleFullScreen] = useState(false);
   const { getMedia, getPlannerData } = useVideos();
-  const { retrieveTabInfo, updateCurrentLocation } = useSurvey();
+  const {
+    retrieveTabInfo,
+    updateCurrentLocation,
+    validateUser,
+    checkConnection,
+  } = useSurvey();
   const [media] = useData(getMedia, true);
   const [schedules] = useData(getPlannerData, true);
   const [coordinates, setCoordinates] = useState([null, null]);
@@ -21,10 +25,11 @@ function App() {
   const [relatedAds, setRelatedAds] = useState(null);
   const [viewAd, toggleAd] = useState(null);
   const [showArticle, toggleArticle] = useState(null);
+  const [newLogin, setNewLogin] = useState(true);
 
-  function sendIncidentReportToDatabase(report) {
-    console.log(alert);
-  }
+  // function sendIncidentReportToDatabase(report) {
+  //   console.log(alert);
+  // }
 
   function calculateDistance(coord1, coord2) {
     const toRadians = (degrees) => (degrees * Math.PI) / 180;
@@ -54,6 +59,33 @@ function App() {
   function closeArticle() {
     toggleArticle(null);
   }
+  useEffect(() => {
+    const preventContextMenu = (event) => {
+      event.preventDefault();
+    };
+    document.addEventListener("contextmenu", preventContextMenu);
+
+    const setup = async () => {
+      let driver = localStorage.getItem("driver");
+
+      if (driver) {
+        driver = JSON.parse(driver);
+
+        const response = await validateUser(driver);
+        // console.log(response);
+        if (typeof response === "object") {
+          setNewLogin(false);
+          localStorage.setItem("driver", JSON.stringify(response));
+        }
+      }
+    };
+    setup();
+
+    return () => {
+      document.removeEventListener("contextmenu", preventContextMenu);
+    };
+  }, [validateUser]);
+
   useEffect(() => {
     if (media && schedules) {
       if (media.length > 0 && schedules.length > 0) {
@@ -95,21 +127,16 @@ function App() {
                   item.contentType.startsWith("image")
               )
             );
-            // setRelatedAds(
-            //   media.filter(
-            //     (item) =>
-            //       categories.includes(item.category.toLowerCase()) &&
-            //       item.contentType.startsWith("image")
-            //   )
-            // );
+          }else{
+            setPlayingSchedule(null)
           }
         };
 
-        // Set an interval to update the playingSchedule periodically (e.g., every minute)
-        const interval = setInterval(updatePlayingSchedule, 60000); // 60000 milliseconds = 1 minute
-
         // Initial update
         updatePlayingSchedule();
+
+        // Set an interval to update the playingSchedule periodically (e.g., every minute)
+        const interval = setInterval(updatePlayingSchedule, 60000); // 60000 milliseconds = 1 minute
 
         // Clean up the interval when the component unmounts
         return () => clearInterval(interval);
@@ -117,38 +144,22 @@ function App() {
     }
   }, [media, schedules]);
   useEffect(() => {
-    const handleOnline = () => {
-      const pendingIncidentReports =
-        JSON.parse(localStorage.getItem("pendingIncidentReports")) || [];
+    const handleOnline = async () => {
+      let driver = localStorage.getItem("driver");
 
-      pendingIncidentReports.forEach((report) => {
-        sendIncidentReportToDatabase(report);
-      });
+      if (driver) {
+        driver = JSON.parse(driver);
 
-      localStorage.removeItem("pendingIncidentReports");
+        const response = await validateUser(driver);
+        if (typeof response === "object") {
+          const logConnection = await checkConnection(driver._id);
+          console.log(logConnection);
+        }
+      }
     };
-    const handleOffline = () => {
-      const incidentReport = {
-        timestamp: new Date(),
-        message: "Network connection lost",
-        details: "Additional incident details",
-      };
+    const realtimeData = setInterval(handleOnline, 600000);
 
-      // Store the incident report in local storage or an array
-      const pendingIncidentReports =
-        JSON.parse(localStorage.getItem("pendingIncidentReports")) || [];
-      pendingIncidentReports.push(incidentReport);
-      localStorage.setItem(
-        "pendingIncidentReports",
-        JSON.stringify(pendingIncidentReports)
-      );
-    };
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
+    return () => clearInterval(realtimeData);
   }, []);
 
   useEffect(() => {
@@ -157,6 +168,7 @@ function App() {
       const longitude = position.coords.longitude;
       const driverDetails = await retrieveTabInfo();
 
+      if (!driverDetails) return;
       const newCoordinate = {
         latitude: latitude,
         longitude: longitude,
@@ -181,6 +193,7 @@ function App() {
           lat: latitude,
         };
         // update the current location
+        console.log(newData);
 
         const response = await updateCurrentLocation(newData);
         console.log(response);
@@ -207,25 +220,9 @@ function App() {
     };
   }, [coordinates]);
 
-  useEffect(() => {
-    const preventContextMenu = (event) => {
-      event.preventDefault();
-    };
-
-    document.addEventListener("contextmenu", preventContextMenu);
-
-    return () => {
-      document.removeEventListener("contextmenu", preventContextMenu);
-    };
-  }, []);
-  // useEffect(() => {
-  //   const ping = async () => {
-  //     await checkConnection();
-  //   };
-  //   ping();
-  // }, []);
-
-  return (
+  return newLogin ? (
+    <AccessForm setLogin={setNewLogin} />
+  ) : (
     <div className="relative bg-gradient-to-br h-screen from-main to-[#c2c2c2] grid grid-cols-[8fr_3.2fr] grid-rows-[8fr_2.3fr] box-border gap-2 p-2">
       {/* {playingSchedule && console.log(playingSchedule)} */}
       <AdsPlayer
@@ -247,9 +244,9 @@ function App() {
       {/* <SurveyModal modal={showSurvey} setModal={toggleSurvey} /> */}
       <Popup viewAd={viewAd} toggleAd={toggleAd} />
       <ArticlePopup article={showArticle} closeArticle={closeArticle} />
-      <AccessForm />
+
       <p className="absolute bottom-0 bg-[#0000006c] text-xs px-2 text-white">
-        Version 1.3.0
+        Version 1.3.4
       </p>
     </div>
   );

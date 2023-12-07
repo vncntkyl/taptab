@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Taptab Out</title>
+  </head>
+
+  <body>
+    <p id="container">You will be redirected now to the site.</p>
+    <script>
+      const container = document.querySelector("#container");
+      const url = new URL(window.location.href);
+      const id = url.searchParams.get("id");
+
+      const updateStaticAdsAnalytics = async (data) => {
+        const log = {
+          action: "scanned",
+          date: new Date(new Date().toISOString()),
+        };
+        console.log(log);
+        fetch("http://192.168.10.113:5050/staticAds/analytics/" + data._id, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            // Add any other headers if needed
+          },
+          body: JSON.stringify(log),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          .then((result) => {
+            console.log(result)
+            if (result.acknowledged) {
+              window.location.href = data.link;
+            } else {
+              container.innerHTML = "An error occured";
+            }
+          });
+      };
+
+      fetch("http://192.168.10.113:5050/staticAds/" + id, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          // Add any other headers if needed
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            container.innerHTML = "QR INVALID";
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then(async (data) => {
+          const adsData = { ...data };
+          await updateStaticAdsAnalytics(adsData);
+        });
+    </script>
+  </body>
+</html>

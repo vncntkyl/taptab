@@ -44,7 +44,7 @@ function PlayerModal({ modal, setModal, setPlayer, handleSubmission, player }) {
         setPlayer({
           device_name: "",
           isOnline: false,
-          status: "available",
+          status: "ready",
           date_created: new Date(),
           last_location: {
             long: 0,
@@ -97,7 +97,7 @@ function PlayerModal({ modal, setModal, setPlayer, handleSubmission, player }) {
             <TextInput
               id="driver-contact_no"
               onChange={(e) => onInputChange(e, "driver-contact_no")}
-              type="text"
+              type="number"
               sizing="sm"
               value={player.driver.contact_no}
               required

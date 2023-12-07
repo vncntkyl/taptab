@@ -1,13 +1,15 @@
 import PropTypes from "prop-types";
-import { Badge, Button, Checkbox, Table } from "flowbite-react";
+import { Button, Table } from "flowbite-react";
 import { RiDeleteBinFill, RiEditBoxFill } from "react-icons/ri";
 import { useFunction } from "../context/Functions";
 import { iconButton } from "../context/CustomThemes";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
-  const { capitalize, convertText } = useFunction();
+  const { capitalize, convertText, removeSpaces } = useFunction();
   const headers = ["preview", "name", "details", "date_modified"];
+  const navigate = useNavigate();
 
   const getFileURL = (objectName) => {
     return `https://storage.googleapis.com/tamc_advertisements/${objectName}`;
@@ -21,14 +23,15 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
   };
 
   return (
-    <Table className="border bg-white rounded-md">
-      <Table.Head className="shadow-md">
-        <Table.HeadCell className="text-main text-center">
-          <Checkbox />
-        </Table.HeadCell>
+    <Table className="bg-white rounded-md">
+      <Table.Head className="shadow-md sticky top-0 z-[5]">
         {headers.map((header, index) => {
           return (
-            <Table.HeadCell key={index} className="text-main">
+            <Table.HeadCell
+              key={index}
+              className="text-main"
+              onClick={(e) => console.log(e.currentTarget)}
+            >
               {convertText(header)}
             </Table.HeadCell>
           );
@@ -44,17 +47,21 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
               (thumbnail) => thumbnail._id == item._id
             );
             return (
-              <Table.Row key={index} className="text-center">
-                <Table.Cell>
-                  <Checkbox />
-                </Table.Cell>
+              <Table.Row
+                key={index}
+                className="text-center hover:bg-slate-200 cursor-pointer"
+                onClick={() => {
+                  localStorage.setItem("media_id", item._id);
+                  navigate(`./${removeSpaces(item.name)}`);
+                }}
+              >
                 <Table.Cell align="left">
                   {tmb ? (
                     <img
                       src={getFileURL(tmb._urlID)}
                       alt=""
                       loading="lazy"
-                      className="w-full max-w-[300px]"
+                      className="w-full max-w-[300px] rounded"
                     />
                   ) : (
                     <>No preview available</>
@@ -112,7 +119,7 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
                 <Table.Cell>
                   <div className="flex items-center justify-center gap-1">
                     <Button
-                      className="focus:ring-0 w-fit bg-white"
+                      className="focus:ring-0 w-fit"
                       color="transparent"
                       size="sm"
                       theme={iconButton}
@@ -126,7 +133,7 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
                       <RiEditBoxFill className="text-lg" />
                     </Button>
                     <Button
-                      className="focus:ring-0 w-fit bg-white"
+                      className="focus:ring-0 w-fit"
                       color="transparent"
                       size="sm"
                       theme={iconButton}

@@ -35,39 +35,6 @@ const submitSurvey = async (_id, data) => {
     console.error(error);
   }
 };
-const retrieveTabInfo = () => {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open("accounts");
-
-    request.onsuccess = (event) => {
-      const db = event.target.result;
-
-      if (db.objectStoreNames.contains("players")) {
-        const transaction = db.transaction(["players"], "readonly");
-        const objectStore = transaction.objectStore("players");
-        const getRequest = objectStore.get("data");
-
-        getRequest.onsuccess = (event) => {
-          const data = event.target.result;
-          if (data) {
-            const result = JSON.parse(data.value);
-            resolve(result);
-          } else {
-            reject("Data not found");
-          }
-        };
-
-        getRequest.onerror = (event) => {
-          reject("Error getting data: " + event.target.error);
-        };
-      }
-    };
-
-    request.onerror = (event) => {
-      reject("Database error: " + event.target.error);
-    };
-  });
-};
 
 const updateCurrentLocation = async (data) => {
   try {
@@ -84,34 +51,77 @@ const updateCurrentLocation = async (data) => {
   }
 };
 
-const checkConnection = async () => {
+const checkConnection = async (id) => {
   try {
-    const response = await axios.get(`${url.players}ping`, {
+    const response = await axios.get(`${url.players}ping/${id}`, {
       headers: {
         "Content-Type": "application/json",
       },
     });
     if (response.status === 200) {
-      const ID = response.data;
-      const tabInfo = await retrieveTabInfo();
-
-      if (tabInfo) {
-        const validate = await axios.post(
-          `${url.players}ping/${ID._id}`,
-          tabInfo,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        ); // Assuming you want to log the data from the response
-      }
+      return response.data;
     }
   } catch (error) {
     console.error(error);
   }
 };
+const retrieveTabInfo = async () => {
+  let driver = localStorage.getItem("driver");
 
+  if (driver) {
+    driver = JSON.parse(driver);
+    return driver;
+  }
+};
+const loginTaptab = async (data) => {
+  try {
+    const response = await axios.post(
+      url.players + "login",
+      {
+        key: data.accessCode,
+        ip: data.IP,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    console.log(e);
+  }
+};
+const validateUser = async (driver) => {
+  try {
+    const response = await axios.get(`${url.players}taptab/${driver._id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+const getIP = async () => {
+  try {
+    const response = await axios.get(`${url.players}get-ip`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 export const useSurvey = () => {
   return {
     getSurveys,
@@ -119,5 +129,8 @@ export const useSurvey = () => {
     retrieveTabInfo,
     updateCurrentLocation,
     checkConnection,
+    validateUser,
+    loginTaptab,
+    getIP,
   };
 };

@@ -5,6 +5,8 @@ import {
   FileInput,
   Label,
   Modal,
+  Pagination,
+  Select,
   TextInput,
 } from "flowbite-react";
 import { useAuth } from "../context/AuthContext";
@@ -18,9 +20,13 @@ import {
   mainButton,
   modalTheme,
   redMainButton,
+  selectTheme,
   textTheme,
 } from "../context/CustomThemes";
 import { format } from "date-fns";
+import { Route, Routes } from "react-router-dom";
+import FilterDropdown from "../fragments/FilterDropdown";
+import MediaItem from "../components/mediaLibrary/MediaItem";
 
 function MediaLibrary() {
   const { getMedia, uploadMedia, deleteMediaItem } = useStorage();
@@ -40,17 +46,25 @@ function MediaLibrary() {
     usage: 0,
     analytics: {
       clicks: 0,
-      
+
       logs: [],
     },
   });
   const [media, setMedia] = useState(null);
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("normal");
+  const [filter, setFilter] = useState("all");
   const [file, setFile] = useState(null);
+  const [pages, setPages] = useState(1);
+  const [categories, setCategories] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const videoFeed = useRef(null);
   const canvasRef = useRef(null);
   const videoLink = useRef(null);
 
+  const onPageChange = (page) => {
+    setCurrentPage(page);
+  };
   const isVideoLink = (link) => {
     const videoExtensions = [
       ".3g2",
@@ -273,16 +287,88 @@ function MediaLibrary() {
   useEffect(() => {
     const setup = async () => {
       const response = await getMedia();
-      setMediaFiles(
-        response.filter((res) => {
-          // Check if the object has a fileName key, and if it doesn't, consider it as a link
-          if (!res.fileName) {
-            return res.type === "link";
-          }
-          // Include files that don't start with "thumbnail" or have a type of "link"
-          return !res.fileName.startsWith("thumbnail") || res.type === "link";
-        })
-      );
+      let filteredMedia = response.filter((res) => {
+        // Check if the object has a fileName key, and if it doesn't, consider it as a link
+        if (!res.fileName) {
+          return res.type === "link";
+        }
+        // Include files that don't start with "thumbnail" or have a type of "link"
+        return !res.fileName.startsWith("thumbnail") || res.type === "link";
+      });
+
+      setCategories([...new Set(filteredMedia.map((item) => item.category))]);
+      if (search.length > 2) {
+        filteredMedia = filteredMedia.filter((media) =>
+          media.name.toLowerCase().includes(search.toLowerCase())
+        );
+        console.log(filteredMedia);
+      }
+      if (sort !== "normal") {
+        switch (sort) {
+          case "A-Z_asc":
+            filteredMedia = filteredMedia.sort((a, b) => {
+              const itemA = a.name.toUpperCase();
+              const itemB = b.name.toUpperCase();
+
+              if (itemA < itemB) {
+                return -1;
+              }
+              if (itemA > itemB) {
+                return 1;
+              }
+              return 0;
+            });
+            break;
+          case "Z-A_desc":
+            filteredMedia = filteredMedia.sort((a, b) => {
+              const itemA = b.name.toUpperCase();
+              const itemB = a.name.toUpperCase();
+
+              if (itemA < itemB) {
+                return -1;
+              }
+              if (itemA > itemB) {
+                return 1;
+              }
+              return 0;
+            });
+            break;
+          case "date_asc":
+            filteredMedia = filteredMedia.sort((a, b) => {
+              const dateA = new Date(a.timeCreated).getTime();
+              const dateB = new Date(b.timeCreated).getTime();
+              return dateA - dateB;
+            });
+            break;
+          case "date_desc":
+            filteredMedia = filteredMedia.sort((a, b) => {
+              const dateA = new Date(a.timeCreated).getTime();
+              const dateB = new Date(b.timeCreated).getTime();
+              return dateB - dateA;
+            });
+            break;
+          case "usage_asc":
+            filteredMedia = filteredMedia.sort((a, b) => {
+              return a.usage - b.usage;
+            });
+            break;
+          case "usage_desc":
+            filteredMedia = filteredMedia.sort((a, b) => {
+              return b.usage - a.usage;
+            });
+            break;
+        }
+      }
+      if (filter !== "all") {
+        filteredMedia = filteredMedia.filter(
+          (media) => media.category.toLowerCase() === filter.toLowerCase()
+        );
+      }
+      const size = filteredMedia.length;
+      const pageCount = Math.ceil(size / 5);
+      setPages(pageCount);
+      const limit = (currentPage - 1) * 5;
+      setMediaFiles(filteredMedia.splice(limit, 5));
       setThumbnails(
         response.filter((res) => {
           if (res.contentType) {
@@ -297,37 +383,60 @@ function MediaLibrary() {
     return () => {
       clearInterval(realtimeData);
     };
-  }, []);
+  }, [currentPage, getMedia, search, setIsLoading, sort, filter]);
   return (
     <>
-      <div className="transition-all w-full flex flex-col gap-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
-          <PageHeader>Manage Media Library</PageHeader>
-          <MediaUploadDropdown triggerModal={triggerModal} />
-        </div>
-        {mediaFiles && (
-          <div className="w-full overflow-x-auto rounded-md shadow-md flex flex-col gap-2">
-            <form>
-              <TextInput
-                id="search"
-                onChange={(e) => setSearch(e.target.value)}
-                type="text"
-                sizing="sm"
-                placeholder={`Search media`}
-                value={search}
-                required
-                theme={textTheme}
-              />
-            </form>
-            <MediaLibraryTable
-              media={mediaFiles}
-              thumbnails={thumbnails}
-              setItem={setMediaItem}
-              setModal={setModal}
-            />
-          </div>
-        )}
-      </div>
+      <Routes>
+        <Route
+          exact
+          path="/"
+          element={
+            <>
+              <div className="transition-all w-full flex flex-col gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
+                  <PageHeader>Manage Media Library</PageHeader>
+                  <MediaUploadDropdown triggerModal={triggerModal} />
+                </div>
+                {mediaFiles && (
+                  <>
+                    <FilterDropdown
+                      sortOptions={[
+                        "A-Z_asc",
+                        "Z-A_desc",
+                        "date_asc",
+                        "date_desc",
+                        "usage_asc",
+                        "usage_desc",
+                      ]}
+                      filterOptions={categories}
+                      sort={sort}
+                      filter={filter}
+                      query={search}
+                      searchItem={setSearch}
+                      sortItems={setSort}
+                      filterItems={setFilter}
+                    />
+                    <div className="w-full overflow-x-auto rounded-md shadow-md flex flex-col gap-2 max-h-[70vh]">
+                      <MediaLibraryTable
+                        media={mediaFiles}
+                        thumbnails={thumbnails}
+                        setItem={setMediaItem}
+                        setModal={setModal}
+                      />
+                    </div>
+                    <Pagination
+                      totalPages={pages}
+                      currentPage={currentPage}
+                      onPageChange={onPageChange}
+                    />
+                  </>
+                )}
+              </div>
+            </>
+          }
+        />
+        <Route path="/:id" element={<MediaItem />} />
+      </Routes>
       <Modal
         position="center"
         show={modal.toggle}

@@ -14,6 +14,7 @@ import thunder from "./thunder.png";
 import thunderstorm from "./thunderstorm.png";
 import thunderWithSun from "./thunderWithSun.png";
 import fullMoonRaining from "./fullMoonRaining.png";
+import taptabLogo from "./TapTabLogo.png";
 
 export {
   patchyRain,
@@ -32,4 +33,5 @@ export {
   thunder,
   thunderWithSun,
   thunderstorm,
+  taptabLogo,
 };

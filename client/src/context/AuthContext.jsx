@@ -106,6 +106,7 @@ export function AuthProvider({ children }) {
     return JSON.parse(localStorage.getItem("user"));
   };
   const getFullName = (user = JSON.parse(localStorage.getItem("user"))) => {
+    if (!user) return;
     const currentuser = user;
     const middleInitial =
       currentuser.middle_name.length > 0 &&

@@ -64,7 +64,7 @@ function Login() {
     <>
       {isLoading && <Loader />}
       <div
-        className="relative min-h-screen flex items-center justify-center bg-cover bg-center bg-white dark:bg-matte-black"
+        className="relative min-h-screen flex items-center justify-center bg-cover bg-center bg-white dark:bg-matte-black animate-fade duration-500"
         style={{ backgroundImage: `url('${bg}')` }}
       >
         <div className="relative flex flex-col items-center justify-center gap-2 w-full px-4">

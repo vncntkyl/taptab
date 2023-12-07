@@ -35,6 +35,9 @@ function convertText(text) {
 function removeUnderscore(text) {
   return text.replace(/_/g, " ");
 }
+function removeSpaces(text) {
+  return text.replace(/ /g, "_");
+}
 function getPath() {
   return window.location.pathname;
 }
@@ -58,6 +61,7 @@ export const useFunction = () => {
     capitalize,
     convertText,
     getPath,
+    removeSpaces,
     createBreadCrumb,
     removeUnderscore,
     generateRandomString,

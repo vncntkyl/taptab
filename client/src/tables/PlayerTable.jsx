@@ -6,6 +6,7 @@ import { RiDeleteBinFill, RiEditBoxFill } from "react-icons/ri";
 import classNames from "classnames";
 import { GoDotFill, GoEye } from "react-icons/go";
 import { useState } from "react";
+import { differenceInMinutes } from "date-fns";
 
 function PlayerTable({ data }) {
   const { convertText, capitalize } = useFunction();
@@ -39,7 +40,14 @@ function PlayerTable({ data }) {
                     <GoDotFill
                       className={classNames(
                         "text-3xl",
-                        player.isOnline ? "text-green-400" : "text-red-400"
+                        player.isOnline !== ""
+                          ? differenceInMinutes(
+                              new Date(),
+                              new Date(player.isOnline)
+                            ) <= 10
+                            ? "text-green-400"
+                            : "text-red-400"
+                          : "text-red-400"
                       )}
                     />
                   </Table.Cell>
