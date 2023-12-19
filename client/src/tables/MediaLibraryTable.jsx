@@ -49,13 +49,16 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
             return (
               <Table.Row
                 key={index}
-                className="text-center hover:bg-slate-200 cursor-pointer"
-                onClick={() => {
-                  localStorage.setItem("media_id", item._id);
-                  navigate(`./${removeSpaces(item.name)}`);
-                }}
+                className="text-center hover:bg-slate-200 "
               >
-                <Table.Cell align="left">
+                <Table.Cell
+                  align="left"
+                  className="cursor-pointer"
+                  onClick={() => {
+                    localStorage.setItem("media_id", item._id);
+                    navigate(`./${removeSpaces(item.name)}`);
+                  }}
+                >
                   {tmb ? (
                     <img
                       src={getFileURL(tmb._urlID)}

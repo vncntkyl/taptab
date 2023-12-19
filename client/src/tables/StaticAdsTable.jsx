@@ -18,8 +18,8 @@ function StaticAdsTable({ ads, setItem, setModal }) {
   };
 
   return (
-    <Table className="border bg-white rounded-md">
-      <Table.Head className="shadow-md">
+    <Table className="bg-white rounded-md">
+      <Table.Head className="shadow-md sticky top-0 z-[5]">
         {headers.map((header, index) => {
           return (
             <Table.HeadCell key={index} className="text-main">
@@ -35,7 +35,10 @@ function StaticAdsTable({ ads, setItem, setModal }) {
         {ads.length > 0 ? (
           ads.map((item, index) => {
             return (
-              <Table.Row key={index} className="text-center">
+              <Table.Row
+                key={index}
+                className="text-center hover:bg-slate-200 cursor-pointer"
+              >
                 <Table.Cell>
                   <img
                     src={getFileURL(item._urlID)}
@@ -55,7 +58,7 @@ function StaticAdsTable({ ads, setItem, setModal }) {
                     </p>
                     <p>
                       {/* <pre>{JSON.stringify(item.views)}</pre> */}
-                      <span>{item.views.length}</span>
+                      <span>{item.views?.length}</span>
                       <span> Interactions</span>
                     </p>
                   </div>
@@ -88,7 +91,7 @@ function StaticAdsTable({ ads, setItem, setModal }) {
                 <Table.Cell>
                   <div className="flex items-center justify-center gap-1">
                     <Button
-                      className="focus:ring-0 w-fit bg-white"
+                      className="focus:ring-0 w-fit z-[2]"
                       color="transparent"
                       size="sm"
                       theme={iconButton}
@@ -111,7 +114,7 @@ function StaticAdsTable({ ads, setItem, setModal }) {
                       <RiEditBoxFill className="text-lg" />
                     </Button>
                     <Button
-                      className="focus:ring-0 w-fit bg-white"
+                      className="focus:ring-0 w-fit z-[2]"
                       color="transparent"
                       size="sm"
                       theme={iconButton}

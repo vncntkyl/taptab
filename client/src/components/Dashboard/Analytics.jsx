@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useStorage } from "../../context/StorageContext";
 import Card from "./Card";
-import { Progress } from "flowbite-react";
+import { useNavigate } from "react-router-dom";
+import { useFunction } from "../../context/Functions";
 
 function Analytics(props) {
   const { getAnalytics, getMedia } = useStorage();
   const [adAnalytics, setAdAnalytics] = useState(null);
+  const navigate = useNavigate();
+  const { removeSpaces } = useFunction();
 
   const retrieveTotalDuration = (logs) => {
     return logs.reduce((total, log) => (total += log.duration), 0) / 3600;
@@ -138,9 +141,12 @@ function Analytics(props) {
                   <div
                     key={ad._id}
                     className="w-full flex justify-between items-center gap-2 p-2 hover:text-secondary hover:cursor-pointer"
-                    onClick={() =>
-                      window.alert("WIP: will redirect to analytics page")
-                    }
+                    onClick={() => {
+                      localStorage.setItem("media_id", ad.media_id);
+                      navigate(
+                        `./media_library/${removeSpaces(ad.media_name)}`
+                      );
+                    }}
                   >
                     <p className="whitespace-nowrap font-semibold">
                       {ad.media_name.length > 20

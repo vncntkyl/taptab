@@ -45,7 +45,7 @@ function FilterDropdown({
       </div>
       <div className="flex flex-col items-start md:flex-row md:items-center gap-2 w-full row-[2/3] xl:w-fit">
         <label
-          htmlFor="sort"
+          htmlFor="filter"
           className="w-full md:w-1/2 xl:w-fit xl:whitespace-nowrap"
         >
           Categorized By:{" "}

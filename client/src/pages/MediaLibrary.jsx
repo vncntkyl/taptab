@@ -301,7 +301,6 @@ function MediaLibrary() {
         filteredMedia = filteredMedia.filter((media) =>
           media.name.toLowerCase().includes(search.toLowerCase())
         );
-        console.log(filteredMedia);
       }
       if (sort !== "normal") {
         switch (sort) {

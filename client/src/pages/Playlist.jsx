@@ -3,7 +3,7 @@ import PageHeader from "../fragments/PageHeader";
 import { useStorage } from "../context/StorageContext";
 import { useAuth } from "../context/AuthContext";
 import PlaylistTable from "../tables/PlaylistTable";
-import { Button } from "flowbite-react";
+import { Button, Pagination } from "flowbite-react";
 import { lightButton } from "../context/CustomThemes";
 import { RiAddFill } from "react-icons/ri";
 import { Link, Route, Routes } from "react-router-dom";
@@ -22,11 +22,13 @@ function Playlist() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("normal");
   const [filter, setFilter] = useState("all");
-  const [file, setFile] = useState(null);
   const [pages, setPages] = useState(1);
-  const [categories, setCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [categories, setCategories] = useState([]);
 
+  const onPageChange = (page) => {
+    setCurrentPage(page);
+  };
   useEffect(() => {
     setIsLoading(true);
   }, [setIsLoading]);
@@ -55,7 +57,80 @@ function Playlist() {
             }),
         };
       });
-      setPlaylists(mappedPlaylist);
+      setCategories([...new Set(mappedPlaylist.map((item) => item.category))]);
+      if (search.length > 2) {
+        mappedPlaylist = mappedPlaylist.filter((media) =>
+          media.playlist_name.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+      if (sort !== "normal") {
+        setCurrentPage(1);
+        switch (sort) {
+          case "A-Z_asc":
+            mappedPlaylist = mappedPlaylist.sort((a, b) => {
+              const itemA = a.playlist_name.toUpperCase();
+              const itemB = b.playlist_name.toUpperCase();
+
+              if (itemA < itemB) {
+                return -1;
+              }
+              if (itemA > itemB) {
+                return 1;
+              }
+              return 0;
+            });
+            break;
+          case "Z-A_desc":
+            mappedPlaylist = mappedPlaylist.sort((a, b) => {
+              const itemA = b.playlist_name.toUpperCase();
+              const itemB = a.playlist_name.toUpperCase();
+
+              if (itemA < itemB) {
+                return -1;
+              }
+              if (itemA > itemB) {
+                return 1;
+              }
+              return 0;
+            });
+            break;
+          case "date_asc":
+            mappedPlaylist = mappedPlaylist.sort((a, b) => {
+              const dateA = new Date(a.time_created).getTime();
+              const dateB = new Date(b.time_created).getTime();
+              return dateA - dateB;
+            });
+            break;
+          case "date_desc":
+            mappedPlaylist = mappedPlaylist.sort((a, b) => {
+              const dateA = new Date(a.time_created).getTime();
+              const dateB = new Date(b.time_created).getTime();
+              return dateB - dateA;
+            });
+            break;
+          case "usage_asc":
+            mappedPlaylist = mappedPlaylist.sort((a, b) => {
+              return a.usage - b.usage;
+            });
+            break;
+          case "usage_desc":
+            mappedPlaylist = mappedPlaylist.sort((a, b) => {
+              return b.usage - a.usage;
+            });
+            break;
+        }
+      }
+      if (filter !== "all") {
+        setCurrentPage(1);
+        mappedPlaylist = mappedPlaylist.filter(
+          (media) => media.category.toLowerCase() === filter.toLowerCase()
+        );
+      }
+      const size = mappedPlaylist.length;
+      const pageCount = Math.ceil(size / 5);
+      setPages(pageCount);
+      const limit = (currentPage - 1) * 5;
+      setPlaylists(mappedPlaylist.splice(limit, 5));
       setIsLoading(false);
     };
     setup();
@@ -63,7 +138,7 @@ function Playlist() {
     // return () => {
     //   clearInterval(realtimeData);
     // };
-  }, [window.location.pathname, onAlert]);
+  }, [onAlert, sort, filter, search, setIsLoading, currentPage]);
   return (
     <>
       <div className="transition-all w-full flex flex-col gap-4">
@@ -108,9 +183,14 @@ function Playlist() {
                       sortItems={setSort}
                       filterItems={setFilter}
                     />
-                    <div className="w-full overflow-x-auto rounded-md shadow-md">
+                    <div className="w-full overflow-x-auto rounded-md shadow-md flex flex-col gap-2 max-h-[70vh]">
                       <PlaylistTable data={playlist} />
                     </div>
+                    <Pagination
+                      totalPages={pages}
+                      currentPage={currentPage}
+                      onPageChange={onPageChange}
+                    />
                   </>
                 )}
               </>

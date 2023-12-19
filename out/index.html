@@ -13,37 +13,7 @@
       const url = new URL(window.location.href);
       const id = url.searchParams.get("id");
 
-      const updateStaticAdsAnalytics = async (data) => {
-        const log = {
-          action: "scanned",
-          date: new Date(new Date().toISOString()),
-        };
-        console.log(log);
-        fetch("http://192.168.10.113:5050/staticAds/analytics/" + data._id, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            // Add any other headers if needed
-          },
-          body: JSON.stringify(log),
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Network response was not ok");
-            }
-            return response.json();
-          })
-          .then((result) => {
-            console.log(result)
-            if (result.acknowledged) {
-              window.location.href = data.link;
-            } else {
-              container.innerHTML = "An error occured";
-            }
-          });
-      };
-
-      fetch("http://192.168.10.113:5050/staticAds/" + id, {
+      fetch("http://192.168.10.245:5050/staticAds/analytics/" + id, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -57,9 +27,8 @@
           }
           return response.json();
         })
-        .then(async (data) => {
-          const adsData = { ...data };
-          await updateStaticAdsAnalytics(adsData);
+        .then((data) => {
+          window.location.href = data.link;
         });
     </script>
   </body>

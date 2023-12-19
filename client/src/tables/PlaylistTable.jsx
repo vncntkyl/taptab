@@ -8,12 +8,12 @@ import { iconButton } from "../context/CustomThemes";
 import { RiDeleteBinFill, RiEditBoxFill } from "react-icons/ri";
 
 function PlaylistTable({ data }) {
-  const { capitalize, convertText } = useFunction();
+  const { convertText } = useFunction();
   const headers = ["name", "details", "action"];
 
   return (
-    <Table className="border bg-white rounded-md">
-      <Table.Head className="shadow-md">
+    <Table className="bg-white rounded-md">
+      <Table.Head className="shadow-md sticky top-0 z-[5]">
         {headers.map((header, index) => {
           return (
             <Table.HeadCell key={index} className="text-main" align="center">
