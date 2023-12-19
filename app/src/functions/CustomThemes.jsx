@@ -78,15 +78,21 @@ export const iconButton = {
     md: "text-sm px-2 py-2 rounded-full",
   },
 };
+export const navButton = {
+  base: "focus: outline-none hover:bg-[#000000d9]",
+  size: {
+    md: "px-2 py-2 rounded-none",
+  },
+};
 export const modalTheme = {
   root: {
-    base: "animate-fade z-50",
+    base: "animate-fade z-50 select-none outline-none ring-0",
     show: {
       on: "flex bg-black bg-opacity-20 dark:bg-opacity-80",
     },
   },
   content: {
-    base: "relative h-auto w-full p-4",
+    base: "relative h-auto w-full p-4 outline-none",
   },
 };
 export const tabTheme = {

@@ -223,7 +223,7 @@ function App() {
   return newLogin ? (
     <AccessForm setLogin={setNewLogin} />
   ) : (
-    <div className="relative bg-gradient-to-br h-screen from-main to-[#c2c2c2] grid grid-cols-[8fr_3.2fr] grid-rows-[8fr_2.3fr] box-border gap-2 p-2">
+    <div className="relative bg-gradient-to-br h-screen from-main to-[#c2c2c2] grid grid-cols-[8fr_3fr] grid-rows-[8fr_2.4fr] box-border gap-2 p-2">
       {/* {playingSchedule && console.log(playingSchedule)} */}
       <AdsPlayer
         // isFullScreen={isFullScreen}
@@ -246,7 +246,7 @@ function App() {
       <ArticlePopup article={showArticle} closeArticle={closeArticle} />
 
       <p className="absolute bottom-0 bg-[#0000006c] text-xs px-2 text-white">
-        Version 1.3.4
+        Version 1.3.6
       </p>
     </div>
   );

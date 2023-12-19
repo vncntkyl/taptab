@@ -19,9 +19,8 @@ const getStaticAds = async () => {
 const updateStaticAdsAnalytics = async (data) => {
   const log = {
     action: "viewed",
-    date: new Date(new Date().toISOString()),
+    date: new Date(new Date().toISOString()).toISOString(),
   };
-  console.log(log);
   const link = url.staticAds + "analytics/" + data._id;
   try {
     const response = await axios.put(link, log, {
