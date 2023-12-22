@@ -15,6 +15,20 @@ const getStaticAds = async () => {
     console.error(error);
   }
 };
+const getStaticAdInformation = async (id) => {
+  try {
+    const response = await axios.get(url.staticAds + id, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 const createStaticAds = async (adImage, adData) => {
   try {
     const formData = new FormData();
@@ -73,6 +87,7 @@ const deleteStaticAd = async (_id) => {
 export const useStaticAds = () => {
   return {
     getStaticAds,
+    getStaticAdInformation,
     createStaticAds,
     updateStaticAd,
     deleteStaticAd,

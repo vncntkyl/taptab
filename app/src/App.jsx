@@ -246,7 +246,7 @@ function App() {
       <ArticlePopup article={showArticle} closeArticle={closeArticle} />
 
       <p className="absolute bottom-0 bg-[#0000006c] text-xs px-2 text-white">
-        Version 1.3.6
+        Version 1.3.7
       </p>
     </div>
   );

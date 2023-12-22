@@ -23,6 +23,8 @@ import {
 } from "../context/CustomThemes";
 import { RiAddFill } from "react-icons/ri";
 import FilterDropdown from "../fragments/FilterDropdown";
+import { Route, Routes } from "react-router-dom";
+import StaticAd from "../components/staticAds/StaticAd";
 
 function StaticAds() {
   const { setIsLoading, setAlert } = useAuth();
@@ -270,56 +272,66 @@ function StaticAds() {
   return (
     <>
       <div className="transition-all w-full flex flex-col gap-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
-          <PageHeader>Manage Static Ads</PageHeader>
-          <Button
-            className="focus:ring-0 w-fit bg-white"
-            onClick={() =>
-              setModal({
-                toggle: true,
-                title: "create new ad",
-              })
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
+                  <PageHeader>Manage Static Ads</PageHeader>
+                  <Button
+                    className="focus:ring-0 w-fit bg-white"
+                    onClick={() =>
+                      setModal({
+                        toggle: true,
+                        title: "create new ad",
+                      })
+                    }
+                    color="transparent"
+                    theme={lightButton}
+                  >
+                    <RiAddFill />
+                    <p>New Ad</p>
+                  </Button>
+                </div>
+                {staticAds && (
+                  <>
+                    <FilterDropdown
+                      sortOptions={[
+                        "A-Z_asc",
+                        "Z-A_desc",
+                        "date_asc",
+                        "date_desc",
+                        "usage_asc",
+                        "usage_desc",
+                      ]}
+                      filterOptions={categories}
+                      sort={sort}
+                      filter={filter}
+                      query={search}
+                      searchItem={setSearch}
+                      sortItems={setSort}
+                      filterItems={setFilter}
+                    />
+                    <div className="w-full overflow-x-auto rounded-md shadow-md flex flex-col gap-2 max-h-[70vh]">
+                      <StaticAdsTable
+                        ads={staticAds}
+                        setModal={setModal}
+                        setItem={setAdItem}
+                      />
+                    </div>
+                    <Pagination
+                      totalPages={pages}
+                      currentPage={currentPage}
+                      onPageChange={onPageChange}
+                    />
+                  </>
+                )}
+              </>
             }
-            color="transparent"
-            theme={lightButton}
-          >
-            <RiAddFill />
-            <p>New Ad</p>
-          </Button>
-        </div>
-        {staticAds && (
-          <>
-            <FilterDropdown
-              sortOptions={[
-                "A-Z_asc",
-                "Z-A_desc",
-                "date_asc",
-                "date_desc",
-                "usage_asc",
-                "usage_desc",
-              ]}
-              filterOptions={categories}
-              sort={sort}
-              filter={filter}
-              query={search}
-              searchItem={setSearch}
-              sortItems={setSort}
-              filterItems={setFilter}
-            />
-            <div className="w-full overflow-x-auto rounded-md shadow-md flex flex-col gap-2 max-h-[70vh]">
-              <StaticAdsTable
-                ads={staticAds}
-                setModal={setModal}
-                setItem={setAdItem}
-              />
-            </div>
-            <Pagination
-              totalPages={pages}
-              currentPage={currentPage}
-              onPageChange={onPageChange}
-            />
-          </>
-        )}
+          />
+          <Route path="/:id" element={<StaticAd />} />
+        </Routes>
       </div>
       <Modal
         position="center"

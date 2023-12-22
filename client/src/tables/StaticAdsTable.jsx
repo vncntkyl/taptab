@@ -8,15 +8,23 @@ import {
 import { useFunction } from "../context/Functions";
 import { iconButton } from "../context/CustomThemes";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 function StaticAdsTable({ ads, setItem, setModal }) {
-  const { capitalize, convertText } = useFunction();
+  const { capitalize, convertText, removeSpaces } = useFunction();
   const headers = ["image", "details", "description", "link", "date_modified"];
+  const navigate = useNavigate();
 
   const getFileURL = (objectName) => {
     return `https://storage.googleapis.com/tamc_advertisements/${objectName}`;
   };
 
+  const viewItem = (ad) => {
+    const id = ad._id;
+    const name = ad.name;
+    localStorage.setItem("static_id", id);
+    navigate(`./${removeSpaces(name)}`);
+  };
   return (
     <Table className="bg-white rounded-md">
       <Table.Head className="shadow-md sticky top-0 z-[5]">
@@ -39,7 +47,7 @@ function StaticAdsTable({ ads, setItem, setModal }) {
                 key={index}
                 className="text-center hover:bg-slate-200 cursor-pointer"
               >
-                <Table.Cell>
+                <Table.Cell onClick={() => viewItem(item)}>
                   <img
                     src={getFileURL(item._urlID)}
                     alt=""
@@ -47,7 +55,7 @@ function StaticAdsTable({ ads, setItem, setModal }) {
                     className="max-w-[250px] rounded"
                   />
                 </Table.Cell>
-                <Table.Cell>
+                <Table.Cell onClick={() => viewItem(item)}>
                   <div className="flex flex-col text-start">
                     <p>
                       <span className="font-semibold">{item.name}</span>
@@ -63,7 +71,10 @@ function StaticAdsTable({ ads, setItem, setModal }) {
                     </p>
                   </div>
                 </Table.Cell>
-                <Table.Cell className="max-w-[250px] text-left">
+                <Table.Cell
+                  className="max-w-[250px] text-left"
+                  onClick={() => viewItem(item)}
+                >
                   <p>{item.description || "---"}</p>
                 </Table.Cell>
                 <Table.Cell className="text-left">
