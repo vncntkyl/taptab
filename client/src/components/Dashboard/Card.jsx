@@ -1,20 +1,25 @@
 import classNames from "classnames";
 import PropTypes from "prop-types";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-function Card({ title, count, link, icon }) {
-  const navigate = useNavigate();
+function Card({ title, count, link, icon: Icon }) {
   return (
     <Link
       to={`/${link ? link : ""}`}
       className={classNames(
-        "relative w-full min-w-[100%] sm:min-w-[49%] lg:min-w-[32.5%] xl:min-w-[19%] min-h-[150px] snap-start flex flex-col justify-between p-2 bg-white border-b-8 border-main text-secondary-light shadow-md font-bold",
+        "relative w-full min-w-[100%] sm:min-w-[49%] lg:min-w-[32.5%] xl:min-w-[19%] min-h-[150px] snap-start flex flex-col items-center justify-evenly p-4 gap-6 bg-white py-8 text-secondary-light font-bold",
         link ? "cursor-pointer" : "cursor-default"
       )}
     >
-      <p className="text-5xl pb-4">{count}</p>
-      <div className="text-lg">{title}</div>
-      <div className="absolute top-0 right-0 p-4">{icon}</div>
+      <div className="flex items-center gap-2">
+        <Icon
+          className={classNames(
+            "font-bold text-secondary-dark tracking-wider text-2xl"
+          )}
+        />
+        <div>{title}</div>
+      </div>
+      <p className="text-7xl">{count}</p>
     </Link>
   );
 }

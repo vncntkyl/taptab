@@ -1,4 +1,4 @@
-const host = "http://192.168.10.245:5050/";
+const host = "http://localhost:5050/";
 // const host = "https://taptab-server.onrender.com/";
 export const developmentRoutes = {
   users: host + "users/",

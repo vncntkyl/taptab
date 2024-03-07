@@ -6,12 +6,12 @@ import QuickLinks from "../components/Dashboard/QuickLinks";
 import Analytics from "../components/Dashboard/Analytics";
 function Dashboard() {
   return (
-    <div>
+    <div className="flex flex-col gap-4 p-4 h-full">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <PageHeader>Dashboard Overview</PageHeader>
         <Today />
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4">
         <QuickLinks />
         <Analytics />
       </div>

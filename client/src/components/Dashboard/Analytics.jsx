@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useStorage } from "../../context/StorageContext";
-import Card from "./Card";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useFunction } from "../../context/Functions";
+import { RiInformationLine } from "react-icons/ri";
+import { Tooltip } from "flowbite-react";
+import classNames from "classnames";
 
-function Analytics(props) {
+function Analytics() {
   const { getAnalytics, getMedia } = useStorage();
   const [adAnalytics, setAdAnalytics] = useState(null);
-  const navigate = useNavigate();
-  const { removeSpaces } = useFunction();
+  const { removeSpaces, removeUnderscore } = useFunction();
 
   const retrieveTotalDuration = (logs) => {
     return logs.reduce((total, log) => (total += log.duration), 0) / 3600;
@@ -59,6 +60,89 @@ function Analytics(props) {
     return analytics.reduce((hours, ad) => (hours += ad.totalWatchHours), 0);
   };
 
+  function WatchCards({ title, module }) {
+    let count = 0;
+    let countText;
+    switch (module) {
+      case "total":
+        count = calculateTotalWatchHours(adAnalytics);
+        break;
+      case "avg":
+        count = adAnalytics.reduce(
+          (hours, ad) =>
+            (hours = ad.avgWatchHours ? hours + ad.avgWatchHours : hours),
+          0
+        );
+        break;
+      case "percentage":
+        count = calculateFinishRate(adAnalytics);
+        break;
+      case "impression":
+        count = 25;
+        break;
+      case "engagement":
+        count = 29;
+        break;
+    }
+
+    if (!/impression|engagement/.test(module)) {
+      count = showHours(count, module);
+    }
+    if (!/impression|engagement|percentage/.test(module)) {
+      countText = count.split(" ");
+      countText = (
+        <>
+          <span>{countText[0]}</span>
+          <span className="text-lg">{countText[1]}</span>
+          {" "}
+          <span>{countText[2]}</span>
+          <span className="text-lg">{countText[3]}</span>
+        </>
+      );
+    } else {
+      countText = count;
+    }
+
+    //Split the count by decimals and return the hours and mins if module is total or avg
+    return (
+      <div className="relative w-full min-w-[100%] sm:min-w-[49%] lg:min-w-[32.5%] xl:min-w-[19%] min-h-[150px] snap-start flex flex-col items-center justify-between gap-4 p-4 bg-white py-8 pt-10 text-secondary-light font-bold border-b-8 border-secondary">
+        <p
+          className={classNames(
+            "whitespace-nowrap text-center",
+            count.length > 10
+              ? "text-3xl"
+              : count.length > 5
+              ? "text-4xl"
+              : "text-5xl"
+          )}
+        >
+          {countText}
+        </p>
+        <p className="capitalize text-center">{title}</p>
+      </div>
+    );
+  }
+  function showHours(count, module) {
+    let hours = count.toFixed(2);
+    let [hour, minute] = hours.split(".");
+
+    if (["total", "avg"].includes(module)) {
+      hour = parseInt(hour);
+      minute = parseInt((minute / 100) * 60); // Convert remaining minutes to seconds
+
+      if (hour > 0 && minute > 0) {
+        hours = `${hour} hrs ${minute} mins`;
+      } else if (hour > 0) {
+        hours = `${hour} hrs`;
+      } else {
+        hours = `${minute} mins`;
+      }
+    } else {
+      hours += "%";
+    }
+    return hours;
+  }
+
   useEffect(() => {
     const setup = async () => {
       const response = await getAnalytics();
@@ -99,91 +183,75 @@ function Analytics(props) {
   }, []);
   return adAnalytics ? (
     <>
-      <div className="flex flex-col gap-2">
-        <div>
-          <div className="font-bold text-lg">TapTab Summary</div>
-          <p>Last 28 days</p>
-          <div className="flex gap-2 w-full overflow-x-auto snap-mandatory snap-x pt-2">
-            <Card
-              title="Total Watch Hours"
-              count={`${calculateTotalWatchHours(adAnalytics).toFixed(
-                2
-              )} hours`}
-            />
-            <Card
-              title="Average Watch Hours"
-              count={`${adAnalytics
-                .reduce(
-                  (hours, ad) =>
-                    (hours = ad.avgWatchHours
-                      ? hours + ad.avgWatchHours
-                      : hours),
-                  0
-                )
-                .toFixed(2)} hour`}
-            />
-            <Card
-              title="Total Watch Percentage"
-              count={`${calculateFinishRate(adAnalytics)}%`}
-            />
-            <Card title="Static Ads Impressions" count={25} />
+      <div className="flex flex-row w-full gap-8 py-4">
+        <div className="w-1/2 flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <p className="font-bold text-xl">TapTab Summary</p>
+            <Tooltip
+              content="Taptab summary shows the analytics from the past 28 days"
+              placement="right"
+            >
+              <RiInformationLine className="text-xl" />
+            </Tooltip>
+          </div>
+          <div className="flex shadow-md">
+            <WatchCards title="total watch hours" module="total" />
+            <WatchCards title="average watch hours" module="avg" />
+            <WatchCards title="total watch percentage" module="percentage" />
+          </div>
+          <div className="flex gap-4">
+            <WatchCards title="static ad impressions" module="impression" />
+            <WatchCards title="static ad engagements" module="engagement" />
           </div>
         </div>
-        <div>
-          <div className="font-bold text-lg">Top Advertisements</div>
-          <div className="bg-white w-full md:w-1/3 p-2">
+        <div className="w-1/2 flex flex-col gap-4">
+          <div className="font-bold text-xl">Top Advertisements</div>
+          <div className="bg-white w-full h-full p-4 shadow-md">
             {adAnalytics
               .filter((ad) => ad.totalWatchHours)
               .splice(0, 5)
               .sort((a, b) => b.totalWatchHours - a.totalWatchHours)
               .map((ad) => {
                 return (
-                  <div
+                  <Link
                     key={ad._id}
-                    className="w-full flex justify-between items-center gap-2 p-2 hover:text-secondary hover:cursor-pointer"
+                    to={`./media_library/${removeSpaces(ad.media_name)}`}
+                    className="group w-full flex justify-between items-center gap-4 p-4 hover:text-secondary hover:cursor-pointer"
                     onClick={() => {
                       localStorage.setItem("media_id", ad.media_id);
-                      navigate(
-                        `./media_library/${removeSpaces(ad.media_name)}`
-                      );
                     }}
                   >
-                    <p className="whitespace-nowrap font-semibold">
-                      {ad.media_name.length > 20
-                        ? ad.media_name.substring(0, 20) + "..."
-                        : ad.media_name}
+                    <p className="whitespace-nowrap font-semibold text-xl">
+                      {removeUnderscore(
+                        ad.media_name.length > 20
+                          ? ad.media_name.substring(0, 20) + "..."
+                          : ad.media_name
+                      )}
                     </p>
                     <div className="relative w-full h-[10px]">
                       <div
-                        className="bg-secondary-dark absolute right-10 top-0 h-full rounded-full"
+                        className="bg-secondary-dark group-hover:bg-secondary absolute top-0 h-full rounded-full"
                         style={{
-                          width: `${
+                          width: `${(
                             (ad.totalWatchHours /
                               calculateTotalWatchHours(adAnalytics)) *
                             100
-                          }%`,
+                          ).toFixed(2)}%`,
+                          right: `${
+                            showHours(ad.totalWatchHours, "total").length
+                          }ch`,
                         }}
                       ></div>
-                      <p className="absolute right-0 top-0 h-full flex items-center justify-center text-secondary-dark">
-                        {ad.totalWatchHours.toFixed(2)}
+
+                      <p className="absolute right-0 top-0 h-full flex items-center justify-center text-secondary-dark group-hover:text-secondary">
+                        {showHours(ad.totalWatchHours, "total")}
                       </p>
                     </div>
-                    {/* <Progress
-                      theme={{ base: "w-full overflow-hidden rounded-full" }}
-                      progress={
-                        (ad.totalWatchHours /
-                          calculateTotalWatchHours(adAnalytics)) *
-                        100
-                      }
-                    /> */}
-                  </div>
+                  </Link>
                 );
               })}
           </div>
         </div>
-        {/* <pre className="whitespace-pre-wrap">
-          {JSON.stringify(adAnalytics, null, 2)}
-        </pre> */}
       </div>
     </>
   ) : (
@@ -191,6 +259,9 @@ function Analytics(props) {
   );
 }
 
-Analytics.propTypes = {};
+Analytics.propTypes = {
+  title: PropTypes.string,
+  module: PropTypes.string,
+};
 
 export default Analytics;

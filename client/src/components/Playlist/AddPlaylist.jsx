@@ -66,6 +66,7 @@ function AddPlaylist(props) {
       if (_id) {
         const playlistData = localStorage.getItem("playlistData");
         data = JSON.parse(playlistData);
+        console.log(data);
         setDetails({
           playlist_name: data.playlist_name,
           category: data.category,

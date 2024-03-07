@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useStorage } from "../../context/StorageContext";
 import { useStaticAds } from "../../context/StaticAdsContext";
@@ -11,7 +10,7 @@ import { BsMegaphoneFill } from "react-icons/bs";
 import { FaTabletScreenButton, FaUsers } from "react-icons/fa6";
 import { RiSurveyFill } from "react-icons/ri";
 
-function QuickLinks(props) {
+function QuickLinks() {
   const [count, setCount] = useState(null);
   const { getMedia } = useStorage();
   const { getStaticAds } = useStaticAds();
@@ -44,25 +43,19 @@ function QuickLinks(props) {
           title: "Media Library",
           count: filteredMediaAds.length,
           link: "media_library",
-          icon: (
-            <FaPhotoVideo className="font-bold text-secondary-dark tracking-wider text-2xl" />
-          ),
+          icon: FaPhotoVideo,
         },
         {
           title: "Static Ads",
           count: staticAds.length,
           link: "static_ads",
-          icon: (
-            <BsMegaphoneFill className="font-bold text-secondary-dark tracking-wider text-2xl -rotate-45" />
-          ),
+          icon: BsMegaphoneFill,
         },
         {
           title: "Players",
           count: players.length,
           link: "players",
-          icon: (
-            <FaTabletScreenButton className="font-bold text-secondary-dark tracking-wider text-2xl" />
-          ),
+          icon: FaTabletScreenButton,
         },
         {
           title: "Survey Engagements",
@@ -71,17 +64,13 @@ function QuickLinks(props) {
             0
           ),
           link: "user_engagement",
-          icon: (
-            <RiSurveyFill className="font-bold text-secondary-dark tracking-wider text-2xl" />
-          ),
+          icon: RiSurveyFill,
         },
         {
           title: "Users",
           count: users.length,
           link: "user_accounts",
-          icon: (
-            <FaUsers className="font-bold text-secondary-dark tracking-wider text-2xl" />
-          ),
+          icon: FaUsers,
         },
       ];
 
@@ -91,9 +80,18 @@ function QuickLinks(props) {
     setup();
   }, []);
   return count ? (
-    <div className="flex gap-2 w-full overflow-x-auto snap-mandatory snap-x pt-2">
+    <div className="flex w-full overflow-x-auto snap-mandatory snap-x divide-x-2 shadow-md">
       {count.map((item, index) => {
-        return <Card key={index} {...item} />;
+        const { icon: Icon } = item;
+        return (
+          <Card
+            key={index}
+            title={item.title}
+            count={item.count}
+            link={item.link}
+            icon={Icon}
+          />
+        );
       })}
     </div>
   ) : (

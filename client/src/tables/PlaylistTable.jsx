@@ -35,6 +35,12 @@ function PlaylistTable({ data }) {
                       <Link
                         to={`./${convertText(media.playlist_name)}`}
                         className="text-main"
+                        onClick={() =>
+                          localStorage.setItem(
+                            "playlistData",
+                            JSON.stringify(media)
+                          )
+                        }
                       >
                         {media.playlist_name}
                       </Link>
