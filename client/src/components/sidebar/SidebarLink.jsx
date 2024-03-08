@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import classNames from "classnames";
 import { useFunction } from "../../context/Functions";
 
-function SidebarLink({ name, icon, count = null, toggle, toggler }) {
+function SidebarLink({ name, icon: Icon, count = null, toggle, toggler }) {
   const { capitalize, convertText } = useFunction();
   return (
     <Link
@@ -12,7 +12,7 @@ function SidebarLink({ name, icon, count = null, toggle, toggler }) {
       className="relative hover:bg-secondary-dark transition-all py-1"
     >
       <div className="relative">
-        {icon}
+        <Icon className="text-xl h-[40px] w-[40px] p-2 transition-all duration-200" />
         {count !== null && (
           <span
             className={classNames(

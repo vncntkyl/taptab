@@ -1,6 +1,7 @@
 import axios from "axios";
 import { developmentRoutes as url } from "./Routes";
 
+const geoTaggedAdsUrl = url.storage + "/geolocation";
 const getStaticAds = async () => {
   try {
     const response = await axios.get(url.staticAds, {
@@ -15,9 +16,37 @@ const getStaticAds = async () => {
     console.error(error);
   }
 };
+const getGeoAds = async () => {
+  try {
+    const response = await axios.get(geoTaggedAdsUrl, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 const getStaticAdInformation = async (id) => {
   try {
     const response = await axios.get(url.staticAds + id, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+const getGeoAd = async (id) => {
+  try {
+    const response = await axios.get(geoTaggedAdsUrl + id, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -91,5 +120,7 @@ export const useStaticAds = () => {
     createStaticAds,
     updateStaticAd,
     deleteStaticAd,
+    getGeoAd,
+    getGeoAds,
   };
 };

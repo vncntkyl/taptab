@@ -6,6 +6,7 @@ import { FaChevronRight } from "react-icons/fa";
 import { CgDanger } from "react-icons/cg";
 import { taptabLogo } from "../assets/index";
 import { useSurvey } from "../functions/EngagementFunctions";
+import Cookies from "js-cookie";
 function AccessForm({ setLogin }) {
   const keyRef = useRef(null);
   const [onError, setError] = useState(null);
@@ -27,7 +28,7 @@ function AccessForm({ setLogin }) {
     if (typeof response === "string") {
       setError(response);
     } else {
-      localStorage.setItem("driver", JSON.stringify(response));
+      Cookies.set("driver", JSON.stringify(response));
       setLogin(false);
     }
   };

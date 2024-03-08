@@ -3,31 +3,39 @@ import PropTypes from "prop-types";
 import SidebarLink from "./SidebarLink";
 import { BiSolidDashboard } from "react-icons/bi";
 import { BsFillCalendarWeekFill, BsMegaphoneFill } from "react-icons/bs";
-import { FaTabletScreenButton, FaUsers } from "react-icons/fa6";
+import { FaGear, FaTabletScreenButton, FaUsers } from "react-icons/fa6";
 import { RiSurveyFill } from "react-icons/ri";
 import { FaPhotoVideo } from "react-icons/fa";
-import { MdOutlineVideoLibrary, MdWarning } from "react-icons/md";
+import { MdOutlineVideoLibrary } from "react-icons/md";
+import { FaMapMarkedAlt } from "react-icons/fa";
 
 function Sidebar({ toggle, setToggle }) {
-  const sidebarLinkClassname =
-    "text-xl h-[40px] w-[40px] p-2 transition-all duration-200"; /* toggle && "lg:h-[45px] lg:w-[45px] pl-4"*/
-
-  const Divider = ({ children, className }) => {
-    return (
-      <p
-        className={classNames(
-          "mx-2 uppercase font-bold text-main tracking-wider text-sm",
-          className
-        )}
-      >
-        {children}
-      </p>
-    );
-  };
-  Divider.propTypes = {
-    children: PropTypes.node,
-    className: PropTypes.string,
-  };
+  const links = [
+    {
+      name: "media library",
+      icon: FaPhotoVideo,
+    },
+    {
+      name: "playlist",
+      icon: MdOutlineVideoLibrary,
+    },
+    {
+      name: "players",
+      icon: FaTabletScreenButton,
+    },
+    {
+      name: "planner",
+      icon: BsFillCalendarWeekFill,
+    },
+    {
+      name: "static ads",
+      icon: BsMegaphoneFill,
+    },
+    { name: "geo tagged ads", icon: FaMapMarkedAlt },
+    { name: "user engagements", icon: RiSurveyFill },
+    { name: "user accounts", icon: FaUsers },
+    { name: "settings", icon: FaGear },
+  ];
   return (
     <div
       className={classNames(
@@ -41,70 +49,66 @@ function Sidebar({ toggle, setToggle }) {
         name="dashboard"
         toggle={toggle}
         toggler={setToggle}
-        icon={<BiSolidDashboard className={classNames(sidebarLinkClassname)} />}
+        icon={BiSolidDashboard}
       />
       <Divider>Media</Divider>
-      <SidebarLink
-        name="media library"
-        toggle={toggle}
-        toggler={setToggle}
-        icon={<FaPhotoVideo className={classNames(sidebarLinkClassname)} />}
-      />
-      <SidebarLink
-        name="playlist"
-        toggle={toggle}
-        toggler={setToggle}
-        icon={
-          <MdOutlineVideoLibrary className={classNames(sidebarLinkClassname)} />
-        }
-      />
-      <SidebarLink
-        name="players"
-        toggle={toggle}
-        toggler={setToggle}
-        icon={
-          <FaTabletScreenButton className={classNames(sidebarLinkClassname)} />
-        }
-      />
-      <SidebarLink
-        name="planner"
-        toggle={toggle}
-        toggler={setToggle}
-        icon={
-          <BsFillCalendarWeekFill
-            className={classNames(sidebarLinkClassname)}
+      {links.splice(0, 4).map((link) => {
+        const { name, icon: Icon } = link;
+        return (
+          <SidebarLink
+            key={name}
+            name={name}
+            toggle={toggle}
+            toggler={setToggle}
+            icon={Icon}
           />
-        }
-      />
+        );
+      })}
       <Divider>Others</Divider>
-      <SidebarLink
-        name="static ads"
-        toggle={toggle}
-        toggler={setToggle}
-        icon={<BsMegaphoneFill className={classNames(sidebarLinkClassname)} />}
-      />
-      <SidebarLink
-        name="user engagements"
-        toggle={toggle}
-        toggler={setToggle}
-        icon={<RiSurveyFill className={classNames(sidebarLinkClassname)} />}
-      />
-      {/* <SidebarLink
-        name="incident reports"
-        toggle={toggle}
-        toggler={setToggle}
-        icon={<MdWarning className={classNames(sidebarLinkClassname)} />}
-      /> */}
-      <SidebarLink
-        name="user accounts"
-        toggle={toggle}
-        toggler={setToggle}
-        icon={<FaUsers className={classNames(sidebarLinkClassname)} />}
-      />
+      {links.splice(0, 3).map((link) => {
+        const { name, icon: Icon } = link;
+        return (
+          <SidebarLink
+            key={name}
+            name={name}
+            toggle={toggle}
+            toggler={setToggle}
+            icon={Icon}
+          />
+        );
+      })}
+      <Divider>System</Divider>
+      {links.splice(0, 3).map((link) => {
+        const { name, icon: Icon } = link;
+        return (
+          <SidebarLink
+            key={name}
+            name={name}
+            toggle={toggle}
+            toggler={setToggle}
+            icon={Icon}
+          />
+        );
+      })}
     </div>
   );
 }
-
+const Divider = ({ children, className }) => {
+  return (
+    <p
+      className={classNames(
+        "mx-2 uppercase font-bold text-main tracking-wider text-sm",
+        className
+      )}
+    >
+      {children}
+    </p>
+  );
+};
+Divider.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+};
 Sidebar.propTypes = {
   toggle: PropTypes.bool,
   setToggle: PropTypes.func,

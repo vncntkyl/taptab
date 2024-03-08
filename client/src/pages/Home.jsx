@@ -15,6 +15,7 @@ import UserEngagement from "./UserEngagement";
 import Playlist from "./Playlist";
 import Planner from "./Planner";
 import Players from "./Players";
+import GeoTaggedAds from "./GeoTaggedAds";
 
 function Home() {
   const [onSidebar, toggleSidebar] = useState(false);
@@ -61,6 +62,7 @@ function Home() {
             <Route path="/planner" element={<Planner />} />
             <Route path="/players" element={<Players />} />
             <Route path="/static_ads/*" element={<StaticAds />} />
+            <Route path="/geo_tagged_ads/*" element={<GeoTaggedAds />} />
             <Route path="/user_engagements/*" element={<UserEngagement />} />
             <Route path="/user_accounts" element={<UserAccounts />} />
           </Routes>

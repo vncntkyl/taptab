@@ -8,9 +8,9 @@ import { useSurvey } from "./functions/EngagementFunctions";
 import Widget from "./components/widgets/Widget";
 import Popup from "./components/StaticAds/Popup";
 import ArticlePopup from "./components/ArticlePopup";
+import Cookies from "js-cookie";
 
 function App() {
-  // const [isFullScreen, toggleFullScreen] = useState(false);
   const { getMedia, getPlannerData } = useVideos();
   const {
     retrieveTabInfo,
@@ -26,10 +26,6 @@ function App() {
   const [viewAd, toggleAd] = useState(null);
   const [showArticle, toggleArticle] = useState(null);
   const [newLogin, setNewLogin] = useState(true);
-
-  // function sendIncidentReportToDatabase(report) {
-  //   console.log(alert);
-  // }
 
   function calculateDistance(coord1, coord2) {
     const toRadians = (degrees) => (degrees * Math.PI) / 180;
@@ -66,7 +62,7 @@ function App() {
     document.addEventListener("contextmenu", preventContextMenu);
 
     const setup = async () => {
-      let driver = localStorage.getItem("driver");
+      let driver = Cookies.get("driver");
 
       if (driver) {
         driver = JSON.parse(driver);
@@ -75,7 +71,7 @@ function App() {
         // console.log(response);
         if (typeof response === "object") {
           setNewLogin(false);
-          localStorage.setItem("driver", JSON.stringify(response));
+          Cookies.set("driver", JSON.stringify(response));
         }
       }
     };
@@ -127,8 +123,8 @@ function App() {
                   item.contentType.startsWith("image")
               )
             );
-          }else{
-            setPlayingSchedule(null)
+          } else {
+            setPlayingSchedule(null);
           }
         };
 
