@@ -1,5 +1,4 @@
 import PageHeader from "../fragments/PageHeader";
-import PropTypes from "prop-types";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import QuickLinks from "../components/Dashboard/QuickLinks";
@@ -18,13 +17,6 @@ function Dashboard() {
     </div>
   );
 }
-
-function SubTitle({ children }) {
-  return <div className="font-bold text-lg">{children}</div>;
-}
-SubTitle.propTypes = {
-  children: PropTypes.node,
-};
 function Today() {
   const [date, setDate] = useState(new Date());
 

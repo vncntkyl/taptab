@@ -15,4 +15,5 @@ export const developmentRoutes = {
   engagements: host + "surveys/",
   planner: host + "planner/",
   players: host + "players/",
+  widget: host + "widgets/",
 };

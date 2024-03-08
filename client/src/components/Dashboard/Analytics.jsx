@@ -93,8 +93,7 @@ function Analytics() {
       countText = (
         <>
           <span>{countText[0]}</span>
-          <span className="text-lg">{countText[1]}</span>
-          {" "}
+          <span className="text-lg">{countText[1]}</span>{" "}
           <span>{countText[2]}</span>
           <span className="text-lg">{countText[3]}</span>
         </>

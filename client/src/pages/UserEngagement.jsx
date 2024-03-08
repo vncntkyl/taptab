@@ -65,8 +65,8 @@ function UserEngagement() {
       setTab(tab);
       tabs.current?.setActiveTab(tab);
     }
-    if (window.location.pathname === "/user_engagement/responses") {
-      navigate("/user_engagement");
+    if (window.location.pathname === "/user_engagements/responses") {
+      navigate("/user_engagements");
     }
   }, [window.location.pathname]);
 

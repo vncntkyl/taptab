@@ -177,7 +177,7 @@ function Survey() {
       setAlert(alert);
       localStorage.removeItem("settings_progress");
       localStorage.removeItem("survey_progress");
-      navigate("./user_engagement");
+      navigate("./user_engagements");
     } else {
       alert.type = "failure";
       alert.message = response;

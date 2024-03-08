@@ -84,7 +84,7 @@ function Sidebar({ toggle, setToggle }) {
         icon={<BsMegaphoneFill className={classNames(sidebarLinkClassname)} />}
       />
       <SidebarLink
-        name="user engagement"
+        name="user engagements"
         toggle={toggle}
         toggler={setToggle}
         icon={<RiSurveyFill className={classNames(sidebarLinkClassname)} />}

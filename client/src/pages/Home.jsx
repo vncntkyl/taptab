@@ -42,7 +42,7 @@ function Home() {
       navigate("/login");
       return;
     }
-    if (!window.location.pathname.includes("user_engagement")) {
+    if (!window.location.pathname.includes("user_engagements")) {
       if (localStorage.getItem("activeTab")) {
         localStorage.removeItem("activeTab");
       }
@@ -61,8 +61,7 @@ function Home() {
             <Route path="/planner" element={<Planner />} />
             <Route path="/players" element={<Players />} />
             <Route path="/static_ads/*" element={<StaticAds />} />
-            <Route path="/user_engagement/*" element={<UserEngagement />} />
-            {/* <Route path="/incident_reports" element={<>Incident Reports</>} /> */}
+            <Route path="/user_engagements/*" element={<UserEngagement />} />
             <Route path="/user_accounts" element={<UserAccounts />} />
           </Routes>
         </div>
@@ -74,7 +73,6 @@ function Home() {
           />
         )}
         <Sidebar toggle={onSidebar} setToggle={toggleSidebar} />
-        {/* {localStorage.getItem("user")} */}
         {onAlert.isOn && (
           <Alert
             icon={RiInformationFill}
