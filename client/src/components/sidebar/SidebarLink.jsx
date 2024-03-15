@@ -1,15 +1,27 @@
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import classNames from "classnames";
 import { useFunction } from "../../context/Functions";
 
 function SidebarLink({ name, icon: Icon, count = null, toggle, toggler }) {
   const { capitalize, convertText } = useFunction();
+  const location = useLocation();
+  const checkPath = () => {
+    if (location.pathname === "/" && name === "dashboard") {
+      return "bg-secondary-dark";
+    }
+    if (location.pathname.includes(convertText(name))) {
+      return "bg-secondary-dark";
+    }
+  };
   return (
     <Link
       to={name === "dashboard" ? "/" : `/${convertText(name)}`}
       onClick={() => toggler(false)}
-      className="relative hover:bg-secondary-dark transition-all py-1"
+      className={classNames(
+        "relative hover:bg-secondary-dark transition-all py-1",
+        checkPath()
+      )}
     >
       <div className="relative">
         <Icon className="text-xl h-[40px] w-[40px] p-2 transition-all duration-200" />
@@ -42,7 +54,7 @@ function SidebarLink({ name, icon: Icon, count = null, toggle, toggler }) {
 }
 SidebarLink.propTypes = {
   name: PropTypes.string,
-  icon: PropTypes.node,
+  icon: PropTypes.func,
   count: PropTypes.number,
   toggle: PropTypes.bool,
   toggler: PropTypes.func,

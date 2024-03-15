@@ -591,7 +591,3 @@ function MediaLibrary() {
 }
 
 export default MediaLibrary;
-
-{
-  /* {`https://storage.googleapis.com/${media[0].bucket}/${media[0]._urlID}`} */
-}

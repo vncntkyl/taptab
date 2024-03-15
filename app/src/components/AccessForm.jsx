@@ -79,6 +79,9 @@ function AccessForm({ setLogin }) {
           )}
         </form>
       </div>
+      <p className="absolute bottom-0 bg-[#0000006c] text-xs px-2 text-white">
+        Version 1.4.2
+      </p>
     </>
   );
 }

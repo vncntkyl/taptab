@@ -12,24 +12,21 @@ import { useNavigate } from "react-router-dom";
 
 function GeoTaggedAdsTable({ ads, setItem, setModal }) {
   const { capitalize, convertText, removeSpaces } = useFunction();
-  const headers = [
-    "image",
-    "details",
-    "location_trigger",
-    "link",
-    "date_modified",
-  ];
+  const headers = ["image", "details", "location", "link", "date_modified"];
   const navigate = useNavigate();
 
   const getFileURL = (objectName) => {
     return `https://storage.googleapis.com/tamc_advertisements/${objectName}`;
   };
 
-  const viewItem = (ad) => {
+  const viewItem = (ad, isEdit) => {
     const id = ad._id;
     const name = ad.name;
     localStorage.setItem("geo_ad_id", id);
-    navigate(`./${removeSpaces(name)}/edit`);
+    const url = !isEdit
+      ? `./${removeSpaces(name)}`
+      : `./${removeSpaces(name)}/edit`;
+    navigate(url);
   };
   return (
     <Table className="bg-white rounded-md">
@@ -49,10 +46,7 @@ function GeoTaggedAdsTable({ ads, setItem, setModal }) {
         {ads?.length > 0 ? (
           ads.map((item, index) => {
             return (
-              <Table.Row
-                key={index}
-                className="text-center hover:bg-slate-200 cursor-pointer"
-              >
+              <Table.Row key={index} className="text-center hover:bg-slate-200">
                 <Table.Cell onClick={() => viewItem(item)}>
                   <img
                     src={getFileURL(item._urlID)}
@@ -71,16 +65,21 @@ function GeoTaggedAdsTable({ ads, setItem, setModal }) {
                       {capitalize(item.status)}
                     </p>
                     <p>
-                      <span>{item.views?.length}</span>
+                      <span>{item.views}</span>
                       <span> Views</span>
                     </p>
                   </div>
                 </Table.Cell>
-                <Table.Cell
-                  className="max-w-[250px] text-left"
-                  onClick={() => viewItem(item)}
-                >
-                  <p>{item.description || "---"}</p>
+                <Table.Cell className="max-w-[250px] text-left">
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${item.coords.lat}%2C${item.coords.lng}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="relative group font-semibold"
+                  >
+                    {item.location}
+                    <RiExternalLinkFill className="absolute bottom-0 right-0 hidden group-hover:block bg-white" />
+                  </a>
                 </Table.Cell>
                 <Table.Cell className="text-left">
                   <a
@@ -111,21 +110,7 @@ function GeoTaggedAdsTable({ ads, setItem, setModal }) {
                       color="transparent"
                       size="sm"
                       theme={iconButton}
-                      onClick={() => {
-                        setModal({
-                          toggle: true,
-                          title: "edit ad",
-                        });
-                        setItem({
-                          _id: item._id,
-                          name: item.name,
-                          image: getFileURL(item._urlID),
-                          category: item.category,
-                          link: item.link,
-                          coords: item.coords,
-                          imagePath: item.fileName,
-                        });
-                      }}
+                      onClick={() => viewItem(item, true)}
                     >
                       <RiEditBoxFill className="text-lg" />
                     </Button>

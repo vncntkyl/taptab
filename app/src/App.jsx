@@ -8,6 +8,7 @@ import { useSurvey } from "./functions/EngagementFunctions";
 import Widget from "./components/widgets/Widget";
 import Popup from "./components/StaticAds/Popup";
 import ArticlePopup from "./components/ArticlePopup";
+import GeoTaggedAds from "./components/GeoTaggedAds/Index";
 import Cookies from "js-cookie";
 
 function App() {
@@ -163,7 +164,6 @@ function App() {
       const latitude = position.coords.latitude;
       const longitude = position.coords.longitude;
       const driverDetails = await retrieveTabInfo();
-
       if (!driverDetails) return;
       const newCoordinate = {
         latitude: latitude,
@@ -188,9 +188,6 @@ function App() {
           long: longitude,
           lat: latitude,
         };
-        // update the current location
-        console.log(newData);
-
         const response = await updateCurrentLocation(newData);
         console.log(response);
         console.log("Position has changed.");
@@ -220,6 +217,7 @@ function App() {
     <AccessForm setLogin={setNewLogin} />
   ) : (
     <div className="relative bg-gradient-to-br h-screen from-main to-[#c2c2c2] grid grid-cols-[8fr_3fr] grid-rows-[8fr_2.4fr] box-border gap-2 p-2">
+      <GeoTaggedAds coords={coordinates} />
       {/* {playingSchedule && console.log(playingSchedule)} */}
       <AdsPlayer
         // isFullScreen={isFullScreen}
@@ -240,9 +238,8 @@ function App() {
       {/* <SurveyModal modal={showSurvey} setModal={toggleSurvey} /> */}
       <Popup viewAd={viewAd} toggleAd={toggleAd} />
       <ArticlePopup article={showArticle} closeArticle={closeArticle} />
-
       <p className="absolute bottom-0 bg-[#0000006c] text-xs px-2 text-white">
-        Version 1.3.7
+        Version 1.4.1
       </p>
     </div>
   );

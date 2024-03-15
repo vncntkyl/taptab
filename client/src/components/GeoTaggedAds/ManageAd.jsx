@@ -1,11 +1,157 @@
-import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
+import PageHeader from "../../fragments/PageHeader";
+import { useEffect, useState } from "react";
+import { Button, FileInput, Label, TextInput } from "flowbite-react";
+import { useFunction } from "../../context/Functions";
+import { mainButton, textTheme } from "../../context/CustomThemes";
+import MapPicker from "./MapPicker";
+import { useStaticAds } from "../../context/StaticAdsContext";
 
-function ManageAd(props) {
+function ManageAd() {
   const { id } = useParams();
-  return <div>
-    
-  </div>;
+  const { capitalize } = useFunction();
+  const { createGeoTaggedAds, getGeoAd } = useStaticAds();
+  const [ad, setAd] = useState({
+    image: "",
+    file: "",
+    name: "",
+    link: "",
+  });
+  const [location, setLocation] = useState({
+    lat: 14.556289599266941,
+    lng: 121.00485772896641,
+  });
+
+  const handleAdEdit = async () => {};
+
+  const handleAdUpload = async () => {
+    const geoAd = { ...ad, coords: location, views: 0, status: "active" };
+    delete geoAd.image;
+    console.log(geoAd);
+
+    const response = await createGeoTaggedAds(geoAd);
+    console.log(response);
+  };
+
+  const onInputChange = (e, key) => {
+    setAd((current) => {
+      return {
+        ...current,
+        [key]: e.target.value,
+      };
+    });
+  };
+  const onFileChange = (evt) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      // Access image contents from reader result
+      const mediaContent = e.target.result;
+      const filename = evt.target.files[0].name
+        .split(".")
+        .slice(0, -1)
+        .join(".");
+      if (id) {
+        setAd((ad) => {
+          return {
+            ...ad,
+            image: mediaContent,
+            file: evt.target.files[0],
+          };
+        });
+      } else {
+        setAd((ad) => {
+          return {
+            ...ad,
+            image: mediaContent,
+            name: filename,
+            file: evt.target.files[0],
+          };
+        });
+      }
+    };
+    reader.readAsDataURL(evt.target.files[0]);
+  };
+
+  useEffect(() => {
+    const setup = async () => {
+      if (id) {
+        const response = await getGeoAd(localStorage.getItem("geo_ad_id"));
+        if (response) {
+          setLocation(response.coords);
+          delete response.coords;
+          console.log(response);
+          setAd(response);
+        }
+      }
+    };
+    setup();
+  }, []);
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <PageHeader>{id ? `Edit ${id}` : `Create New Ad`}</PageHeader>
+        <Button
+          className=""
+          type="submit"
+          color="transparent"
+          onClick={id ? handleAdEdit : handleAdUpload}
+          theme={mainButton}
+        >
+          {id ? "Save Changes" : "Save"}
+        </Button>
+      </div>
+      <div className="bg-white p-6 shadow rounded">
+        <form className="flex flex-col gap-6" encType="multipart/form-data">
+          <div className="flex flex-col gap-6 xl:flex-row">
+            <div className="w-full xl:w-1/2 flex flex-col gap-4">
+              <div>
+                <Label htmlFor="file" value="Upload Image" />
+                <FileInput
+                  id="file"
+                  type="text"
+                  sizing="lg"
+                  accept="image/*"
+                  onChange={(e) => onFileChange(e)}
+                  theme={textTheme}
+                />
+              </div>
+              {["name", "link"].map((item, index) => {
+                return (
+                  <div key={index}>
+                    <Label htmlFor={item} value={capitalize(item)} />
+                    <TextInput
+                      id={item}
+                      onChange={(e) => onInputChange(e, item)}
+                      type="text"
+                      sizing="md"
+                      color="gray"
+                      placeholder={
+                        item === "link" ? "https://www.adlink.com" : ""
+                      }
+                      value={ad[item]}
+                      required
+                    />
+                  </div>
+                );
+              })}
+              {ad?.image && (
+                <div>
+                  <span className="font-semibold">Image Preview:</span>
+                  <img src={ad.image} alt="" className="w-auto max-h-[300px]" />
+                </div>
+              )}
+            </div>
+            <MapPicker
+              center={location}
+              setCenter={setLocation}
+              onChange={setAd}
+              item={ad}
+            />
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
 
 ManageAd.propTypes = {};

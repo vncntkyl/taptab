@@ -1,5 +1,6 @@
 import axios from "axios";
 import { developmentRoutes as url } from "./Routes";
+import Cookies from "js-cookie";
 
 const link = url.engagements;
 const getSurveys = async () => {
@@ -66,7 +67,7 @@ const checkConnection = async (id) => {
   }
 };
 const retrieveTabInfo = async () => {
-  let driver = localStorage.getItem("driver");
+  let driver = localStorage.getItem("driver") || Cookies.get("driver");
 
   if (driver) {
     driver = JSON.parse(driver);
