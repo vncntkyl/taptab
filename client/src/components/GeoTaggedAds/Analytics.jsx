@@ -1,19 +1,23 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useStaticAds } from "../../context/StaticAdsContext";
 import format from "date-fns/format";
 import AnalyticsCard from "../../fragments/AnalyticsCard";
-import { Label, Select } from "flowbite-react";
+import { Datepicker, Label, Radio, Select } from "flowbite-react";
 import {
   Bar,
-  BarChart,
   CartesianGrid,
+  ComposedChart,
   Legend,
+  Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
+import classNames from "classnames";
 function Analytics() {
+  const { getGeoAdStatistics } = useStaticAds();
   const currentDate = new Date();
   const [analytics, setAnalytics] = useState();
   const [dates, setDates] = useState({
@@ -23,61 +27,137 @@ function Analytics() {
     ),
     to: format(currentDate, "MM/dd/yy"),
   });
-  const { getGeoAdStatistics } = useStaticAds();
+  const [dateFilter, setDateFilter] = useState("all");
+  const [metricFilter, setMetricFilter] = useState("all");
 
   useEffect(() => {
     const id = localStorage.getItem("geo_ad_id");
     const setup = async () => {
       if (id) {
-        const response = await getGeoAdStatistics(id, dates);
+        const dateOptions =
+          dateFilter === "all" ? { range: dateFilter } : dates;
+        const response = await getGeoAdStatistics(id, dateOptions);
+        console.log(response);
         setAnalytics(response);
       }
     };
     setup();
-  }, [dates]);
+  }, [dateFilter, dates]);
   return (
     analytics && (
-      <div>
+      <div className="space-y-6">
         <section className="flex gap-4">
-          {["shows", "scans", "interactions"].map((key) => {
+          {["shows"].map((key) => {
             return (
-              <AnalyticsCard key={key} title={key} count={analytics[key]} />
+              <AnalyticsCard key={key} title={"Shows"} count={analytics[key]} />
             );
           })}
+          <AnalyticsCard title="Total Clicks" count={analytics.interactions} />
+          <AnalyticsCard
+            title="Players Passed By"
+            count={analytics.players?.length}
+          />
         </section>
-        <section>
-          <div className=" bg-white p-4 gap-4 w-full flex flex-col rounded shadow-md">
-            <h1 className="font-bold">Hourly Engagement Statistics</h1>
-            <div className="flex flex-row gap-2 items-center border-b pb-2">
-              <Label htmlFor="filter" value="Show Statistics" />
-              {/* <Select
+        <section className="flex flex-col gap-4">
+          <h2 className="font-bold text-lg border-b">Statistics</h2>
+          <div className="flex flex-row gap-2 items-center">
+            <div className="flex gap-4 items-center">
+              <p className="font-bold whitespace-nowrap">Select Date:</p>
+              <div className="flex items-center gap-2">
+                <Radio
+                  id="all"
+                  name="date_types"
+                  value="All"
+                  defaultChecked
+                  onChange={() => setDateFilter("all")}
+                />
+                <Label htmlFor="all" value="All" />
+              </div>
+              <div className="flex items-center gap-2">
+                <Radio
+                  id="range"
+                  name="date_types"
+                  value="Range"
+                  onChange={() => setDateFilter("range")}
+                />
+                <Label htmlFor="range" value="Range" />
+                <div
+                  className={classNames(
+                    dateFilter !== "range" && "pointer-events-none opacity-50",
+                    "flex items-center gap-4"
+                  )}
+                >
+                  <Datepicker
+                    onSelectedDateChanged={(date) =>
+                      setDates((prev) => ({ ...prev, from: date }))
+                    }
+                    defaultDate={new Date(dates.from)}
+                  />
+                  <span>-</span>
+                  <Datepicker
+                    onSelectedDateChanged={(date) =>
+                      setDates((prev) => ({ ...prev, to: date }))
+                    }
+                    defaultDate={new Date(dates.to)}
+                    maxDate={new Date()}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <Label htmlFor="filter" value="Show Metrics" />
+              <Select
                 id="filter"
-                onChange={(e) => {
-                  setAnalytics(filterLogs(e.target.value, logs));
-                }}
+                onChange={(e) => setMetricFilter(e.target.value)}
               >
                 <option value="all">All</option>
-                <option value="today">Today</option>
-                <option value="week">Past Week</option>
-                <option value="monthly">Past 28 Days</option>
-              </Select> */}
+                <option value="shows">Shows</option>
+                <option value="clicks">Clicks</option>
+                <option value="scans">Scans</option>
+              </Select>
             </div>
-            {/* <ResponsiveContainer
+          </div>
+          <div className=" bg-white p-4 gap-4 w-full flex flex-col rounded shadow-md">
+            <ResponsiveContainer
               width={"100%"}
               height={350}
-              className="overflow-auto"
+              className="overflow-hidden"
             >
-              {console.log(analytics.charts.daily)}
-              <BarChart data={analytics.charts.daily}>
+              <ComposedChart data={analytics?.charts}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="isScanned" />
+                <XAxis dataKey="day" />
                 <YAxis />
-                <Legend />
                 <Tooltip />
-                <Bar dataKey="isClosed" fill="#119dd8" />
-                <Bar dataKey="isScanned" fill="#052f41" />
-              </BarChart>
-            </ResponsiveContainer> */}
+                <Legend />
+                {metricFilter !== "all" ? (
+                  metricFilter === "shows" ? (
+                    <Line
+                      type="natural"
+                      dataKey="records"
+                      strokeWidth={4}
+                      stroke="#1c4a5d"
+                    />
+                  ) : metricFilter === "clicks" ? (
+                    <Bar dataKey="clicks" fill="#39b1e5" />
+                  ) : (
+                    metricFilter === "scans" && (
+                      <Bar dataKey="scans" fill="#052f41" />
+                    )
+                  )
+                ) : (
+                  <>
+                    <Line
+                      type="natural"
+                      dataKey="records"
+                      strokeWidth={4}
+                      stroke="#1c4a5d"
+                    />
+                    <Bar dataKey="clicks" fill="#39b1e5" />
+                    <Bar dataKey="scans" fill="#052f41" />
+                  </>
+                )}
+              </ComposedChart>
+            </ResponsiveContainer>
           </div>
         </section>
         {/* <pre className="whitespace-pre-wrap">
@@ -87,5 +167,4 @@ function Analytics() {
     )
   );
 }
-
 export default Analytics;
