@@ -46,7 +46,11 @@ function GeoTaggedAdsTable({ ads, setItem, setModal }) {
         {ads?.length > 0 ? (
           ads.map((item, index) => {
             return (
-              <Table.Row key={index} className="text-center hover:bg-slate-200">
+              <Table.Row
+                key={index}
+                id={item._id}
+                className="text-center hover:bg-slate-200"
+              >
                 <Table.Cell onClick={() => viewItem(item)}>
                   <img
                     src={getFileURL(item._urlID)}

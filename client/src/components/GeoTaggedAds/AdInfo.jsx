@@ -6,6 +6,7 @@ import { useStaticAds } from "../../context/StaticAdsContext";
 import PageHeader from "../../fragments/PageHeader";
 import { format } from "date-fns";
 import { APIProvider, AdvancedMarker, Map } from "@vis.gl/react-google-maps";
+import Analytics from "./Analytics";
 
 function AdInfo() {
   const { id } = useParams();
@@ -87,7 +88,7 @@ function AdInfo() {
             </section>
             <section className="bg-white p-6 shadow rounded w-full space-y-4 xl:w-2/3">
               <h2 className="font-bold text-lg border-b">Analytics</h2>
-              
+              <Analytics />
             </section>
           </>
         )}

@@ -30,6 +30,23 @@ const getGeoAds = async () => {
     console.error(error);
   }
 };
+const getGeoAdStatistics = async (id, dates) => {
+  try {
+    const response = await axios.get(geoTaggedAdsUrl + `analytics/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      params: {
+        dates: JSON.stringify(dates),
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 const getStaticAdInformation = async (id) => {
   try {
     const response = await axios.get(url.staticAds + id, {
@@ -142,6 +159,7 @@ export const useStaticAds = () => {
     deleteStaticAd,
     getGeoAd,
     getGeoAds,
+    getGeoAdStatistics,
     createGeoTaggedAds,
   };
 };
