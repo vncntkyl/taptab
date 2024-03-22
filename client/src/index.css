@@ -6,6 +6,7 @@
 * {
   font-family: "Nunito Sans", sans-serif;
   -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
 }
 .rbc-header {
   background-color: #fff;

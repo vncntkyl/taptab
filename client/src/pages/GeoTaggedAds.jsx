@@ -58,7 +58,9 @@ function Main() {
       link: "",
     });
   };
-  const handleAdDelete = () => {};
+  const handleAdDelete = async () => {
+    
+  };
 
   useEffect(() => {
     const setup = async () => {

@@ -73,7 +73,7 @@ function MapPicker({ center, setCenter, onChange, item }) {
           or drag the map to your desired location
         </span>
         <APIProvider apiKey="AIzaSyDpY0KunEUDCKU4HEiArB3GAnixSdkZCZk">
-          <div className="h-[400px] w-full">
+          <div className="h-[475px] w-full">
             {/* {center.lat + ", " + center.lng} */}
             <Map
               onDragend={handleCenterChange}

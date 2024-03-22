@@ -10,7 +10,7 @@ import Analytics from "./Analytics";
 
 function AdInfo() {
   const { id } = useParams();
-  const { capitalize, removeUnderscore } = useFunction();
+  const { removeUnderscore } = useFunction();
   const { getGeoAd } = useStaticAds();
   const [ad, setAd] = useState();
   const [location, setLocation] = useState();
@@ -47,10 +47,14 @@ function AdInfo() {
                     <span className="font-semibold">Name: </span>
                     <span>{removeUnderscore(id)}</span>
                   </p>
-                  <p>
-                    <span className="font-semibold">Date Created: </span>
+                  <p className="flex gap-1">
+                    <span className="font-semibold">Runtime Date: </span>
                     <span>
-                      {format(new Date(ad.timeCreated), "MMMM dd, yyyy")}
+                      {format(new Date(ad.runtime_date?.from), "MMMM dd, yyyy")}
+                    </span>
+                    <span>-</span>
+                    <span>
+                      {format(new Date(ad.runtime_date?.to), "MMMM dd, yyyy")}
                     </span>
                   </p>
                   <p>
@@ -63,6 +67,12 @@ function AdInfo() {
                     >
                       {ad.link}
                     </a>
+                  </p>
+                  <p>
+                    <span className="font-semibold">Creation Date: </span>
+                    <span>
+                      {format(new Date(ad.timeCreated), "MMMM dd, yyyy")}
+                    </span>
                   </p>
                   <p>
                     <span className="font-semibold">Location: </span>

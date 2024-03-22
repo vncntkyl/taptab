@@ -12,7 +12,9 @@ export default {
       animation: {
         "fade-fr-t": "fade-fr-t 750ms ease-in-out",
         fade: "fade 200ms ease-in-out",
+        fadeWithDelay: "fade 1s ease-in-out 1s",
         "pop-up": "popUp 0.3s ease-in-out",
+        splash: "splash .9s ease-in-out",
       },
       keyframes: {
         fade: {
@@ -33,6 +35,21 @@ export default {
             opacity: 1,
           },
         },
+        splash: {
+          "0%": {
+            transform: "scale(0.2)",
+            opacity: 0,
+          },
+          "80%": {
+            transform: "scale(1.5)",
+            opacity: 1,
+          },
+          "100%": {
+            transform: "scale(1)",
+            opacity: 1,
+          },
+        },
+
         "fade-fr-t": {
           "0%": {
             opacity: 0,

@@ -64,14 +64,24 @@ function GeoTaggedAdsTable({ ads, setItem, setModal }) {
                     <p>
                       <span className="font-semibold">{item.name}</span>
                     </p>
-                    <p>
-                      <span>Status: </span>
-                      {capitalize(item.status)}
-                    </p>
-                    <p>
-                      <span>{item.views}</span>
-                      <span> Views</span>
-                    </p>
+                    <div>
+                      <span className="font-semibold">Runtime Date: </span>
+                      <p className="flex gap-1">
+                        <span>
+                          {format(
+                            new Date(item.runtime_date?.from),
+                            "MMMM dd, yyyy"
+                          )}
+                        </span>
+                        <span>-</span>
+                        <span>
+                          {format(
+                            new Date(item.runtime_date?.to),
+                            "MMMM dd, yyyy"
+                          )}
+                        </span>
+                      </p>
+                    </div>
                   </div>
                 </Table.Cell>
                 <Table.Cell className="max-w-[250px] text-left">

@@ -213,35 +213,32 @@ function App() {
     };
   }, [coordinates]);
 
-  return newLogin ? (
-    <AccessForm setLogin={setNewLogin} />
-  ) : (
-    <div className="relative bg-gradient-to-br h-screen from-main to-[#c2c2c2] grid grid-cols-[8fr_3fr] grid-rows-[8fr_2.4fr] box-border gap-2 p-2">
-      <GeoTaggedAds coords={coordinates} />
-      {/* {playingSchedule && console.log(playingSchedule)} */}
-      <AdsPlayer
-        // isFullScreen={isFullScreen}
-        // toggleFullScreen={toggleFullScreen}
-        relatedAds={relatedAds}
-        className="col-[1/2] row-[1/2]"
-        playlist={playingSchedule ? playingSchedule.playlist_media : []}
-        links={
-          playingSchedule
-            ? playingSchedule.playlist_media.map((med) =>
-                med._urlID ? med._urlID : med.link
-              )
-            : []
-        }
-      />
-      <StaticsAds className="col-[1/3] row-[2/3]" toggle={toggleAd} />
-      <Widget setArticle={toggleArticle} />
-      {/* <SurveyModal modal={showSurvey} setModal={toggleSurvey} /> */}
-      <Popup viewAd={viewAd} toggleAd={toggleAd} />
-      <ArticlePopup article={showArticle} closeArticle={closeArticle} />
-      <p className="absolute bottom-0 bg-[#0000006c] text-xs px-2 text-white">
-        Version 1.4.1
-      </p>
-    </div>
+  return (
+    <>
+      <AccessForm setLogin={setNewLogin} />
+      <div className="relative bg-gradient-to-br h-screen from-main to-[#c2c2c2] grid grid-cols-[8fr_3fr] grid-rows-[8fr_2.4fr] box-border gap-2 p-2">
+        <GeoTaggedAds coords={coordinates} />
+        <AdsPlayer
+          relatedAds={relatedAds}
+          className="col-[1/2] row-[1/2]"
+          playlist={playingSchedule ? playingSchedule.playlist_media : []}
+          links={
+            playingSchedule
+              ? playingSchedule.playlist_media.map((med) =>
+                  med._urlID ? med._urlID : med.link
+                )
+              : []
+          }
+        />
+        <StaticsAds className="col-[1/3] row-[2/3]" toggle={toggleAd} />
+        <Widget setArticle={toggleArticle} />
+        <Popup viewAd={viewAd} toggleAd={toggleAd} />
+        <ArticlePopup article={showArticle} closeArticle={closeArticle} />
+        <p className="absolute bottom-0 bg-[#0000006c] text-xs px-2 text-white z-30">
+          Version 1.4.3
+        </p>
+      </div>
+    </>
   );
 }
 

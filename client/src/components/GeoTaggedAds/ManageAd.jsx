@@ -1,16 +1,27 @@
 import { useParams } from "react-router-dom";
 import PageHeader from "../../fragments/PageHeader";
 import { useEffect, useState } from "react";
-import { Button, FileInput, Label, TextInput } from "flowbite-react";
+import {
+  Button,
+  Datepicker,
+  FileInput,
+  Label,
+  TextInput,
+} from "flowbite-react";
 import { useFunction } from "../../context/Functions";
 import { mainButton, textTheme } from "../../context/CustomThemes";
 import MapPicker from "./MapPicker";
 import { useStaticAds } from "../../context/StaticAdsContext";
+import { format } from "date-fns";
+import { useAuth } from "../../context/AuthContext";
+import PropTypes from "prop-types";
 
 function ManageAd() {
+  const currentDate = new Date();
   const { id } = useParams();
   const { capitalize } = useFunction();
   const { createGeoTaggedAds, getGeoAd } = useStaticAds();
+  const { setAlert } = useAuth();
   const [ad, setAd] = useState({
     image: "",
     file: "",
@@ -21,16 +32,30 @@ function ManageAd() {
     lat: 14.556289599266941,
     lng: 121.00485772896641,
   });
+  const [dates, setDates] = useState();
 
   const handleAdEdit = async () => {};
 
   const handleAdUpload = async () => {
-    const geoAd = { ...ad, coords: location, views: 0, status: "active" };
+    const geoAd = { ...ad, coords: location, runtime_date: dates };
     delete geoAd.image;
-    console.log(geoAd);
 
     const response = await createGeoTaggedAds(geoAd);
     console.log(response);
+
+    if (response?.acknowledged) {
+      setAlert({
+        isOn: true,
+        type: "success",
+        message: "New advertisement created!",
+      });
+    } else {
+      setAlert({
+        isOn: true,
+        type: "warning",
+        message: "An error has occured",
+      });
+    }
   };
 
   const onInputChange = (e, key) => {
@@ -78,10 +103,13 @@ function ManageAd() {
         const response = await getGeoAd(localStorage.getItem("geo_ad_id"));
         if (response) {
           setLocation(response.coords);
+          setDates(response.runtime_date);
           delete response.coords;
-          console.log(response);
+          delete response.runtime_date;
           setAd(response);
         }
+      } else {
+        setDates({ from: currentDate, to: new Date() });
       }
     };
     setup();
@@ -134,6 +162,31 @@ function ManageAd() {
                   </div>
                 );
               })}
+              {dates && (
+                <div className="flex flex-col gap-2">
+                  {console.log(dates)}
+                  <Label value="Runtime Date" className="font-semibold" />
+                  <div className="flex items-center gap-4">
+                    <Datepicker
+                      className="w-1/2"
+                      onSelectedDateChanged={(date) =>
+                        setDates((prev) => ({ ...prev, from: date }))
+                      }
+                      defaultDate={new Date(dates.from)}
+                      minDate={new Date()}
+                    />
+                    <span>-</span>
+                    <Datepicker
+                      className="w-1/2"
+                      onSelectedDateChanged={(date) =>
+                        setDates((prev) => ({ ...prev, to: date }))
+                      }
+                      // value={format(new Date(dates.to), "MMMM dd, yyyy")}
+                      defaultDate={new Date(dates.to)}
+                    />
+                  </div>
+                </div>
+              )}
               {ad?.image && (
                 <div>
                   <span className="font-semibold">Image Preview:</span>
@@ -153,7 +206,5 @@ function ManageAd() {
     </div>
   );
 }
-
-ManageAd.propTypes = {};
 
 export default ManageAd;
