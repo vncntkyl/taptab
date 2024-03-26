@@ -11,14 +11,9 @@ import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 
 function GeoTaggedAdsTable({ ads, setItem, setModal }) {
-  const { capitalize, convertText, removeSpaces } = useFunction();
+  const { convertText, removeSpaces } = useFunction();
   const headers = ["image", "details", "location", "link", "date_modified"];
   const navigate = useNavigate();
-
-  const getFileURL = (objectName) => {
-    return `https://storage.googleapis.com/tamc_advertisements/${objectName}`;
-  };
-
   const viewItem = (ad, isEdit) => {
     const id = ad._id;
     const name = ad.name;
@@ -53,7 +48,7 @@ function GeoTaggedAdsTable({ ads, setItem, setModal }) {
               >
                 <Table.Cell onClick={() => viewItem(item)}>
                   <img
-                    src={getFileURL(item._urlID)}
+                    src={item.signedUrl}
                     alt=""
                     loading="lazy"
                     className="max-w-[250px] rounded"

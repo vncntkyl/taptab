@@ -57,17 +57,21 @@ function AdInfo() {
                       {format(new Date(ad.runtime_date?.to), "MMMM dd, yyyy")}
                     </span>
                   </p>
-                  <p>
-                    <span className="font-semibold">Advertisement Link: </span>
-                    <a
-                      href={ad.link}
-                      rel="noreferrer"
-                      target="_blank"
-                      className="text-secondary underline"
-                    >
-                      {ad.link}
-                    </a>
-                  </p>
+                  {ad?.link && (
+                    <p>
+                      <span className="font-semibold">
+                        Advertisement Link:{" "}
+                      </span>
+                      <a
+                        href={ad.link}
+                        rel="noreferrer"
+                        target="_blank"
+                        className="text-secondary underline"
+                      >
+                        {ad.link}
+                      </a>
+                    </p>
+                  )}
                   <p>
                     <span className="font-semibold">Creation Date: </span>
                     <span>
@@ -79,12 +83,12 @@ function AdInfo() {
                     <span>{ad.location}</span>
                   </p>
                   <div>
-                    <APIProvider apiKey="AIzaSyDpY0KunEUDCKU4HEiArB3GAnixSdkZCZk">
+                    <APIProvider apiKey="AIzaSyDbeapt7qyPCPwnOl2FwkyPARyS3dYfYck">
                       <div className="h-[300px] md:h-[250px] w-full">
                         <Map
                           center={location}
                           zoom={16}
-                          mapId={"d552bb0d161a38d8"}
+                          mapId={"b3f282d4d5ce8522"}
                           fullscreenControl={false}
                           streetViewControl={false}
                         >

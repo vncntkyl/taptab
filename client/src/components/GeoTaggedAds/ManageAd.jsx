@@ -164,7 +164,6 @@ function ManageAd() {
               })}
               {dates && (
                 <div className="flex flex-col gap-2">
-                  {console.log(dates)}
                   <Label value="Runtime Date" className="font-semibold" />
                   <div className="flex items-center gap-4">
                     <Datepicker
