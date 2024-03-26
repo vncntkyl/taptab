@@ -36,7 +36,7 @@ function Maps() {
       <div className="w-full h-full shadow-md rounded-md overflow-hidden">
         <GoogleMapReact
           bootstrapURLKeys={{
-            key: "AIzaSyBgdBRaOqyGeoc4E4cWlP8N_wlILEFdgtQ",
+            key: "AIzaSyDbeapt7qyPCPwnOl2FwkyPARyS3dYfYck",
           }}
           center={currentLocation}
           zoom={17}

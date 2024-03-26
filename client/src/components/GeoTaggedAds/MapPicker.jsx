@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { APIProvider, AdvancedMarker, Map } from "@vis.gl/react-google-maps";
 import { Button, Label, TextInput } from "flowbite-react";
@@ -72,7 +72,7 @@ function MapPicker({ center, setCenter, onChange, item }) {
         <span className="font-semibold">
           or drag the map to your desired location
         </span>
-        <APIProvider apiKey="AIzaSyDpY0KunEUDCKU4HEiArB3GAnixSdkZCZk">
+        <APIProvider apiKey="AIzaSyDbeapt7qyPCPwnOl2FwkyPARyS3dYfYck">
           <div className="h-[475px] w-full">
             {/* {center.lat + ", " + center.lng} */}
             <Map
@@ -80,7 +80,7 @@ function MapPicker({ center, setCenter, onChange, item }) {
               onDrag={() => setSearch("")}
               center={center}
               zoom={zoom}
-              mapId={"d552bb0d161a38d8"}
+              mapId={"b3f282d4d5ce8522"}
               onCenterChanged={(event) => setCenter(event.detail.center)}
               fullscreenControl={false}
               streetViewControl={false}
