@@ -7,6 +7,8 @@ import { useAuth } from "../context/AuthContext";
 import { RiInformationFill } from "react-icons/ri";
 import { mainButton } from "../context/CustomThemes";
 import Loader from "../fragments/Loader";
+import { useWidget } from "../context/WidgetContext";
+import Cookies from "js-cookie";
 function Login() {
   const [loginForm, setLoginForm] = useState({
     username: "",
@@ -18,6 +20,7 @@ function Login() {
   });
 
   const { loginUser, navigate, isLoading, setIsLoading } = useAuth();
+  const { retrieveSettings } = useWidget();
   const customTextInputTheme = {
     field: {
       input: {
@@ -41,9 +44,11 @@ function Login() {
     setIsLoading(true);
 
     const response = await loginUser(loginForm);
+    const settings = await retrieveSettings();
     if (response._id) {
       localStorage.setItem("last_login", Date.now());
       localStorage.setItem("user", JSON.stringify(response));
+      Cookies.set("settings", JSON.stringify(settings));
       navigate("/");
     } else {
       toggleError({

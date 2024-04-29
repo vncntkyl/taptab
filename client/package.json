@@ -18,7 +18,7 @@
     "axios": "^1.5.0",
     "classnames": "^2.3.2",
     "date-fns": "^2.30.0",
-    "flowbite-react": "^0.7.3",
+    "flowbite-react": "^0.7.5",
     "google-map-react": "^2.2.1",
     "js-cookie": "^3.0.5",
     "leaflet": "^1.9.4",

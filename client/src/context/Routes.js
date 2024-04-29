@@ -16,4 +16,5 @@ export const developmentRoutes = {
   planner: host + "planner/",
   players: host + "players/",
   widget: host + "widgets/",
+  config: host + "config/",
 };
