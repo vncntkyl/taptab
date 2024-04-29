@@ -75,7 +75,7 @@ function Analytics() {
         );
         break;
       case "percentage":
-        count = calculateFinishRate(adAnalytics);
+        count = calculateFinishRate(adAnalytics) || 0;
         break;
       case "impression":
         count = 25;
