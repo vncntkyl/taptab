@@ -15,6 +15,20 @@ const getPlannerData = async () => {
     console.error(error);
   }
 };
+const getOnePlannerData = async (id) => {
+  try {
+    const response = await axios.get(url.planner + id, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const addSchedule = async (data) => {
   try {
@@ -33,6 +47,7 @@ const addSchedule = async (data) => {
 
 export const usePlanner = () => {
   return {
+    getOnePlannerData,
     getPlannerData,
     addSchedule,
   };

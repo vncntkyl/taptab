@@ -23,7 +23,7 @@ function Planner() {
   const { setIsLoading, setAlert } = useAuth();
   const { capitalize } = useFunction();
   const { getPlaylistNames } = useStorage();
-  const { getPlannerData, addSchedule } = usePlanner();
+  const { getPlannerData, addSchedule, getOnePlannerData } = usePlanner();
 
   const [refresh, doRefresh] = useState(false);
   const [schedule, setSchedule] = useState({
@@ -160,6 +160,30 @@ function Planner() {
     }
     doRefresh((current) => !current);
   };
+
+  const onDateSelection = (e) => {
+    const { start, end } = e;
+    setSchedule((prev) => {
+      return {
+        ...prev,
+        start: start,
+        end: end,
+      };
+    });
+  };
+
+  const onEventSelection = async (e) => {
+    const { id } = e;
+
+    const response = await getOnePlannerData(id);
+    // response.start = new Date(response.start);
+    // response.end = new Date(response.end);
+
+    if (response.occurence.repeat === "custom") {
+      setDays(response.occurence.timeslot);
+    }
+    setSchedule(response);
+  };
   function generateRandomHexColor() {
     const light = "89ABCDEF"; // Adjusted to include lighter shades
     const literals = "0123456789ABCDEF";
@@ -173,24 +197,12 @@ function Planner() {
     }
     return color;
   }
-
   useEffect(() => {
     const setup = async () => {
       const playlistData = await getPlaylistNames();
       const plannerData = await getPlannerData();
       setPlaylists(playlistData);
       setSchedules(
-        plannerData.map((item) => {
-          return {
-            ...item,
-            title: playlistData.find((data) => data._id === item.playlist_id)
-              .playlist_name,
-            start: new Date(item.start),
-            end: new Date(item.end),
-          };
-        })
-      );
-      console.log(
         plannerData.map((item) => {
           return {
             ...item,
@@ -262,7 +274,7 @@ function Planner() {
                   className="w-full md:w-2/5"
                   disabled={schedule.title === ""}
                   onChange={(e) => onInputChange(e)}
-                  value={format(schedule.start, "yyyy-MM-dd")}
+                  value={format(new Date(schedule.start), "yyyy-MM-dd")}
                   min={format(new Date(), "yyyy-MM-dd")}
                   required
                   theme={textTheme}
@@ -274,10 +286,10 @@ function Planner() {
                   className="w-full md:w-2/5"
                   disabled={schedule.title === ""}
                   onChange={(e) => onInputChange(e)}
-                  value={format(schedule.end, "yyyy-MM-dd")}
+                  value={format(new Date(schedule.end), "yyyy-MM-dd")}
                   required
                   min={
-                    format(schedule.start, "yyyy-MM-dd") ||
+                    format(new Date(schedule.start), "yyyy-MM-dd") ||
                     format(new Date(), "yyyy-MM-dd")
                   }
                   theme={textTheme}
@@ -426,9 +438,9 @@ function Planner() {
                 startAccessor="start"
                 endAccessor="end"
                 eventPropGetter={eventPropGetter}
-                onSelectEvent={(e) => setSchedule({ ...e, edit: true })}
+                onSelectEvent={onEventSelection}
                 selectable
-                onSelectSlot={(e) => console.log(e)}
+                onSelectSlot={onDateSelection}
                 style={{ height: "600px" }}
                 components={{
                   toolbar: CustomToolbar, // Use your custom toolbar component
@@ -504,7 +516,7 @@ function TimeSelector({ id, schedule, setSchedule, isEveryday = false }) {
         disabled={schedule.title === ""}
         className="w-full md:w-2/5"
         onChange={(e) => onInputChange(e)}
-        value={format(timeslot.start, "HH:mm")}
+        value={format(new Date(timeslot.start), "HH:mm")}
         required
         theme={textTheme}
       />
@@ -515,7 +527,7 @@ function TimeSelector({ id, schedule, setSchedule, isEveryday = false }) {
         disabled={schedule.title === ""}
         className="w-full md:w-2/5"
         onChange={(e) => onInputChange(e)}
-        value={format(timeslot.end, "HH:mm")}
+        value={format(new Date(timeslot.end), "HH:mm")}
         required
         theme={textTheme}
       />
