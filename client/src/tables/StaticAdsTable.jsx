@@ -15,10 +15,6 @@ function StaticAdsTable({ ads, setItem, setModal }) {
   const headers = ["image", "details", "description", "link", "date_modified"];
   const navigate = useNavigate();
 
-  const getFileURL = (objectName) => {
-    return `https://storage.googleapis.com/tamc_advertisements/${objectName}`;
-  };
-
   const viewItem = (ad) => {
     const id = ad._id;
     const name = ad.name;
@@ -49,7 +45,7 @@ function StaticAdsTable({ ads, setItem, setModal }) {
               >
                 <Table.Cell onClick={() => viewItem(item)}>
                   <img
-                    src={getFileURL(item._urlID)}
+                    src={item.signedUrl}
                     alt=""
                     loading="lazy"
                     className="max-w-[250px] rounded"

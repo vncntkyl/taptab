@@ -44,6 +44,7 @@ export default {
         main: "#119dd8",
         secondary: "#39b1e5",
         light: "#47b8e9",
+        lighter: "#7ecdef",
         dark: "#052f41",
         "secondary-dark": "#1d5973",
         "secondary-light": "#1c4a5d",

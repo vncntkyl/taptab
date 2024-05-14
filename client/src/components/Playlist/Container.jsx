@@ -22,7 +22,7 @@ function Container({ title, items }) {
       className="w-full bg-white rounded shadow-md flex flex-col gap-2 h-[500px] max-h-[500px]"
       ref={setNodeRef}
     >
-      <header className="bg-secondary-dark p-2 text-white font-bold rounded-t">
+      <header className="bg-secondary p-2 text-white font-bold rounded-t">
         {capitalize(convertText(title))}
       </header>
       <main className="p-2 overflow-y-auto flex flex-col gap-2 cursor-auto">

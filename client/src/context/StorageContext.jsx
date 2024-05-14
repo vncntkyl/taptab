@@ -29,6 +29,20 @@ const getPlaylist = async () => {
     console.error(error);
   }
 };
+const getPlaylistNames = async () => {
+  try {
+    const response = await axios.get(url.storage + "playlist", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 const uploadMedia = async (files, mediaData) => {
   try {
     const formData = new FormData();
@@ -44,6 +58,34 @@ const uploadMedia = async (files, mediaData) => {
         "Content-Type": "multipart/form-data",
       },
     });
+
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const updateMedia = async (files, mediaData) => {
+  try {
+    const formData = new FormData();
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i]);
+      }
+    }
+    formData.append("mediaData", JSON.stringify(mediaData));
+
+    const response = await axios.put(
+      url.uploadMedia + `/${mediaData._id}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
 
     if (response.status === 200) {
       return response.data;
@@ -133,9 +175,11 @@ export const useStorage = () => {
     getPlaylist,
     getAnalytics,
     uploadMedia,
+    updateMedia,
     uploadPlaylist,
     updatePlaylist,
     deleteMediaItem,
+    getPlaylistNames,
     getMediaInformation,
   };
 };

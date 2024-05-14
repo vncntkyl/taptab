@@ -43,7 +43,7 @@ function CustomToolbar({ onNavigate, onView, date, view }) {
         })}
       </Button.Group>
       <h1 className="text-center font-bold text-secondary-dark">
-        {format(new Date(date), "MMMM, yyyy")}
+        {format(new Date(date), "MMMM dd, yyyy")}
       </h1>
       <Button.Group className="w-full md:w-fit">
         {views.map((item, index) => {

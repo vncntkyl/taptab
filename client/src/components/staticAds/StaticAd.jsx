@@ -12,9 +12,6 @@ function StaticAd() {
   const { getStaticAdInformation } = useStaticAds();
   const [staticAd, setStaticAd] = useState(null);
 
-  const getFileURL = (objectName) => {
-    return `https://storage.googleapis.com/tamc_advertisements/${objectName}`;
-  };
   const getTime = (seconds) => {
     const milliseconds = Math.floor(seconds * 1000);
 
@@ -53,7 +50,7 @@ function StaticAd() {
               <p className="font-bold text-lg border-b">Advertisement Information</p>
               <div className="flex flex-col gap-4">
                 <img
-                  src={getFileURL(staticAd._urlID)}
+                  src={staticAd.signedUrl}
                   className="w-full transition-all max-w-lg"
                 ></img>
                 <div>

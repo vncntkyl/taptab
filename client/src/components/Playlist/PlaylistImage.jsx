@@ -1,17 +1,14 @@
 import PropTypes from "prop-types";
 import { BsImageAlt } from "react-icons/bs";
 
-function PlaylistImage({ media, mediaFiles }) {
-  const getFileURL = (objectName) => {
-    return `https://storage.googleapis.com/tamc_advertisements/${objectName}`;
-  };
+function PlaylistImage({ id, mediaFiles }) {
   return (
-    <div className="stack" key={media._id}>
+    <div className="stack" key={id}>
       {mediaFiles.map((item) => {
-        if (item._urlID) {
+        if (item.signedUrl) {
           return (
             <img
-              src={getFileURL(item._urlID)}
+              src={item.signedUrl}
               key={item._id}
               alt=""
               className="aspect-square overflow-hidden object-cover max-w-[100px] rounded"
@@ -33,7 +30,7 @@ function PlaylistImage({ media, mediaFiles }) {
 }
 
 PlaylistImage.propTypes = {
-  media: PropTypes.object,
+  id: PropTypes.string,
   mediaFiles: PropTypes.array,
 };
 

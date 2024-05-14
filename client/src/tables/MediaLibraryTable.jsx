@@ -5,15 +5,20 @@ import { useFunction } from "../context/Functions";
 import { iconButton } from "../context/CustomThemes";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import classNames from "classnames";
 
-function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
+function MediaLibraryTable({
+  media,
+  setItem,
+  setModal,
+  thumbnails,
+  setCategory,
+  filter,
+}) {
   const { capitalize, convertText, removeSpaces } = useFunction();
   const headers = ["preview", "name", "details", "date_modified"];
   const navigate = useNavigate();
 
-  const getFileURL = (objectName) => {
-    return `https://storage.googleapis.com/tamc_advertisements/${objectName}`;
-  };
   const convertSize = (size) => {
     if (size < 1048576) {
       return (size / 1000).toFixed(2) + "KB";
@@ -23,7 +28,7 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
   };
 
   return (
-    <Table className="bg-white rounded-md">
+    <Table className="bg-white rounded-md" hoverable>
       <Table.Head className="shadow-md sticky top-0 z-[5]">
         {headers.map((header, index) => {
           return (
@@ -47,13 +52,10 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
               (thumbnail) => thumbnail._id == item._id
             );
             return (
-              <Table.Row
-                key={index}
-                className="text-center hover:bg-slate-200 "
-              >
+              <Table.Row key={index} className="text-center">
                 <Table.Cell
                   align="left"
-                  className="cursor-pointer"
+                  className="cursor-pointer max-w-[300px]"
                   onClick={() => {
                     localStorage.setItem("media_id", item._id);
                     navigate(`./${removeSpaces(item.name)}`);
@@ -61,7 +63,7 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
                 >
                   {tmb ? (
                     <img
-                      src={getFileURL(tmb._urlID)}
+                      src={tmb.signedUrl}
                       alt=""
                       loading="lazy"
                       className="w-full max-w-[300px] rounded"
@@ -73,14 +75,28 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
                 <Table.Cell>
                   <div className="flex flex-col text-start">
                     <p>
-                      <span>Name: </span>
-                      <span className="font-semibold">{item.name}</span>
+                      {/* <span>Name: </span> */}
+                      <span className="font-bold">{item.name}</span>
                     </p>
-                    <p>{capitalize(item.status)}</p>
+                    <p
+                      className={classNames(
+                        "text-secondary font-semibold w-fit",
+                        filter === "all" && "cursor-pointer"
+                      )}
+                      onClick={() => {
+                        if (filter === "all") {
+                          setCategory(item.category);
+                        }
+                      }}
+                    >
+                      {/* <span>Category: </span> */}
+                      {capitalize(item.category)}
+                    </p>
+                    {/* <p>{capitalize(item.status)}</p> */}
                   </div>
                 </Table.Cell>
                 <Table.Cell>
-                  <div className="flex flex-col text-start text-xs">
+                  <div className="flex flex-col text-start text-xs 2xl:text-sm">
                     <p>
                       <span>Type: </span>
                       {capitalize(item.type)}
@@ -94,28 +110,19 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
                     {item.videoDuration && (
                       <p>
                         <span>Duration: </span>
-                        {item.videoDuration}
+                        {Math.round(item.videoDuration)}s
                       </p>
                     )}
                     <p>
-                      <span>Category: </span>
-                      {capitalize(item.category)}
+                      <span>Used: </span>
+                      {item.usage}
                     </p>
                   </div>
                 </Table.Cell>
                 <Table.Cell>
-                  <div className="flex flex-col text-start text-xs">
+                  <div className="flex flex-col text-start text-xs 2xl:text-sm">
                     <p>
-                      <span>Date Uploaded: </span>
                       {format(new Date(item.timeCreated), "yyyy-MM-dd h:m a")}
-                    </p>
-                    <p>
-                      <span>Date Updated: </span>
-                      {format(new Date(item.timeUpdated), "yyyy-MM-dd h:mm a")}
-                    </p>
-                    <p>
-                      <span>Used: </span>
-                      {item.usage}
                     </p>
                   </div>
                 </Table.Cell>
@@ -131,9 +138,15 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
                           toggle: true,
                           title: "edit",
                         });
+                        setItem({
+                          ...item,
+                          thumbnail_src: thumbnails.find(
+                            (thumbnail) => thumbnail._id == item._id
+                          )?.fileName,
+                        });
                       }}
                     >
-                      <RiEditBoxFill className="text-lg" />
+                      <RiEditBoxFill className="text-2xl" />
                     </Button>
                     <Button
                       className="focus:ring-0 w-fit"
@@ -153,7 +166,7 @@ function MediaLibraryTable({ media, setItem, setModal, thumbnails }) {
                         });
                       }}
                     >
-                      <RiDeleteBinFill className="text-lg text-c-red" />
+                      <RiDeleteBinFill className="text-2xl text-c-red" />
                     </Button>
                   </div>
                 </Table.Cell>
@@ -175,6 +188,8 @@ MediaLibraryTable.propTypes = {
   thumbnails: PropTypes.array,
   setItem: PropTypes.func,
   setModal: PropTypes.func,
+  setCategory: PropTypes.func,
+  filter: PropTypes.string,
 };
 
 export default MediaLibraryTable;

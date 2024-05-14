@@ -146,6 +146,7 @@ function Analytics() {
     const setup = async () => {
       const response = await getAnalytics();
       const mediaItems = await getMedia();
+    
       if (!response || !mediaItems) return;
       setAdAnalytics(
         response.map((res) => {

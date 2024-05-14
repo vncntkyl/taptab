@@ -34,7 +34,6 @@ function MediaItem() {
 
     const setup = async (id) => {
       const response = await getMediaInformation(id);
-      console.log(response);
       setMedia(response);
     };
 
@@ -54,7 +53,7 @@ function MediaItem() {
               <div className="flex flex-col gap-4">
                 {media.type === "image" ? (
                   <img
-                    src={getFileURL(media._urlID)}
+                    src={media.signedUrl}
                     className="w-full transition-all max-w-lg"
                   ></img>
                 ) : media.type === "link" ? (
@@ -65,7 +64,7 @@ function MediaItem() {
                   ></video>
                 ) : (
                   <video
-                    src={getFileURL(media._urlID)}
+                    src={media.signedUrl}
                     controls
                     className="w-full transition-all max-w-lg"
                   ></video>
@@ -121,7 +120,8 @@ function MediaItem() {
               </div>
             </section>
             <section className="flex flex-col gap-2 mr-4 min-h-[500px]">
-              {media.logs.logs.length === 0 ? (
+              {/* {console.log(Object.values(media.logs))} */}
+              {Object.values(media.logs).length === 0 ? (
                 <>
                   <div className="relative w-full h-full bg-white shadow border p-2 px-4">
                     <p className="font-bold text-lg border-b">Ad Analytics</p>

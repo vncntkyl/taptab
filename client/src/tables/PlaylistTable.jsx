@@ -30,7 +30,7 @@ function PlaylistTable({ data }) {
               <Table.Row key={media._id}>
                 <Table.Cell align="left">
                   <div className="flex items-center gap-2">
-                    <PlaylistImage media={media} mediaFiles={mediaFiles} />
+                    <PlaylistImage id={media._id} mediaFiles={mediaFiles} />
                     <div>
                       <Link
                         to={`./${convertText(media.playlist_name)}`}

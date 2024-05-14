@@ -29,7 +29,7 @@ import FilterDropdown from "../fragments/FilterDropdown";
 import MediaItem from "../components/mediaLibrary/MediaItem";
 
 function MediaLibrary() {
-  const { getMedia, uploadMedia, deleteMediaItem } = useStorage();
+  const { getMedia, uploadMedia, deleteMediaItem, updateMedia } = useStorage();
   const { capitalize } = useFunction();
   const { setIsLoading, setAlert } = useAuth();
   const [modal, setModal] = useState({
@@ -46,7 +46,6 @@ function MediaLibrary() {
     usage: 0,
     analytics: {
       clicks: 0,
-
       logs: [],
     },
   });
@@ -92,6 +91,7 @@ function MediaLibrary() {
   const handleMediaUpload = async (e) => {
     e.preventDefault();
     let response = null;
+    let handleFunction = modal.title === "edit" ? updateMedia : uploadMedia;
     setIsLoading((previous) => !previous);
     setModal({
       toggle: false,
@@ -104,6 +104,7 @@ function MediaLibrary() {
       category: "",
       type: "",
     });
+
     if (mediaItem.type === "image") {
       const fileData = {
         ...mediaItem,
@@ -113,7 +114,7 @@ function MediaLibrary() {
         usage: 0,
       };
 
-      response = await uploadMedia([file], fileData);
+      response = await handleFunction([file], fileData);
       const alert = {
         isOn: true,
         type: "success",
@@ -155,7 +156,7 @@ function MediaLibrary() {
               }
             );
             const mediaFile = [screenshotFile, file];
-            response = await uploadMedia(mediaFile, fileData);
+            response = await handleFunction(mediaFile, fileData);
             const alert = {
               isOn: true,
               type: "success",
@@ -199,11 +200,13 @@ function MediaLibrary() {
               }
             );
             const mediaFile = [screenshotFile, file];
-            response = await uploadMedia(mediaFile, fileData);
+            response = await handleFunction(mediaFile, fileData);
             const alert = {
               isOn: true,
               type: "success",
-              message: "You have successfully added new media item.",
+              message: `You have successfully ${
+                modal.title === "edit" ? "updated" : "added"
+              } new media item.`,
             };
             console.log(response);
             if (response.acknowledged) {
@@ -420,6 +423,8 @@ function MediaLibrary() {
                         media={mediaFiles}
                         thumbnails={thumbnails}
                         setItem={setMediaItem}
+                        setCategory={setFilter}
+                        filter={filter}
                         setModal={setModal}
                       />
                     </div>
@@ -458,8 +463,8 @@ function MediaLibrary() {
       >
         <Modal.Header className="border-b-default-dark p-3 px-4">
           {modal.toggle &&
-            (modal.title.includes("delete")
-              ? capitalize(modal.title) + " Item"
+            (modal.title.includes("delete") || modal.title.includes("edit")
+              ? capitalize(modal.title) + ' "' + mediaItem.name + '"'
               : "Add New " + capitalize(modal.title))}
         </Modal.Header>
         <Modal.Body>
@@ -548,6 +553,8 @@ function MediaLibrary() {
                     videoRef={videoFeed}
                     onFileChange={onFileChange}
                     media={media}
+                    item={mediaItem}
+                    title={modal.title}
                   />
                 )}
                 <div>
@@ -580,7 +587,7 @@ function MediaLibrary() {
                   color="transparent"
                   theme={mainButton}
                 >
-                  Upload
+                  {modal.title === "edit" ? "Save Changes" : "Upload"}
                 </Button>
               </form>
             ))}

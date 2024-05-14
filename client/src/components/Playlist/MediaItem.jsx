@@ -72,13 +72,10 @@ const stripName = (name) => {
   return fileName.replace(/^thumbnail\//, "").replace(/_tmb\.\w+$/, "");
 };
 function Preview({ item }) {
-  const getFileURL = (objectName) => {
-    return `https://storage.googleapis.com/tamc_advertisements/${objectName}`;
-  };
-  if (item._urlID) {
+  if (item.signedUrl) {
     return (
       <img
-        src={getFileURL(item._urlID)}
+        src={item.signedUrl}
         key={item._id}
         alt=""
         className="aspect-square overflow-hidden object-cover max-w-[100px] rounded"
