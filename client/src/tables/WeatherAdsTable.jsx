@@ -1,26 +1,15 @@
+import React from "react";
 import PropTypes from "prop-types";
 import { Button, Table } from "flowbite-react";
-import {
-  RiDeleteBinFill,
-  RiEditBoxFill,
-  RiExternalLinkFill,
-} from "react-icons/ri";
 import { useFunction } from "../context/Functions";
+import { RiDeleteBinFill, RiEditBoxFill } from "react-icons/ri";
 import { iconButton } from "../context/CustomThemes";
 import { format } from "date-fns";
-import { useNavigate } from "react-router-dom";
 
-function StaticAdsTable({ ads, setItem, setModal }) {
-  const { capitalize, convertText, removeSpaces } = useFunction();
-  const headers = ["image", "details", "description", "link", "date_modified"];
-  const navigate = useNavigate();
+function WeatherAdsTable({ ads, setModal, setItem }) {
+  const { convertText, removeSpaces } = useFunction();
+  const headers = ["image", "name", "details", "date_modified", "actions"];
 
-  const viewItem = (ad) => {
-    const id = ad._id;
-    const name = ad.name;
-    localStorage.setItem("static_id", id);
-    navigate(`./${removeSpaces(name)}`);
-  };
   return (
     <Table className="bg-white rounded-md">
       <Table.Head className="shadow-md sticky top-0 z-[5]">
@@ -31,57 +20,57 @@ function StaticAdsTable({ ads, setItem, setModal }) {
             </Table.HeadCell>
           );
         })}
-        <Table.HeadCell className="text-main text-center">
-          Actions
-        </Table.HeadCell>
       </Table.Head>
       <Table.Body className="divide-y">
-        {ads.length > 0 ? (
+        {ads?.length > 0 ? (
           ads.map((item, index) => {
             return (
               <Table.Row
                 key={index}
-                className="text-center hover:bg-slate-200 cursor-pointer"
+                id={item._id}
+                className="text-center hover:bg-slate-200"
               >
-                <Table.Cell onClick={() => viewItem(item)}>
+                <Table.Cell className="max-w-[150px]">
                   <img
                     src={item.signedUrl}
                     alt=""
                     loading="lazy"
-                    className="max-w-[250px] rounded"
+                    className="w-full rounded"
                   />
                 </Table.Cell>
-                <Table.Cell onClick={() => viewItem(item)}>
-                  <div className="flex flex-col text-start">
+                <Table.Cell className="text-start">
+                  <span className="font-bold">{item.name}</span>
+                </Table.Cell>
+                <Table.Cell>
+                  <div className="flex flex-col text-start gap-2">
                     <p>
-                      <span className="font-semibold">{item.name}</span>
+                      <span>Shows on </span>
+                      <span className="font-bold">{item.weather} weather</span>
+                      <span> or when temperature reaches </span>
+                      <span className="font-bold">
+                        {item.trigger_temperature}&deg;{item.trigger_unit}
+                      </span>
+                      <span> and above. </span>
                     </p>
-                    <p>
-                      <span>Status: </span>
-                      {capitalize(item.status)}
-                    </p>
-                    <p>
-                      {/* <pre>{JSON.stringify(item.views)}</pre> */}
-                      <span>{item.views?.length}</span>
-                      <span> Interactions</span>
-                    </p>
+                    <div className="flex gap-2">
+                      <span>Runtime Date: </span>
+                      <p className="flex gap-1 font-bold">
+                        <span>
+                          {format(
+                            new Date(item.runtime_date?.from),
+                            "MMMM dd, yyyy"
+                          )}
+                        </span>
+                        <span>-</span>
+                        <span>
+                          {format(
+                            new Date(item.runtime_date?.to),
+                            "MMMM dd, yyyy"
+                          )}
+                        </span>
+                      </p>
+                    </div>
                   </div>
-                </Table.Cell>
-                <Table.Cell
-                  className="max-w-[250px] text-left"
-                  onClick={() => viewItem(item)}
-                >
-                  <p>{item.description || "---"}</p>
-                </Table.Cell>
-                <Table.Cell className="text-left">
-                  <a
-                    href={item.link}
-                    target="blank"
-                    className="relative group text-main"
-                  >
-                    {item.name}
-                    <RiExternalLinkFill className="absolute bottom-0 right-0 hidden group-hover:block bg-white" />
-                  </a>
                 </Table.Cell>
                 <Table.Cell>
                   <div className="flex flex-col text-start text-xs">
@@ -89,10 +78,10 @@ function StaticAdsTable({ ads, setItem, setModal }) {
                       <span>Date Uploaded: </span>
                       {format(new Date(item.timeCreated), "yyyy-MM-dd h:m a")}
                     </p>
-                    <p>
+                    {/* <p>
                       <span>Date Updated: </span>
                       {format(new Date(item.timeUpdated), "yyyy-MM-dd h:mm a")}
-                    </p>
+                    </p> */}
                   </div>
                 </Table.Cell>
                 <Table.Cell>
@@ -108,13 +97,8 @@ function StaticAdsTable({ ads, setItem, setModal }) {
                           title: "edit ad",
                         });
                         setItem({
-                          _id: item._id,
-                          name: item.name,
+                          ...item,
                           image: item.signedUrl,
-                          category: item.category,
-                          description: item.description,
-                          link: item.link,
-                          imagePath: item.fileName,
                         });
                       }}
                     >
@@ -150,10 +134,10 @@ function StaticAdsTable({ ads, setItem, setModal }) {
   );
 }
 
-StaticAdsTable.propTypes = {
+WeatherAdsTable.propTypes = {
   ads: PropTypes.array,
   setItem: PropTypes.func,
   setModal: PropTypes.func,
 };
 
-export default StaticAdsTable;
+export default WeatherAdsTable;

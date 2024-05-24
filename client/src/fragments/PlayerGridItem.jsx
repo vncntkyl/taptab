@@ -9,7 +9,7 @@ function PlayerGridItem({ player }) {
   const { capitalize } = useFunction();
   return (
     <div className="w-full min-h-[175px] shadow-md rounded bg-slate-200">
-      <div className="flex items-center justify-between gap-1 p-1 text-white bg-slate-500 rounded-t">
+      <div className="flex items-center justify-between p-2 text-white bg-slate-500 rounded-t">
         <GoDotFill
           className={classNames(
             "text-3xl",
@@ -20,13 +20,13 @@ function PlayerGridItem({ player }) {
               : "text-red-400"
           )}
         />
-        {}
-        <p className="font-bold mr-auto text-lg">
+        <p className="font-bold mr-auto text-lg mt-0.5">
           {capitalize(player.device_name)}
         </p>
         <Badge
           color={player.status === "connected" ? "success" : "warning"}
           className="capitalize"
+          size="md"
         >
           {player.status}
         </Badge>
@@ -34,11 +34,13 @@ function PlayerGridItem({ player }) {
       <div className="p-1 px-2 text-sm">
         <p>
           <span className="font-semibold">Location</span>:{" "}
+          {player.last_location.lat === 0 && player.last_location.long === 0 ? "No record yet" :
           <a
-            href={`https://maps.google.com?q=${player.last_location.lat}+${player.last_location.long}`}
-            target="_blank"
-            rel="noreferrer"
+          href={`https://maps.google.com?q=${player.last_location.lat}+${player.last_location.long}`}
+          target="_blank"
+          rel="noreferrer"
           >{`${player.last_location.lat},${player.last_location.long}`}</a>
+        }
         </p>
         <div className="py-1 flex flex-col gap-1">
           <p>

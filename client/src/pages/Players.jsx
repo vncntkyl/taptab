@@ -86,7 +86,7 @@ function Players() {
           {players && (
             <div className="overflow-x-auto">
               {defaultView === "grid" ? (
-                <PlayerGrid players={players} />
+                <PlayerGrid players={players} setModal={setModal} />
               ) : (
                 <PlayerTable data={players} />
               )}

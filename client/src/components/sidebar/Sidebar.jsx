@@ -2,12 +2,13 @@ import classNames from "classnames";
 import PropTypes from "prop-types";
 import SidebarLink from "./SidebarLink";
 import { BiSolidDashboard } from "react-icons/bi";
-import { BsFillCalendarWeekFill, BsMegaphoneFill } from "react-icons/bs";
+import { BsCloudSunFill, BsFillCalendarWeekFill, BsMegaphoneFill } from "react-icons/bs";
 import { FaGear, FaTabletScreenButton, FaUsers } from "react-icons/fa6";
 import { RiSurveyFill } from "react-icons/ri";
 import { FaPhotoVideo } from "react-icons/fa";
 import { MdOutlineVideoLibrary } from "react-icons/md";
 import { FaMapMarkedAlt } from "react-icons/fa";
+import {IoIosCloud} from "react-icons/io"
 
 function Sidebar({ toggle, setToggle }) {
   const links = [
@@ -32,6 +33,7 @@ function Sidebar({ toggle, setToggle }) {
       icon: BsMegaphoneFill,
     },
     { name: "geo tagged ads", icon: FaMapMarkedAlt },
+    { name: "weather targeted ads", icon: BsCloudSunFill },
     { name: "user engagements", icon: RiSurveyFill },
     { name: "user accounts", icon: FaUsers },
     { name: "settings", icon: FaGear },
@@ -65,7 +67,7 @@ function Sidebar({ toggle, setToggle }) {
         );
       })}
       <Divider>Others</Divider>
-      {links.splice(0, 3).map((link) => {
+      {links.splice(0, 4).map((link) => {
         const { name, icon: Icon } = link;
         return (
           <SidebarLink

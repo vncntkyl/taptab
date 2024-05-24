@@ -1,7 +1,7 @@
 import { Modal } from "flowbite-react";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { useStaticAds } from "../../functions/StaticAdFunctions";
+import { useStaticAds } from "../../functions/staticAdFunctions";
 import { isYesterday } from "date-fns";
 function GeoTaggedAds({ coords }) {
   const [advertisement, setAdvertisement] = useState(null);

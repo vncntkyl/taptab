@@ -1,6 +1,6 @@
 import { Link, Route, Routes } from "react-router-dom";
 import PageHeader from "../fragments/PageHeader";
-import { Button, Modal, Pagination } from "flowbite-react";
+import { Button, Modal } from "flowbite-react";
 import { RiAddFill } from "react-icons/ri";
 import {
   lightButton,

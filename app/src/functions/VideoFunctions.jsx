@@ -93,6 +93,41 @@ const recordAdViews = async (_id, data) => {
     console.error(error);
   }
 };
+const recordLastStreamLogs = async (IDs) => {
+  try {
+    if (IDs.length > 0) {
+      for (const _id of IDs) {
+        let adData = [];
+        if (localStorage.getItem(_id)) {
+          adData = JSON.parse(localStorage.getItem(_id));
+        }
+
+        console.log("ID ready for insertion: ", _id);
+        const response = await axios.patch(
+          `${url.storage}analytics/${_id}`,
+          { data: adData },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (response.status === 200) {
+          console.log(response.data);
+          localStorage.removeItem(_id);
+        }
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+const isSameSchedule = (first, second) => {
+  if (!first || !second) return;
+
+  return first.start === second.start && first.end === second.end;
+};
+
 export const useVideos = () => {
   return {
     getFileURL,
@@ -100,6 +135,8 @@ export const useVideos = () => {
     getMedia,
     getPlannerData,
     getType,
+    isSameSchedule,
     recordAdViews,
+    recordLastStreamLogs,
   };
 };

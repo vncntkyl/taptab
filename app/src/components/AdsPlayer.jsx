@@ -1,11 +1,13 @@
 import PropTypes from "prop-types";
-import { Button, Progress } from "flowbite-react";
+import { Button } from "flowbite-react";
 import {
   // MdFullscreen,
   // MdFullscreenExit,
   MdPause,
   MdPlayArrow,
-  MdAnnouncement,
+  MdSkipNext,
+  MdSkipPrevious,
+  // MdAnnouncement,
 } from "react-icons/md";
 import { iconButton } from "../functions/CustomThemes";
 import classNames from "classnames";
@@ -51,11 +53,12 @@ function AdsPlayer({
   };
   const togglePlayPause = () => {
     if (videoRef.current) {
-      setIsPlaying((current) => !current);
       if (videoRef.current.paused) {
         videoRef.current.play();
+        setIsPlaying(true);
       } else {
         videoRef.current.pause();
+        setIsPlaying(false);
       }
     }
   };
@@ -66,13 +69,18 @@ function AdsPlayer({
     }
   };
 
+  const setSkipVideo = (index) => {
+    const media = playlist[index];
+    setPlayingVideo(media._id);
+    setIsPlaying(true);
+  };
   const setPlayingVideo = async (_id) => {
     if (!_id) return;
 
     const item = playlist.find((item) => item._id === _id);
     const previousItem = playlist[currentVideoIndex];
-    const prevURL = previousItem._urlID
-      ? previousItem._urlID
+    const prevURL = previousItem.signedUrl
+      ? previousItem.signedUrl
       : previousItem.link;
     const index = playlist.indexOf(item);
     if (getType(prevURL) === "image") {
@@ -108,10 +116,9 @@ function AdsPlayer({
     const imagePlayer = document.getElementById("image-player");
 
     const handleVideoEnd = async () => {
-      console.log("ended");
       const item = playlist.find(
         (item) =>
-          item?._urlID === links[currentVideoIndex] ||
+          item?.signedUrl === links[currentVideoIndex] ||
           item?.link === links[currentVideoIndex]
       );
       //ichecheck yung survey array if yung play after ID dun is same sa ID ng nag end na video so if true, show survey else tuloy
@@ -261,6 +268,7 @@ function AdsPlayer({
                   /*isFullScreen ? "max-w-full h-[72%]" :*/ "max-w-[100%] h-full"
                 )}
               >
+                {/* {console.log(links)} */}
                 {getType(links[currentVideoIndex]) === "image" ? (
                   <img
                     id="image-player"
@@ -283,21 +291,74 @@ function AdsPlayer({
               </div>
               <div
                 id="controls"
-                className="absolute bottom-0 w-full animate-fade hidden group-hover:flex items-center justify-between"
+                className={classNames(
+                  "absolute top-0 left-0 border w-full h-full flex items-center justify-center gap-4",
+                  !isPlaying ? "bg-[#0000009c]" : "bg-transparent"
+                )}
+                onClick={togglePlayPause}
               >
                 <Button
                   color="transparent"
                   theme={iconButton}
-                  className="focus:ring-0"
-                  onClick={togglePlayPause}
+                  className={classNames(
+                    "focus:ring-0 outline-none animate-fade transition-all bg-[#00000070]",
+                    isPlaying
+                      ? "opacity-0 pointer-events-none"
+                      : "opacity-100 pointer-events-auto"
+                  )}
+                  onClick={(e) => {
+                    e.stopPropagation();
+
+                    if (currentVideoIndex + 1 < playlist.length) {
+                      setSkipVideo(currentVideoIndex + 1);
+                    } else {
+                      setSkipVideo(0);
+                    }
+                  }}
+                >
+                  <MdSkipPrevious className="text-7xl text-white" />
+                </Button>
+                <Button
+                  color="transparent"
+                  theme={iconButton}
+                  className={classNames(
+                    "focus:ring-0 outline-none animate-fade transition-all bg-[#00000070]",
+                    isPlaying
+                      ? "opacity-0 pointer-events-none"
+                      : "opacity-100 pointer-events-auto"
+                  )}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    togglePlayPause();
+                  }}
                 >
                   {isPlaying ? (
-                    <MdPlayArrow className="text-4xl" />
+                    <MdPlayArrow className="text-9xl text-white" />
                   ) : (
-                    <MdPause className="text-4xl" />
+                    <MdPause className="text-9xl text-white" />
                   )}
                 </Button>
-                <div className="w-full">
+                <Button
+                  color="transparent"
+                  theme={iconButton}
+                  className={classNames(
+                    "focus:ring-0 outline-none animate-fade transition-all bg-[#00000070]",
+                    isPlaying
+                      ? "opacity-0 pointer-events-none"
+                      : "opacity-100 pointer-events-auto"
+                  )}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (currentVideoIndex > 0) {
+                      setSkipVideo(currentVideoIndex - 1);
+                    } else {
+                      setSkipVideo(playlist.length - 1);
+                    }
+                  }}
+                >
+                  <MdSkipNext className="text-7xl text-white" />
+                </Button>
+                {/* <div className="w-full">
                   <Progress
                     size="md"
                     progress={
@@ -306,7 +367,7 @@ function AdsPlayer({
                         : (currentTime / (duration || 1)) * 100 // Added a fallback to avoid division by zero
                     }
                   />
-                </div>
+                </div> */}
                 <div className="bg-white text-black">
                   {/* {console.log(currentTime, duration)} */}
                 </div>
@@ -327,6 +388,8 @@ function AdsPlayer({
                 ads={relatedAds}
                 show={showRelatedAds}
                 setVideo={setPlayingVideo}
+                isPlaying={isPlaying}
+                togglePlaying={setIsPlaying}
               />
             </>
           )}

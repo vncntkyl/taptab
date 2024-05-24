@@ -17,4 +17,5 @@ export const developmentRoutes = {
   players: host + "players/",
   widget: host + "widgets/",
   config: host + "config/",
+  weather: host + "weather/",
 };

@@ -9,10 +9,10 @@ import Widget from "./components/widgets/Widget";
 import Popup from "./components/StaticAds/Popup";
 import ArticlePopup from "./components/ArticlePopup";
 import GeoTaggedAds from "./components/GeoTaggedAds/Index";
-import Cookies from "js-cookie";
-
+import WeatherAds from "./components/WeatherAds/Index";
 function App() {
-  const { getMedia, getPlannerData } = useVideos();
+  const { getMedia, getPlannerData, isSameSchedule, recordLastStreamLogs } =
+    useVideos();
   const {
     retrieveTabInfo,
     updateCurrentLocation,
@@ -53,6 +53,22 @@ function App() {
     return distance;
   }
 
+  function getAllLocalStorageItems() {
+    let items = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      let key = localStorage.key(i);
+      if (key === "shownAds" || key === "driver") continue;
+      let value = localStorage.getItem(key);
+      try {
+        value = JSON.parse(value);
+        items.push({ key: key, value: value });
+      } catch (e) {
+        console.log("not a JSON");
+      }
+    }
+    return items;
+  }
+
   function closeArticle() {
     toggleArticle(null);
   }
@@ -63,7 +79,7 @@ function App() {
     document.addEventListener("contextmenu", preventContextMenu);
 
     const setup = async () => {
-      let driver = Cookies.get("driver");
+      let driver = localStorage.getItem("driver");
 
       if (driver) {
         driver = JSON.parse(driver);
@@ -72,7 +88,7 @@ function App() {
         // console.log(response);
         if (typeof response === "object") {
           setNewLogin(false);
-          Cookies.set("driver", JSON.stringify(response));
+          localStorage.setItem("driver", JSON.stringify(response));
         }
       }
     };
@@ -102,28 +118,50 @@ function App() {
         const updatePlayingSchedule = () => {
           const currentTime = new Date();
           const currentSchedule = planner.find((schedule) => {
-            const startDate = new Date(schedule.start_date);
-            const endDate = new Date(schedule.end_date);
+            const startDate = new Date(schedule.start);
+            const endDate = new Date(schedule.end);
             return startDate <= currentTime && currentTime <= endDate;
           });
           if (currentSchedule) {
-            setPlayingSchedule(currentSchedule);
+            if (playingSchedule) {
+              if (!isSameSchedule(playingSchedule, currentSchedule)) {
+                setPlayingSchedule(currentSchedule);
 
-            const IDs = [
-              ...new Set(
-                currentSchedule.playlist_media.map((media) => {
-                  return media._id;
-                })
-              ),
-            ];
-            setRelatedAds(
-              media.filter(
-                (item) =>
-                  IDs.includes(item._id) &&
-                  item.type !== "link" &&
-                  item.contentType.startsWith("image")
-              )
-            );
+                const IDs = [
+                  ...new Set(
+                    currentSchedule.playlist_media.map((media) => {
+                      return media._id;
+                    })
+                  ),
+                ];
+                setRelatedAds(
+                  media.filter(
+                    (item) =>
+                      IDs.includes(item._id) &&
+                      item.type !== "link" &&
+                      item.contentType.startsWith("image")
+                  )
+                );
+              }
+            } else {
+              setPlayingSchedule(currentSchedule);
+
+              const IDs = [
+                ...new Set(
+                  currentSchedule.playlist_media.map((media) => {
+                    return media._id;
+                  })
+                ),
+              ];
+              setRelatedAds(
+                media.filter(
+                  (item) =>
+                    IDs.includes(item._id) &&
+                    item.type !== "link" &&
+                    item.contentType.startsWith("image")
+                )
+              );
+            }
           } else {
             setPlayingSchedule(null);
           }
@@ -140,6 +178,26 @@ function App() {
       }
     }
   }, [media, schedules]);
+
+  useEffect(() => {
+    const upload = async (IDs) => {
+      await recordLastStreamLogs(IDs);
+    };
+    const setup = async () => {
+      if (playingSchedule) {
+        const { playlist_media } = playingSchedule;
+        const currentPlayingAds = playlist_media.map((media) => media._id);
+        const IDs = getAllLocalStorageItems()
+          .filter((media) => !currentPlayingAds.includes(media.key))
+          .map((media) => media.key);
+
+        if (IDs) {
+          upload(IDs);
+        }
+      }
+    };
+    setup();
+  }, [playingSchedule]);
   useEffect(() => {
     const handleOnline = async () => {
       let driver = localStorage.getItem("driver");
@@ -217,6 +275,7 @@ function App() {
     <>
       <AccessForm setLogin={setNewLogin} />
       <div className="relative bg-gradient-to-br h-screen from-main to-[#c2c2c2] grid grid-cols-[8fr_3fr] grid-rows-[8fr_2.4fr] box-border gap-2 p-2">
+        <WeatherAds />
         <GeoTaggedAds coords={coordinates} />
         <AdsPlayer
           relatedAds={relatedAds}
@@ -225,7 +284,7 @@ function App() {
           links={
             playingSchedule
               ? playingSchedule.playlist_media.map((med) =>
-                  med._urlID ? med._urlID : med.link
+                  med.signedUrl ? med.signedUrl : med.link
                 )
               : []
           }

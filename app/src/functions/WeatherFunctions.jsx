@@ -1,4 +1,5 @@
 import axios from "axios";
+import { developmentRoutes as url } from "./Routes";
 
 const retrieveWeatherForecast = async (lat, long) => {
   const weatherAPIKey = "bf92f5dd8b44463abb225737232610";
@@ -21,6 +22,24 @@ const retrieveWeatherForecast = async (lat, long) => {
   }
 };
 
+const retrieveWeatherAds = async (weather, temp) => {
+  try {
+    const response = await axios.get(url.weather, {
+      params: {
+        weather: weather,
+        temperature: temp,
+      },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (e) {
+    console.log(e);
+  }
+};
 export const weatherFunctions = () => {
-  return { retrieveWeatherForecast };
+  return { retrieveWeatherForecast, retrieveWeatherAds };
 };

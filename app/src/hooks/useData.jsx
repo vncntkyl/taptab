@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 function useData(func, isRealtime = false) {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
+  let driver = localStorage.getItem("driver");
 
   useEffect(() => {
     let isMounted = true; // Flag to check if the component is still mounted
@@ -20,17 +21,19 @@ function useData(func, isRealtime = false) {
       }
     };
 
-    fetchData();
+    if (driver) {
+      fetchData();
 
-    if (isRealtime) {
-      const realtimeData = setInterval(fetchData, 30000);
+      if (isRealtime) {
+        const realtimeData = setInterval(fetchData, 30000);
 
-      return () => {
-        clearInterval(realtimeData);
-        isMounted = false; // Component is unmounting, so set isMounted to false
-      };
+        return () => {
+          clearInterval(realtimeData);
+          isMounted = false; // Component is unmounting, so set isMounted to false
+        };
+      }
     }
-  }, [isRealtime]);
+  }, [driver, func, isRealtime]);
 
   return [data, error];
 }

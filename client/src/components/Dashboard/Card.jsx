@@ -24,7 +24,6 @@ function Card({ title, count, link }) {
       break;
     default:
   }
-
   return (
     <Link
       to={`/${link}`}

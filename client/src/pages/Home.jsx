@@ -17,6 +17,7 @@ import Planner from "./Planner";
 import Players from "./Players";
 import GeoTaggedAds from "./GeoTaggedAds";
 import Settings from "./Settings";
+import WeatherAds from "./WeatherAds";
 
 function Home() {
   const [onSidebar, toggleSidebar] = useState(false);
@@ -64,6 +65,7 @@ function Home() {
             <Route path="/players" element={<Players />} />
             <Route path="/static_ads/*" element={<StaticAds />} />
             <Route path="/geo_tagged_ads/*" element={<GeoTaggedAds />} />
+            <Route path="/weather_targeted_ads/*" element={<WeatherAds />} />
             <Route path="/user_engagements/*" element={<UserEngagement />} />
             <Route path="/user_accounts" element={<UserAccounts />} />
             <Route path="/settings" element={<Settings />} />

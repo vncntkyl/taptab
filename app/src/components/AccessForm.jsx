@@ -34,7 +34,7 @@ function AccessForm() {
     if (typeof response === "string") {
       setError(response);
     } else {
-      Cookies.set("driver", JSON.stringify(response));
+      localStorage.setItem("driver", JSON.stringify(response));
       setClear(true);
       setLogin(false);
     }
@@ -50,15 +50,15 @@ function AccessForm() {
 
   useEffect(() => {
     const setup = async () => {
-      let driver = Cookies.get("driver");
-
+      let driver = localStorage.getItem("driver");
       if (driver) {
         driver = JSON.parse(driver);
-
+        
         const response = await validateUser(driver);
+        // console.log(response);
         if (typeof response === "object") {
           setLogin(false);
-          Cookies.set("driver", JSON.stringify(response));
+          localStorage.setItem("driver", JSON.stringify(response));
         }
       }
     };

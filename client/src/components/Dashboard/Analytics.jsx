@@ -10,7 +10,7 @@ import classNames from "classnames";
 function Analytics() {
   const { getAnalytics, getMedia } = useStorage();
   const [adAnalytics, setAdAnalytics] = useState(null);
-  const { removeSpaces, removeUnderscore } = useFunction();
+  const { removeSpaces } = useFunction();
 
   const retrieveTotalDuration = (logs) => {
     return logs.reduce((total, log) => (total += log.duration), 0) / 3600;
@@ -146,12 +146,16 @@ function Analytics() {
     const setup = async () => {
       const response = await getAnalytics();
       const mediaItems = await getMedia();
-    
+
       if (!response || !mediaItems) return;
       setAdAnalytics(
         response.map((res) => {
           const logs = res.logs;
           const media = mediaItems.find((item) => item._id === res.media_id);
+          const thumbnail = mediaItems.find(
+            (item) =>
+              item._id === res.media_id && item.fileName.startsWith("thumbnail")
+          );
           const totalAdDuration = retrieveTotalDuration(logs);
           const avgDuration = retrieveAverageDuration(logs);
           const hasFinishedCounts = calculateHasFinishedData(logs);
@@ -167,9 +171,9 @@ function Analytics() {
             retrieveAverageWatchHoursBeforeSkipping(unfinishedLogs);
 
           return {
-            _id: res._id,
-            media_id: res.media_id,
+            ...media,
             media_name: media.name,
+            thumbnail: thumbnail.signedUrl,
             totalWatchHours: totalAdDuration,
             avgWatchHours: avgDuration,
             skipToFinishedData: trueToFalseRatio,
@@ -206,22 +210,45 @@ function Analytics() {
         </div>
         <div className="w-1/2 flex flex-col gap-4">
           <div className="font-bold text-xl">Top Advertisements</div>
-          <div className="bg-white w-full h-full p-4 shadow-md">
+          <div className="bg-white w-full h-full p-4 shadow-md flex flex-col gap-2">
             {adAnalytics
               .filter((ad) => ad.totalWatchHours)
-              .splice(0, 5)
               .sort((a, b) => b.totalWatchHours - a.totalWatchHours)
+              .splice(0,3)
               .map((ad) => {
                 return (
                   <Link
                     key={ad._id}
                     to={`./media_library/${removeSpaces(ad.media_name)}`}
-                    className="group w-full flex justify-between items-center gap-4 p-4 hover:text-secondary hover:cursor-pointer"
+                    className="group p-2 flex gap-4 hover:bg-slate-100 rounded-lg"
+                    // className="group w-full flex justify-between items-center gap-4 p-4 hover:text-secondary hover:cursor-pointer"
                     onClick={() => {
-                      localStorage.setItem("media_id", ad.media_id);
+                      localStorage.setItem("media_id", ad._id);
                     }}
                   >
-                    <p className="whitespace-nowrap font-semibold text-xl">
+                    <img
+                      src={ad.thumbnail}
+                      className="w-full max-w-[125px] object-cover aspect-square rounded-md"
+                      alt=""
+                    />
+                    <div className="w-full flex flex-col">
+                      <h3 className="font-bold text-black">{ad.media_name}</h3>
+                      <p>View-through rate: {ad.skipToFinishRate.true.toFixed(2)}%</p>
+                      <div className="w-full h-4 border mt-auto relative rounded-md overflow-hidden">
+                        <div
+                          className="group-hover:bg-secondary absolute top-0 h-full bg-secondary-dark"
+                          style={{
+                            width: `${(
+                              (ad.totalWatchHours /
+                                calculateTotalWatchHours(adAnalytics)) *
+                              100
+                            ).toFixed(2)}%`,
+                          }}
+                        ></div>
+                      </div>
+                      <p>{showHours(ad.totalWatchHours, "total")}</p>
+                    </div>
+                    {/* <p className="whitespace-nowrap font-semibold text-xl">
                       {removeUnderscore(
                         ad.media_name.length > 20
                           ? ad.media_name.substring(0, 20) + "..."
@@ -246,7 +273,7 @@ function Analytics() {
                       <p className="absolute right-0 top-0 h-full flex items-center justify-center text-secondary-dark group-hover:text-secondary">
                         {showHours(ad.totalWatchHours, "total")}
                       </p>
-                    </div>
+                    </div> */}
                   </Link>
                 );
               })}

@@ -34,7 +34,7 @@ function Popup({ viewAd, toggleAd }) {
           {viewAd && (
             <div className="relative">
               <img
-                src={getFileURL(viewAd._urlID)}
+                src={viewAd.signedUrl}
                 alt=""
                 className="w-full rounded-md"
               />
