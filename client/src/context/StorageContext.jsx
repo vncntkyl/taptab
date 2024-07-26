@@ -53,7 +53,7 @@ const uploadMedia = async (files, mediaData) => {
     }
     formData.append("mediaData", JSON.stringify(mediaData));
 
-    const response = await axios.post(url.uploadMedia, formData, {
+    const response = await axios.post(url.storage, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -75,10 +75,18 @@ const updateMedia = async (files, mediaData) => {
         formData.append("files", files[i]);
       }
     }
-    formData.append("mediaData", JSON.stringify(mediaData));
+    const finalData = {
+      name: mediaData.name,
+      category: mediaData.category,
+      type: mediaData.type,
+      thumbnail_src: mediaData.thumbnail_src,
+      fileName: mediaData.fileName,
+    };
+    console.log(finalData);
+    formData.append("mediaData", JSON.stringify(finalData));
 
     const response = await axios.put(
-      url.uploadMedia + `/${mediaData._id}`,
+      url.storage + `/${mediaData._id}`,
       formData,
       {
         headers: {
@@ -154,10 +162,24 @@ const getAnalytics = async () => {
     console.error(error);
   }
 };
+const getStaticAnalyticsSummary = async () => {
+  try {
+    const response = await axios.get(url.staticAds + "analytics", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const getMediaInformation = async (id) => {
   try {
-    const response = await axios.get(`${url.storage}media/${id}`, {
+    const response = await axios.get(`${url.storage}/${id}`, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -181,5 +203,6 @@ export const useStorage = () => {
     deleteMediaItem,
     getPlaylistNames,
     getMediaInformation,
+    getStaticAnalyticsSummary,
   };
 };

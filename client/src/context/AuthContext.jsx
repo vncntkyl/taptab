@@ -48,7 +48,10 @@ export function AuthProvider({ children }) {
   };
   const updateUser = async (userData) => {
     try {
-      const response = await axios.patch(url.users + userData._id, userData, {
+      const data = { ...userData };
+      delete data._id;
+
+      const response = await axios.patch(url.users + userData._id, data, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -60,13 +63,17 @@ export function AuthProvider({ children }) {
       console.error(error);
     }
   };
-  const deactivateUser = async (_id) => {
+  const manageStatus = async (_id, status) => {
     try {
-      const response = await axios.delete(url.userDeactivate + _id, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await axios.patch(
+        url.userManageStatus + _id,
+        { status: status },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (response.status === 200) {
         return response.data;
       }
@@ -74,44 +81,22 @@ export function AuthProvider({ children }) {
       console.error(error);
     }
   };
-  const reactivateUser = async (_id) => {
-    try {
-      const response = await axios.patch(url.userReactivate + _id, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.status === 200) {
-        return response.data;
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  const deleteUser = async (_id) => {
-    try {
-      const response = await axios.delete(url.userDelete + _id, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.status === 200) {
-        return response.data;
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+
   const getUser = () => {
     return JSON.parse(localStorage.getItem("user"));
   };
   const getFullName = (user = JSON.parse(localStorage.getItem("user"))) => {
     if (!user) return;
-    const currentuser = user;
+    const { first_name, middle_name, last_name } = user;
     const middleInitial =
-      currentuser.middle_name.length > 0 &&
-      currentuser.middle_name.substring(0, 1) + ". ";
-    return currentuser.first_name + " " + middleInitial + currentuser.last_name;
+      middle_name.length > 0
+        ? middle_name
+            .split(" ")
+            .map((str) => str[0] + ".")
+            .join("")
+            .toUpperCase()
+        : "";
+    return `${first_name} ${middleInitial} ${last_name}`;
   };
 
   useEffect(() => {
@@ -131,9 +116,7 @@ export function AuthProvider({ children }) {
     getUser,
     getFullName,
     updateUser,
-    deleteUser,
-    deactivateUser,
-    reactivateUser,
+    manageStatus,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

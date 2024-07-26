@@ -12,19 +12,6 @@ function StaticAd() {
   const { getStaticAdInformation } = useStaticAds();
   const [staticAd, setStaticAd] = useState(null);
 
-  const getTime = (seconds) => {
-    const milliseconds = Math.floor(seconds * 1000);
-
-    // Format the milliseconds as HH:mm:ss.SSS
-    return new Date(milliseconds).toISOString().substring(11, 19);
-  };
-  const convertSize = (size) => {
-    if (size < 1048576) {
-      return (size / 1000).toFixed(2) + "KB";
-    } else {
-      return (size / 1048576).toFixed(2) + "MB";
-    }
-  };
   useEffect(() => {
     const static_id = localStorage.getItem("static_id");
 
@@ -50,8 +37,8 @@ function StaticAd() {
               <p className="font-bold text-lg border-b">Advertisement Information</p>
               <div className="flex flex-col gap-4">
                 <img
-                  src={staticAd.signedUrl}
-                  className="w-full transition-all max-w-lg"
+                  src={staticAd.images.find(img => img.type === "main").signedUrl}
+                  className="w-full transition-all max-w-sm mx-auto"
                 ></img>
                 <div>
                   <p>
@@ -83,7 +70,7 @@ function StaticAd() {
               </div>
             </section>
             <section className="flex flex-col gap-2 mr-4 min-h-[500px]">
-              {staticAd.views.length === 0 ? (
+              {!staticAd.views ? (
                 <>
                   <div className="relative w-full h-full bg-white shadow border p-2 px-4">
                     <p className="font-bold text-lg border-b">Ad Analytics</p>
@@ -93,7 +80,7 @@ function StaticAd() {
                   </div>
                 </>
               ) : (
-                <StaticAdAnalytics logs={staticAd.views} />
+                <StaticAdAnalytics logs={staticAd.views?.logs} />
               )}
             </section>
           </div>

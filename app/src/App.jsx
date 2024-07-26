@@ -1,77 +1,38 @@
 import { useState, useEffect } from "react";
 import AdsPlayer from "./components/AdsPlayer";
-import StaticsAds from "./components/StaticsAds";
+import StaticAds from "./components/StaticAds";
 import { useVideos } from "./functions/VideoFunctions";
 import useData from "./hooks/useData";
 import AccessForm from "./components/AccessForm";
 import { useSurvey } from "./functions/EngagementFunctions";
 import Widget from "./components/widgets/Widget";
-import Popup from "./components/StaticAds/Popup";
-import ArticlePopup from "./components/ArticlePopup";
-import GeoTaggedAds from "./components/GeoTaggedAds/Index";
-import WeatherAds from "./components/WeatherAds/Index";
+import { AppProvider } from "./contexts/AppContext";
 function App() {
-  const { getMedia, getPlannerData, isSameSchedule, recordLastStreamLogs } =
-    useVideos();
+  const {
+    getMedia,
+    getPlannerData,
+    recordLastStreamLogs,
+    calculateDistance,
+    getAllLocalStorageItems,
+  } = useVideos();
   const {
     retrieveTabInfo,
     updateCurrentLocation,
     validateUser,
     checkConnection,
   } = useSurvey();
+
   const [media] = useData(getMedia, true);
   const [schedules] = useData(getPlannerData, true);
   const [coordinates, setCoordinates] = useState([null, null]);
-  const [playingSchedule, setPlayingSchedule] = useState();
-  const [relatedAds, setRelatedAds] = useState(null);
-  const [viewAd, toggleAd] = useState(null);
-  const [showArticle, toggleArticle] = useState(null);
-  const [newLogin, setNewLogin] = useState(true);
+  const [currentPlaylist, setCurrentPlaylist] = useState(null);
+  const [relatedAds, setRelatedAds] = useState([]);
 
-  function calculateDistance(coord1, coord2) {
-    const toRadians = (degrees) => (degrees * Math.PI) / 180;
+  const isSameSchedule = (first, second) => {
+    if (!first || !second) return;
 
-    const { latitude: lat1, longitude: lon1 } = coord1;
-    const { latitude: lat2, longitude: lon2 } = coord2;
-
-    const earthRadius = 6371000; // Earth's radius in meters
-
-    const dLat = toRadians(lat2 - lat1);
-    const dLon = toRadians(lon2 - lon1);
-
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(toRadians(lat1)) *
-        Math.cos(toRadians(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    const distance = earthRadius * c;
-
-    return distance;
-  }
-
-  function getAllLocalStorageItems() {
-    let items = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      let key = localStorage.key(i);
-      if (key === "shownAds" || key === "driver") continue;
-      let value = localStorage.getItem(key);
-      try {
-        value = JSON.parse(value);
-        items.push({ key: key, value: value });
-      } catch (e) {
-        console.log("not a JSON");
-      }
-    }
-    return items;
-  }
-
-  function closeArticle() {
-    toggleArticle(null);
-  }
+    return first.start === second.start && first.end === second.end;
+  };
   useEffect(() => {
     const preventContextMenu = (event) => {
       event.preventDefault();
@@ -87,7 +48,6 @@ function App() {
         const response = await validateUser(driver);
         // console.log(response);
         if (typeof response === "object") {
-          setNewLogin(false);
           localStorage.setItem("driver", JSON.stringify(response));
         }
       }
@@ -123,9 +83,9 @@ function App() {
             return startDate <= currentTime && currentTime <= endDate;
           });
           if (currentSchedule) {
-            if (playingSchedule) {
-              if (!isSameSchedule(playingSchedule, currentSchedule)) {
-                setPlayingSchedule(currentSchedule);
+            if (currentPlaylist) {
+              if (!isSameSchedule(currentPlaylist, currentSchedule)) {
+                setCurrentPlaylist(currentSchedule);
 
                 const IDs = [
                   ...new Set(
@@ -144,7 +104,7 @@ function App() {
                 );
               }
             } else {
-              setPlayingSchedule(currentSchedule);
+              setCurrentPlaylist(currentSchedule);
 
               const IDs = [
                 ...new Set(
@@ -163,7 +123,7 @@ function App() {
               );
             }
           } else {
-            setPlayingSchedule(null);
+            setCurrentPlaylist(null);
           }
         };
 
@@ -183,21 +143,26 @@ function App() {
     const upload = async (IDs) => {
       await recordLastStreamLogs(IDs);
     };
-    const setup = async () => {
-      if (playingSchedule) {
-        const { playlist_media } = playingSchedule;
-        const currentPlayingAds = playlist_media.map((media) => media._id);
-        const IDs = getAllLocalStorageItems()
-          .filter((media) => !currentPlayingAds.includes(media.key))
-          .map((media) => media.key);
 
-        if (IDs) {
-          upload(IDs);
-        }
+    const setup = async () => {
+      if (!currentPlaylist) return;
+
+      const currentPlayingAds = currentPlaylist.playlist_media.map(
+        ({ _id }) => _id
+      );
+      const storedMediaIDs = getAllLocalStorageItems()
+        .filter(({ key }) => !currentPlayingAds.includes(key))
+        .map(({ key }) => key);
+
+      if (storedMediaIDs.length > 0) {
+        await upload(storedMediaIDs);
       }
     };
+
     setup();
-  }, [playingSchedule]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPlaylist]);
+
   useEffect(() => {
     const handleOnline = async () => {
       let driver = localStorage.getItem("driver");
@@ -207,14 +172,16 @@ function App() {
 
         const response = await validateUser(driver);
         if (typeof response === "object") {
-          const logConnection = await checkConnection(driver._id);
-          console.log(logConnection);
+          await checkConnection(driver._id);
         }
       }
     };
-    const realtimeData = setInterval(handleOnline, 600000);
+    handleOnline();
+
+    const realtimeData = setInterval(handleOnline, 600000); //every 10 mins
 
     return () => clearInterval(realtimeData);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -236,8 +203,11 @@ function App() {
         setCoordinates([latitude, longitude]);
         return;
       }
-
-      if (calculateDistance(newCoordinate, previousCoordinate) > 10) {
+      const currentDistance = calculateDistance(
+        newCoordinate,
+        previousCoordinate
+      );
+      if (currentDistance > 10) {
         if (driverDetails === null) return;
         const { _id } = driverDetails;
 
@@ -246,9 +216,7 @@ function App() {
           long: longitude,
           lat: latitude,
         };
-        const response = await updateCurrentLocation(newData);
-        console.log(response);
-        console.log("Position has changed.");
+        await updateCurrentLocation(newData);
         setCoordinates([latitude, longitude]);
       }
     }
@@ -269,34 +237,33 @@ function App() {
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coordinates]);
 
   return (
     <>
-      <AccessForm setLogin={setNewLogin} />
-      <div className="relative bg-gradient-to-br h-screen from-main to-[#c2c2c2] grid grid-cols-[8fr_3fr] grid-rows-[8fr_2.4fr] box-border gap-2 p-2">
-        <WeatherAds />
-        <GeoTaggedAds coords={coordinates} />
-        <AdsPlayer
-          relatedAds={relatedAds}
-          className="col-[1/2] row-[1/2]"
-          playlist={playingSchedule ? playingSchedule.playlist_media : []}
-          links={
-            playingSchedule
-              ? playingSchedule.playlist_media.map((med) =>
-                  med.signedUrl ? med.signedUrl : med.link
-                )
-              : []
-          }
-        />
-        <StaticsAds className="col-[1/3] row-[2/3]" toggle={toggleAd} />
-        <Widget setArticle={toggleArticle} />
-        <Popup viewAd={viewAd} toggleAd={toggleAd} />
-        <ArticlePopup article={showArticle} closeArticle={closeArticle} />
-        <p className="absolute bottom-0 bg-[#0000006c] text-xs px-2 text-white z-30">
-          Version 1.4.3
-        </p>
-      </div>
+      <AccessForm />
+      <AppProvider>
+        <div className="relative bg-gradient-to-br h-screen from-main to-[#c2c2c2] grid grid-cols-[8fr_3fr] grid-rows-[8fr_3fr] box-border gap-2 p-2">
+          <AdsPlayer
+            relatedAds={relatedAds}
+            className="col-[1/2] row-[1/2]"
+            playlist={(currentPlaylist && currentPlaylist.playlist_media) || []}
+            links={
+              currentPlaylist
+                ? currentPlaylist.playlist_media.map((med) =>
+                    med.signedUrl ? med.signedUrl : med.link
+                  )
+                : []
+            }
+          />
+          <StaticAds className="col-[1/3] row-[2/3]" />
+          <Widget />
+          <p className="absolute bottom-0 bg-[#0000006c] text-xs px-2 text-white z-30">
+            Version 1.5
+          </p>
+        </div>
+      </AppProvider>
     </>
   );
 }

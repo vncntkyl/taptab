@@ -1,11 +1,11 @@
 import PropTypes from "prop-types";
-import { Button, Table } from "flowbite-react";
+import { Table } from "flowbite-react";
 import { useFunction } from "../context/Functions";
 import PlaylistImage from "../components/Playlist/PlaylistImage";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
-import { iconButton } from "../context/CustomThemes";
 import { RiDeleteBinFill, RiEditBoxFill } from "react-icons/ri";
+import ActionButton from "../components/ActionButton";
 
 function PlaylistTable({ data }) {
   const { convertText } = useFunction();
@@ -70,37 +70,26 @@ function PlaylistTable({ data }) {
                 </Table.Cell>
                 <Table.Cell>
                   <div className="flex items-center justify-center gap-1">
-                    <Button
-                      as={Link}
+                    <ActionButton
+                      isLink
                       to={`./${convertText(media.playlist_name)}`}
-                      className="focus:ring-0 w-fit bg-white"
-                      color="transparent"
-                      size="sm"
-                      theme={iconButton}
+                      tooltip="Edit"
+                      icon={RiEditBoxFill}
                       onClick={() => {
                         localStorage.setItem(
                           "playlistData",
                           JSON.stringify(media)
                         );
                       }}
-                    >
-                      <RiEditBoxFill className="text-lg" />
-                    </Button>
-                    <Button
-                      className="focus:ring-0 w-fit bg-white"
-                      color="transparent"
-                      size="sm"
-                      theme={iconButton}
+                    />
+                    <ActionButton
+                      tooltip="Delete"
+                      icon={RiDeleteBinFill}
                       onClick={() => {
-                        // setModal({
-                        //   toggle: true,
-                        //   title: "delete survey",
-                        // });
-                        // setItem(item);
+                        alert("Pending");
                       }}
-                    >
-                      <RiDeleteBinFill className="text-lg text-c-red" />
-                    </Button>
+                      color={"text-c-red"}
+                    />
                   </div>
                 </Table.Cell>
               </Table.Row>

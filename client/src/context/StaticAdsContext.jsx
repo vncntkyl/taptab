@@ -2,6 +2,7 @@ import axios from "axios";
 import { developmentRoutes as url } from "./Routes";
 
 const geoTaggedAdsUrl = url.storage + "geolocation/";
+
 const getStaticAds = async () => {
   try {
     const response = await axios.get(url.staticAds, {
@@ -30,15 +31,17 @@ const getGeoAds = async () => {
     console.error(error);
   }
 };
-const getGeoAdStatistics = async (id, dates) => {
+const getGeoAdStatistics = async (id, dates = "all") => {
   try {
+    let params = {};
+    if (dates !== "all") {
+      params = { ...dates };
+    }
     const response = await axios.get(geoTaggedAdsUrl + `analytics/${id}`, {
       headers: {
         "Content-Type": "application/json",
       },
-      params: {
-        dates: JSON.stringify(dates),
-      },
+      params: params,
     });
     if (response.status === 200) {
       return response.data;
@@ -95,10 +98,14 @@ const createGeoTaggedAds = async (data) => {
     console.error(error);
   }
 };
-const createStaticAds = async (adImage, adData) => {
+const createStaticAds = async (files, adData) => {
   try {
     const formData = new FormData();
-    formData.append("file", adImage);
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i]);
+      }
+    }
     formData.append("adData", JSON.stringify(adData));
 
     const response = await axios.post(url.staticAdsCreation, formData, {

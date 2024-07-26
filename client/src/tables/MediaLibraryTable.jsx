@@ -1,11 +1,11 @@
 import PropTypes from "prop-types";
-import { Button, Table } from "flowbite-react";
+import { Table } from "flowbite-react";
 import { RiDeleteBinFill, RiEditBoxFill } from "react-icons/ri";
 import { useFunction } from "../context/Functions";
-import { iconButton } from "../context/CustomThemes";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import classNames from "classnames";
+import ActionButton from "../components/ActionButton";
 
 function MediaLibraryTable({
   media,
@@ -128,11 +128,8 @@ function MediaLibraryTable({
                 </Table.Cell>
                 <Table.Cell>
                   <div className="flex items-center justify-center gap-1">
-                    <Button
-                      className="focus:ring-0 w-fit"
-                      color="transparent"
-                      size="sm"
-                      theme={iconButton}
+                    <ActionButton
+                      tooltip="Edit"
                       onClick={() => {
                         setModal({
                           toggle: true,
@@ -145,14 +142,10 @@ function MediaLibraryTable({
                           )?.fileName,
                         });
                       }}
-                    >
-                      <RiEditBoxFill className="text-2xl" />
-                    </Button>
-                    <Button
-                      className="focus:ring-0 w-fit"
-                      color="transparent"
-                      size="sm"
-                      theme={iconButton}
+                      icon={RiEditBoxFill}
+                    />
+                    <ActionButton
+                      tooltip="Delete"
                       onClick={() => {
                         setModal({
                           toggle: true,
@@ -165,9 +158,9 @@ function MediaLibraryTable({
                           )?.fileName,
                         });
                       }}
-                    >
-                      <RiDeleteBinFill className="text-2xl text-c-red" />
-                    </Button>
+                      icon={RiDeleteBinFill}
+                      color="text-c-red"
+                    />
                   </div>
                 </Table.Cell>
               </Table.Row>

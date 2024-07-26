@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import PropTypes from "prop-types";
-function RelatedAds({ ads, show, setVideo, isPlaying, togglePlaying }) {
+function RelatedAds({ ads, show, setVideo, isPlaying }) {
   return (
     <section
       className={classNames(

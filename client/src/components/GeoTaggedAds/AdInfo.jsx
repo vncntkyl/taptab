@@ -10,7 +10,7 @@ import Analytics from "./Analytics";
 
 function AdInfo() {
   const { id } = useParams();
-  const { removeUnderscore } = useFunction();
+  const { removeUnderscore, getType } = useFunction();
   const { getGeoAd } = useStaticAds();
   const [ad, setAd] = useState();
   const [location, setLocation] = useState();
@@ -36,12 +36,18 @@ function AdInfo() {
                 Advertisement Information
               </h2>
               <div className="flex flex-col gap-6 items-start md:flex-row xl:flex-col">
-                <img
-                  src={ad.image}
-                  className="w-full md:w-1/2 lg:w-2/5 xl:w-full mx-auto rounded"
-                  alt=""
-                  loading="lazy"
-                />
+                {getType(ad.image) === "video" ? (
+                  <video autoPlay loop className="w-full md:w-1/2 lg:w-2/5 mx-auto rounded">
+                    <source src={ad.image} />
+                  </video>
+                ) : (
+                  <img
+                    src={ad.image}
+                    className="w-full md:w-1/2 lg:w-2/5 mx-auto rounded"
+                    alt=""
+                    loading="lazy"
+                  />
+                )}
                 <div className="w-full md:w-1/2 lg:w-3/5 xl:w-full flex flex-col gap-3">
                   <p>
                     <span className="font-semibold">Name: </span>

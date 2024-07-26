@@ -40,7 +40,7 @@ function Card({ title, count, link }) {
 
 Card.propTypes = {
   title: PropTypes.string,
-  count: PropTypes.string,
+  count: PropTypes.node,
   link: PropTypes.string,
 };
 

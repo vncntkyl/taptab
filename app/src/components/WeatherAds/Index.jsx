@@ -3,7 +3,6 @@ import { weatherFunctions } from "../../functions/WeatherFunctions";
 import { Modal } from "flowbite-react";
 import {
   addMinutes,
-  differenceInMinutes,
   isBefore,
   parseISO,
   subHours,
@@ -68,7 +67,6 @@ function WeatherAds() {
         if (response) {
           const driver = localStorage.getItem("driver");
           if (driver) {
-            console.log("tracking...");
             const condition = checkCondition(response.current.condition.text);
             const temperature = response.current.temp_c;
             const adList = await retrieveWeatherAds(condition, temperature);
@@ -82,7 +80,6 @@ function WeatherAds() {
                   (shown) => shown._id === ad._id
                 );
                 if (!currentAd || isAnHourAgo(currentAd.last_shown)) {
-                  console.log("new ad found!");
                   setTimeout(() => {
                     setAdvertisement(ad);
                   }, 5000);
@@ -90,12 +87,6 @@ function WeatherAds() {
                 } else {
                   let date = new Date(currentAd.last_shown);
                   date = addMinutes(date, 60);
-
-                  console.log("ad is already shown. please wait after an hour");
-                  console.log(
-                    differenceInMinutes(date, new Date()) +
-                      " minutes remaining til next showtime"
-                  );
                 }
               }
             }
@@ -133,7 +124,6 @@ function WeatherAds() {
         } else {
           shownAds.push(newAd);
         }
-        console.log("advertisement removed");
         localStorage.setItem("shownAds", JSON.stringify(shownAds));
         setAdvertisement(null);
       }
@@ -159,7 +149,6 @@ function WeatherAds() {
     >
       <Modal.Body theme={{ base: "p-2 outline-none max-w-2xl mx-auto" }}>
         <div className="bg-white p-3 rounded-md animate-splash">
-          {/* {console.log(advertisement)} */}
           <img className="rounded-md" src={advertisement?.signedUrl} alt="" />
         </div>
       </Modal.Body>

@@ -9,6 +9,7 @@ import { useFunction } from "../context/Functions";
 import { iconButton } from "../context/CustomThemes";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import ActionButton from "../components/ActionButton";
 
 function StaticAdsTable({ ads, setItem, setModal }) {
   const { capitalize, convertText, removeSpaces } = useFunction();
@@ -35,9 +36,13 @@ function StaticAdsTable({ ads, setItem, setModal }) {
           Actions
         </Table.HeadCell>
       </Table.Head>
+      
       <Table.Body className="divide-y">
         {ads.length > 0 ? (
           ads.map((item, index) => {
+            const thumbnail = item.images.find(
+              (img) => img.type === "thumbnail"
+            ).signedUrl;
             return (
               <Table.Row
                 key={index}
@@ -45,7 +50,7 @@ function StaticAdsTable({ ads, setItem, setModal }) {
               >
                 <Table.Cell onClick={() => viewItem(item)}>
                   <img
-                    src={item.signedUrl}
+                    src={thumbnail}
                     alt=""
                     loading="lazy"
                     className="max-w-[250px] rounded"
@@ -97,11 +102,8 @@ function StaticAdsTable({ ads, setItem, setModal }) {
                 </Table.Cell>
                 <Table.Cell>
                   <div className="flex items-center justify-center gap-1">
-                    <Button
-                      className="focus:ring-0 w-fit z-[2]"
-                      color="transparent"
-                      size="sm"
-                      theme={iconButton}
+                    <ActionButton
+                      tooltip={"Edit"}
                       onClick={() => {
                         setModal({
                           toggle: true,
@@ -117,14 +119,11 @@ function StaticAdsTable({ ads, setItem, setModal }) {
                           imagePath: item.fileName,
                         });
                       }}
-                    >
-                      <RiEditBoxFill className="text-lg" />
-                    </Button>
-                    <Button
-                      className="focus:ring-0 w-fit z-[2]"
-                      color="transparent"
-                      size="sm"
-                      theme={iconButton}
+                      icon={RiEditBoxFill}
+                    />
+                    <ActionButton
+                      tooltip={"Delete"}
+                      icon={RiDeleteBinFill}
                       onClick={() => {
                         setModal({
                           toggle: true,
@@ -132,9 +131,8 @@ function StaticAdsTable({ ads, setItem, setModal }) {
                         });
                         setItem(item);
                       }}
-                    >
-                      <RiDeleteBinFill className="text-lg text-c-red" />
-                    </Button>
+                      color={"text-c-red"}
+                    />
                   </div>
                 </Table.Cell>
               </Table.Row>

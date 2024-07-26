@@ -25,19 +25,19 @@ function Analytics() {
   const [dates, setDates] = useState({
     from: format(
       new Date(new Date(currentDate).setDate(currentDate.getDate() - 30)),
-      "MM/dd/yy"
+      "yyyy-MM-dd"
     ),
-    to: format(currentDate, "MM/dd/yy"),
+    to: format(currentDate, "yyyy-MM-dd"),
   });
-  const [dateFilter, setDateFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("range");
   const [metricFilter, setMetricFilter] = useState("all");
 
   useEffect(() => {
     const id = localStorage.getItem("geo_ad_id");
     const setup = async () => {
       if (id) {
-        const dateOptions =
-          dateFilter === "all" ? { range: dateFilter } : dates;
+        const dateOptions = dateFilter === "all" ? "all" : dates;
+        console.log(dateOptions);
         const response = await getGeoAdStatistics(id, dateOptions);
         setAnalytics(response);
       }
@@ -53,11 +53,11 @@ function Analytics() {
             <AnalyticsCard title="Total Shows" count={analytics.shows} />
             <AnalyticsCard
               title="Total Clicks"
-              count={analytics.interactions}
+              count={analytics.interactions.length}
             />
             <AnalyticsCard
               title="Players Passed By"
-              count={analytics.players}
+              count={analytics.players.length}
               link="#players"
             />
           </section>
@@ -72,7 +72,6 @@ function Analytics() {
                   id="all"
                   name="date_types"
                   value="All"
-                  defaultChecked
                   onChange={() => setDateFilter("all")}
                 />
                 <Label htmlFor="all" value="All" />
@@ -81,6 +80,7 @@ function Analytics() {
                 <Radio
                   id="range"
                   name="date_types"
+                  defaultChecked
                   value="Range"
                   onChange={() => setDateFilter("range")}
                 />
@@ -163,10 +163,22 @@ function Analytics() {
                       fill="url(#colorUv)"
                     />
                   ) : metricFilter === "clicks" ? (
-                    <Bar dataKey="clicks" fill="#39b1e5" />
+                    <Area
+                      type="monotone"
+                      dataKey="clicks"
+                      strokeWidth={2}
+                      fill="#39b1e5"
+                    />
                   ) : (
+                    // <Bar dataKey="clicks" fill="#39b1e5" />
                     metricFilter === "scans" && (
-                      <Bar dataKey="scans" fill="#052f41" />
+                      <Area
+                        type="monotone"
+                        dataKey="scans"
+                        strokeWidth={2}
+                        fill="#052f41"
+                      />
+                      // <Bar dataKey="scans" fill="#052f41" />
                     )
                   )
                 ) : (
@@ -177,8 +189,18 @@ function Analytics() {
                       strokeWidth={2}
                       fill="url(#colorUv)"
                     />
-                    <Bar dataKey="clicks" fill="#39b1e5" />
-                    <Bar dataKey="scans" fill="#052f41" />
+                    <Area
+                      type="monotone"
+                      dataKey="clicks"
+                      strokeWidth={2}
+                      fill="#39b1e5"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="scans"
+                      strokeWidth={2}
+                      fill="#052f41"
+                    />
                   </>
                 )}
               </ComposedChart>
@@ -198,7 +220,7 @@ function Analytics() {
               className="overflow-hidden"
             >
               <BarChart
-                data={analytics?.playerChart}
+                data={analytics.players}
                 layout="vertical"
                 margin={{ left: 100 }}
               >

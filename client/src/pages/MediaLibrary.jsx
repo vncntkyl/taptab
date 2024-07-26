@@ -6,7 +6,6 @@ import {
   Label,
   Modal,
   Pagination,
-  Select,
   TextInput,
 } from "flowbite-react";
 import { useAuth } from "../context/AuthContext";
@@ -20,7 +19,6 @@ import {
   mainButton,
   modalTheme,
   redMainButton,
-  selectTheme,
   textTheme,
 } from "../context/CustomThemes";
 import { format } from "date-fns";
@@ -184,42 +182,61 @@ function MediaLibrary() {
         videoDuration: videoFeed.current.duration,
       };
 
-      if (videoFeed.current.readyState >= 2) {
-        videoFeed.current.currentTime = 2;
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(videoFeed.current, 0, 0, canvas.width, canvas.height);
-        canvas.toBlob(async (blob) => {
-          if (blob) {
-            // Create a File object from the Blob
-            const screenshotFile = new File(
-              [blob],
-              `${fileData.name}_tmb.png`,
-              {
-                type: "image/png",
+      if (file) {
+        if (videoFeed.current.readyState >= 2) {
+          videoFeed.current.currentTime = 2;
+          const canvas = canvasRef.current;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(videoFeed.current, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob(async (blob) => {
+            if (blob) {
+              // Create a File object from the Blob
+              const screenshotFile = new File(
+                [blob],
+                `${fileData.name}_tmb.png`,
+                {
+                  type: "image/png",
+                }
+              );
+              const mediaFile = [screenshotFile, file];
+              response = await handleFunction(mediaFile, fileData);
+              const alert = {
+                isOn: true,
+                type: "success",
+                message: `You have successfully ${
+                  modal.title === "edit" ? "updated" : "added"
+                } new media item.`,
+              };
+              console.log(response);
+              if (response.acknowledged) {
+                setAlert(alert);
+              } else {
+                alert.type = "failure";
+                alert.message = response;
+                setAlert(alert);
               }
-            );
-            const mediaFile = [screenshotFile, file];
-            response = await handleFunction(mediaFile, fileData);
-            const alert = {
-              isOn: true,
-              type: "success",
-              message: `You have successfully ${
-                modal.title === "edit" ? "updated" : "added"
-              } new media item.`,
-            };
-            console.log(response);
-            if (response.acknowledged) {
-              setAlert(alert);
             } else {
-              alert.type = "failure";
-              alert.message = response;
-              setAlert(alert);
+              console.log("Failed to create Blob from canvas");
             }
-          } else {
-            console.log("Failed to create Blob from canvas");
-          }
-        }, "image/png");
+          }, "image/png");
+        }
+      } else {
+        response = await handleFunction([], fileData);
+        const alert = {
+          isOn: true,
+          type: "success",
+          message: `You have successfully ${
+            modal.title === "edit" ? "updated" : "added"
+          } new media item.`,
+        };
+        console.log(response);
+        if (response.acknowledged) {
+          setAlert(alert);
+        } else {
+          alert.type = "failure";
+          alert.message = response;
+          setAlert(alert);
+        }
       }
     }
     setIsLoading((previous) => !previous);
@@ -464,7 +481,7 @@ function MediaLibrary() {
         <Modal.Header className="border-b-default-dark p-3 px-4">
           {modal.toggle &&
             (modal.title.includes("delete") || modal.title.includes("edit")
-              ? capitalize(modal.title) + ' "' + mediaItem.name + '"'
+              ? capitalize(modal.title) + "  Ad"
               : "Add New " + capitalize(modal.title))}
         </Modal.Header>
         <Modal.Body>

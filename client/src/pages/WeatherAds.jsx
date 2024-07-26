@@ -85,7 +85,7 @@ function WeatherAds() {
   useEffect(() => {
     const setup = async () => {
       const response = await getWeatherAds();
-      console.log(response);
+     
       setAds(response);
     };
     setup();
@@ -233,18 +233,30 @@ function ManageModal({ item, setItem, id, onSubmit }) {
   return (
     <form
       encType="multipart/form-data"
-      className="flex flex-col gap-6 pb-2"
+      className="flex flex-col gap-4"
       onSubmit={onSubmit}
     >
       <div>
-        {item.image && <img src={item.image} />}
-        <Label htmlFor="file" value="Image" className="capitalize" />
+        {item.image && (
+          <div className="w-full">
+            {console.log(item.image)}
+            <span>Media Preview: </span>
+            {item.image.split(":")[1].substring(0, 5) === "image" ? (
+              <img src={item.image} className="max-w-[150px] mx-auto" />
+            ) : (
+              <video autoPlay loop className="max-w-[150px] mx-auto">
+                <source src={item.image} type="video/mp4" />
+              </video>
+            )}
+          </div>
+        )}
+        <Label htmlFor="file" value="Ad" className="capitalize" />
         <FileInput
           required={!id}
           id="file"
           type="text"
           sizing="lg"
-          accept="image/*"
+          accept="image/*;video/*"
           onChange={onFileChange}
           theme={textTheme}
         />
@@ -255,6 +267,16 @@ function ManageModal({ item, setItem, id, onSubmit }) {
           id="name"
           theme={textTheme}
           value={item.name}
+          onChange={onChange}
+        />
+      </div>
+      <div>
+        <Label htmlFor="link" value="Link" className="capitalize" />
+        <TextInput
+          id="link"
+          theme={textTheme}
+          value={item.link}
+          placeholder="https://www.adlink.com"
           onChange={onChange}
         />
       </div>

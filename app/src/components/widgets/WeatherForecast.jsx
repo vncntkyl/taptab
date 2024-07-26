@@ -73,7 +73,7 @@ function WeatherForecast() {
           />
           <div className="flex flex-col text-white">
             <div className="flex gap-2 items-start">
-              <p className="text-white text-6xl font-bold">
+              <p className="text-white text-5xl font-bold">
                 {tempUnit === "C"
                   ? forecast.current.temp_c
                   : forecast.current.temp_f}

@@ -1,4 +1,3 @@
-import React from "react";
 import PropTypes from "prop-types";
 import { Button, Table } from "flowbite-react";
 import { useFunction } from "../context/Functions";
@@ -7,7 +6,7 @@ import { iconButton } from "../context/CustomThemes";
 import { format } from "date-fns";
 
 function WeatherAdsTable({ ads, setModal, setItem }) {
-  const { convertText, removeSpaces } = useFunction();
+  const { convertText, getType } = useFunction();
   const headers = ["image", "name", "details", "date_modified", "actions"];
 
   return (
@@ -31,12 +30,18 @@ function WeatherAdsTable({ ads, setModal, setItem }) {
                 className="text-center hover:bg-slate-200"
               >
                 <Table.Cell className="max-w-[150px]">
-                  <img
-                    src={item.signedUrl}
-                    alt=""
-                    loading="lazy"
-                    className="w-full rounded"
-                  />
+                  {getType(item.signedUrl) === "video" ? (
+                    <video loop autoPlay className="max-w-[150px]">
+                      <source src={item.signedUrl} type="video/mp4"/>
+                    </video>
+                  ) : (
+                    <img
+                      src={item.signedUrl}
+                      alt=""
+                      loading="lazy"
+                      className="max-w-[150px] rounded"
+                    />
+                  )}
                 </Table.Cell>
                 <Table.Cell className="text-start">
                   <span className="font-bold">{item.name}</span>

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import PropTypes from "prop-types";
 import { Badge, Button, Table } from "flowbite-react";
 import { useFunction } from "../context/Functions";
@@ -13,6 +14,19 @@ function PlayerTable({ data }) {
   const [viewCode, showCode] = useState(
     data.map((item) => ({ _id: item._id, show: false }))
   );
+
+  const LastLocation = ({ location_list }) => {
+    const lastLocation = location_list[location_list.length - 1];
+    return lastLocation.lat === 0 && lastLocation.long === 0 ? (
+      "No record yet"
+    ) : (
+      <a
+        href={`https://maps.google.com?q=${lastLocation.lat}+${lastLocation.long}`}
+        target="_blank"
+        rel="noreferrer"
+      >{`${lastLocation.lat},${lastLocation.long}`}</a>
+    );
+  };
   const headers = ["status", "player", "driver", "action"];
 
   return (
@@ -56,13 +70,7 @@ function PlayerTable({ data }) {
                     <Information
                       label="Location"
                       value={
-                        <>
-                          <a
-                            href={`https://maps.google.com?q=${player.last_location.lat}+${player.last_location.long}`}
-                            target="_blank"
-                            rel="noreferrer"
-                          >{`${player.last_location.lat},${player.last_location.long}`}</a>
-                        </>
+                        <LastLocation location_list={player.last_location} />
                       }
                     />
                     <Information

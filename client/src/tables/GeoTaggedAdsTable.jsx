@@ -1,17 +1,17 @@
 import PropTypes from "prop-types";
-import { Button, Table } from "flowbite-react";
+import { Table } from "flowbite-react";
 import {
   RiDeleteBinFill,
   RiEditBoxFill,
   RiExternalLinkFill,
 } from "react-icons/ri";
 import { useFunction } from "../context/Functions";
-import { iconButton } from "../context/CustomThemes";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import ActionButton from "../components/ActionButton";
 
 function GeoTaggedAdsTable({ ads, setItem, setModal }) {
-  const { convertText, removeSpaces } = useFunction();
+  const { convertText, removeSpaces, getType } = useFunction();
   const headers = ["image", "details", "location", "link", "date_modified"];
   const navigate = useNavigate();
   const viewItem = (ad, isEdit) => {
@@ -46,13 +46,19 @@ function GeoTaggedAdsTable({ ads, setItem, setModal }) {
                 id={item._id}
                 className="text-center hover:bg-slate-200"
               >
-                <Table.Cell onClick={() => viewItem(item)}>
-                  <img
-                    src={item.signedUrl}
-                    alt=""
-                    loading="lazy"
-                    className="max-w-[250px] rounded"
-                  />
+                <Table.Cell onClick={() => viewItem(item)} align="center">
+                  {getType(item.signedUrl) === "video" ? (
+                    <video className="max-w-[150px]" autoPlay muted loop>
+                      <source src={item.signedUrl} />
+                    </video>
+                  ) : (
+                    <img
+                      src={item.signedUrl}
+                      alt=""
+                      loading="lazy"
+                      className="max-w-[250px] rounded"
+                    />
+                  )}
                 </Table.Cell>
                 <Table.Cell onClick={() => viewItem(item)}>
                   <div className="flex flex-col text-start">
@@ -114,20 +120,13 @@ function GeoTaggedAdsTable({ ads, setItem, setModal }) {
                 </Table.Cell>
                 <Table.Cell>
                   <div className="flex items-center justify-center gap-1">
-                    <Button
-                      className="focus:ring-0 w-fit z-[2]"
-                      color="transparent"
-                      size="sm"
-                      theme={iconButton}
+                    <ActionButton
+                      tooltip="Edit"
                       onClick={() => viewItem(item, true)}
-                    >
-                      <RiEditBoxFill className="text-lg" />
-                    </Button>
-                    <Button
-                      className="focus:ring-0 w-fit z-[2]"
-                      color="transparent"
-                      size="sm"
-                      theme={iconButton}
+                      icon={RiEditBoxFill}
+                    />
+                    <ActionButton
+                      tooltip="Delete"
                       onClick={() => {
                         setModal({
                           toggle: true,
@@ -135,9 +134,9 @@ function GeoTaggedAdsTable({ ads, setItem, setModal }) {
                         });
                         setItem(item);
                       }}
-                    >
-                      <RiDeleteBinFill className="text-lg text-c-red" />
-                    </Button>
+                      icon={RiDeleteBinFill}
+                      color="text-c-red"
+                    />
                   </div>
                 </Table.Cell>
               </Table.Row>

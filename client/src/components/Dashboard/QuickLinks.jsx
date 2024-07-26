@@ -12,7 +12,6 @@ function QuickLinks() {
   useEffect(() => {
     const setup = async () => {
       const response = await retrieveQuickLinksValues();
-      console.log(response);
       setCount(response);
     };
 

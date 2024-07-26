@@ -55,9 +55,23 @@ function generateRandomString(length) {
   }
   return result;
 }
+const getType = (link) => {
+  const parts = link.split("/");
+  const file = parts[parts.length - 1].split("?")[0];
+  const imageFormats = ["jpeg", "jpg", "jfif", "png", "webp", "gif"];
+  const videoFormats = ["mp4", "mov", "avi", "webm"];
+
+  const format = file.split(".")[file.split(".").length - 1];
+  return imageFormats.includes(format)
+    ? "image"
+    : videoFormats
+    ? "video"
+    : null;
+};
 
 export const useFunction = () => {
   return {
+    getType,
     capitalize,
     convertText,
     getPath,

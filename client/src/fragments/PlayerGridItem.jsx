@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import PropTypes from "prop-types";
 import { GoDotFill } from "react-icons/go";
 import classNames from "classnames";
@@ -7,6 +8,19 @@ import { differenceInMinutes } from "date-fns";
 
 function PlayerGridItem({ player }) {
   const { capitalize } = useFunction();
+
+  const LastLocation = ({ location_list }) => {
+    const lastLocation = location_list[location_list.length - 1];
+    return lastLocation.lat === 0 && lastLocation.long === 0 ? (
+      "No record yet"
+    ) : (
+      <a
+        href={`https://maps.google.com?q=${lastLocation.lat}+${lastLocation.long}`}
+        target="_blank"
+        rel="noreferrer"
+      >{`${lastLocation.lat},${lastLocation.long}`}</a>
+    );
+  };
   return (
     <div className="w-full min-h-[175px] shadow-md rounded bg-slate-200">
       <div className="flex items-center justify-between p-2 text-white bg-slate-500 rounded-t">
@@ -34,13 +48,7 @@ function PlayerGridItem({ player }) {
       <div className="p-1 px-2 text-sm">
         <p>
           <span className="font-semibold">Location</span>:{" "}
-          {player.last_location.lat === 0 && player.last_location.long === 0 ? "No record yet" :
-          <a
-          href={`https://maps.google.com?q=${player.last_location.lat}+${player.last_location.long}`}
-          target="_blank"
-          rel="noreferrer"
-          >{`${player.last_location.lat},${player.last_location.long}`}</a>
-        }
+          <LastLocation location_list={player.last_location} />
         </p>
         <div className="py-1 flex flex-col gap-1">
           <p>

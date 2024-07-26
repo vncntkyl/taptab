@@ -13,22 +13,37 @@ function Maps() {
   );
 
   useEffect(() => {
-    const watchId = navigator.geolocation.watchPosition(
-      (position) => {
-        const newLocation = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-        setCurrentLocation(newLocation);
-      },
-      (error) => {
-        console.error("Error getting user location:", error);
-      }
-    );
+    let isMounted = true; // Add a flag to handle component unmounting
 
-    return () => {
-      navigator.geolocation.clearWatch(watchId);
-    };
+    if ("geolocation" in navigator) {
+      const positionOptions = {
+        enableHighAccuracy: true, // Request high accuracy
+        timeout: 10000, // Maximum time to wait for a position
+        maximumAge: 0, // Maximum age of cached position
+      };
+      const watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          if (isMounted) {
+            const newLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+            setCurrentLocation(newLocation);
+          }
+        },
+        (error) => {
+          console.error("Error getting user location:", error);
+        },
+        positionOptions
+      );
+
+      return () => {
+        isMounted = false;
+        navigator.geolocation.clearWatch(watchId);
+      };
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+    }
   }, []);
 
   return (
@@ -39,7 +54,7 @@ function Maps() {
             key: "AIzaSyDbeapt7qyPCPwnOl2FwkyPARyS3dYfYck",
           }}
           center={currentLocation}
-          zoom={17}
+          zoom={18}
           draggable={false}
           options={() => {
             return {

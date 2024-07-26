@@ -24,10 +24,13 @@ function Players() {
     isOnline: "",
     status: "ready",
     date_created: new Date(),
-    last_location: {
-      long: 0,
-      lat: 0,
-    },
+    last_location: [
+      {
+        long: 0,
+        lat: 0,
+        timestamp: new Date(),
+      },
+    ],
     driver: {
       name: "",
       contact_no: "",

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useStaticAds } from "../context/StaticAdsContext";
@@ -25,18 +26,21 @@ import { RiAddFill } from "react-icons/ri";
 import FilterDropdown from "../fragments/FilterDropdown";
 import { Route, Routes } from "react-router-dom";
 import StaticAd from "../components/staticAds/StaticAd";
+import { useMemo } from "react";
 
 function StaticAds() {
-  const { setIsLoading, setAlert } = useAuth();
+  const { setIsLoading, setAlert, isLoading } = useAuth();
+
   const { getStaticAds, createStaticAds, updateStaticAd, deleteStaticAd } =
     useStaticAds();
-  const { capitalize } = useFunction();
 
   const [staticAds, setStaticAds] = useState(null);
   const [adItem, setAdItem] = useState({
     name: "",
     image: "",
     imageFile: "",
+    imageThumbnail: "",
+    thumbnailFile: "",
     category: "",
     description: "",
     link: "",
@@ -64,23 +68,26 @@ function StaticAds() {
       name: "",
       image: "",
       imageFile: "",
+      imageThumbnail: "",
+      thumbnailFile: "",
       category: "",
       description: "",
       link: "",
     });
   };
-
   const handleAdUpload = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     const adData = { ...adItem };
-    const file = adItem.imageFile;
+    const files = [adItem.imageFile, adItem.thumbnailFile];
     delete adData.imageFile;
     delete adData.image;
+    delete adData.imageThumbnail;
+    delete adData.thumbnailFile;
     adData.status = "active";
 
+    const response = await createStaticAds(files, adData);
     resetDefaults();
-    const response = await createStaticAds(file, adData);
     console.log(response);
     setIsLoading(false);
     const alert = {
@@ -102,6 +109,9 @@ function StaticAds() {
     const adData = { ...adItem };
     if (adItem.imageFile) {
       delete adData.image;
+    }
+    if (adItem.thumbnailFile) {
+      delete adData.imageThumbnail;
     }
     resetDefaults();
     const response = await updateStaticAd(adData);
@@ -138,44 +148,6 @@ function StaticAds() {
       setAlert(alert);
     }
   };
-  const onInputChange = (e, key) => {
-    setAdItem((current) => {
-      return {
-        ...current,
-        [key]: e.target.value,
-      };
-    });
-  };
-  const onFileChange = (evt) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      // Access image contents from reader result
-      const mediaContent = e.target.result;
-      const filename = evt.target.files[0].name
-        .split(".")
-        .slice(0, -1)
-        .join(".");
-      if (modal.toggle && modal.title.includes("edit")) {
-        setAdItem((ad) => {
-          return {
-            ...ad,
-            image: mediaContent,
-            imageFile: evt.target.files[0],
-          };
-        });
-      } else {
-        setAdItem((ad) => {
-          return {
-            ...ad,
-            image: mediaContent,
-            name: filename,
-            imageFile: evt.target.files[0],
-          };
-        });
-      }
-    };
-    reader.readAsDataURL(evt.target.files[0]);
-  };
   useEffect(() => {
     setIsLoading(true);
   }, [setIsLoading]);
@@ -183,92 +155,24 @@ function StaticAds() {
   useEffect(() => {
     const setup = async () => {
       const response = await getStaticAds();
-      let filteredAds = [...response];
-
-      setCategories([...new Set(filteredAds.map((item) => item.category))]);
-
-      if (search.length > 2) {
-        filteredAds = filteredAds.filter((media) =>
-          media.name.toLowerCase().includes(search.toLowerCase())
-        );
-      }
-      if (sort !== "normal") {
-        setCurrentPage(1);
-        switch (sort) {
-          case "A-Z_asc":
-            filteredAds = filteredAds.sort((a, b) => {
-              const itemA = a.name.toUpperCase();
-              const itemB = b.name.toUpperCase();
-
-              if (itemA < itemB) {
-                return -1;
-              }
-              if (itemA > itemB) {
-                return 1;
-              }
-              return 0;
-            });
-            break;
-          case "Z-A_desc":
-            filteredAds = filteredAds.sort((a, b) => {
-              const itemA = b.name.toUpperCase();
-              const itemB = a.name.toUpperCase();
-
-              if (itemA < itemB) {
-                return -1;
-              }
-              if (itemA > itemB) {
-                return 1;
-              }
-              return 0;
-            });
-            break;
-          case "date_asc":
-            filteredAds = filteredAds.sort((a, b) => {
-              const dateA = new Date(a.timeCreated).getTime();
-              const dateB = new Date(b.timeCreated).getTime();
-              return dateA - dateB;
-            });
-            break;
-          case "date_desc":
-            filteredAds = filteredAds.sort((a, b) => {
-              const dateA = new Date(a.timeCreated).getTime();
-              const dateB = new Date(b.timeCreated).getTime();
-              return dateB - dateA;
-            });
-            break;
-          case "usage_asc":
-            filteredAds = filteredAds.sort((a, b) => {
-              return a.usage - b.usage;
-            });
-            break;
-          case "usage_desc":
-            filteredAds = filteredAds.sort((a, b) => {
-              return b.usage - a.usage;
-            });
-            break;
-        }
-      }
-      if (filter !== "all") {
-        setCurrentPage(1);
-        filteredAds = filteredAds.filter(
-          (media) => media.category.toLowerCase() === filter.toLowerCase()
-        );
-      }
-      const size = filteredAds.length;
-      const pageCount = Math.ceil(size / 5);
-      setPages(pageCount);
-      const limit = (currentPage - 1) * 5;
-      const finalData = filteredAds.splice(limit, 5);
-      setStaticAds(finalData);
+      setStaticAds(response);
       setIsLoading(false);
     };
     setup();
-    const realtimeData = setInterval(setup, 3000);
-    return () => {
-      clearInterval(realtimeData);
-    };
-  }, [currentPage, filter, search, setIsLoading, sort]);
+  }, [isLoading]);
+
+  const filteredAds = useMemo(() => {
+    if (!staticAds) return null;
+
+    const searched =
+      search.length > 2
+        ? staticAds.filter((media) =>
+            media.name.toLowerCase().includes(search.toLowerCase())
+          )
+        : staticAds;
+
+    return searched;
+  }, [staticAds, search]);
   return (
     <>
       <div className="transition-all w-full flex flex-col gap-4">
@@ -315,7 +219,7 @@ function StaticAds() {
                     />
                     <div className="w-full overflow-x-auto rounded-md shadow-md flex flex-col gap-2 max-h-[70vh]">
                       <StaticAdsTable
-                        ads={staticAds}
+                        ads={filteredAds}
                         setModal={setModal}
                         setItem={setAdItem}
                       />
@@ -333,112 +237,206 @@ function StaticAds() {
           <Route path="/:id" element={<StaticAd />} />
         </Routes>
       </div>
-      <Modal
-        position="center"
-        show={modal.toggle}
-        dismissible
-        onClose={() => {
-          resetDefaults();
-        }}
-        size="xl"
-        theme={modalTheme}
-      >
-        <Modal.Header className="border-b-default-dark p-3 px-4">
-          {modal.toggle && capitalize(modal.title)}
-        </Modal.Header>
-        <Modal.Body>
-          {modal.toggle && modal.title.includes("delete") ? (
-            <div>
-              <p className="text-center w-full">
-                Confirm deletion for <strong>{adItem.name}</strong>{" "}
-                advertisement?
-              </p>
-              <Button
-                className="mt-4 w-fit float-right"
-                color="transparent"
-                onClick={() => handleAdDelete()}
-                theme={redMainButton}
-              >
-                Delete
-              </Button>
-            </div>
-          ) : (
-            <form
-              className="flex flex-col gap-2"
-              encType="multipart/form-data"
-              onSubmit={
-                modal.toggle && modal.title.includes("edit")
-                  ? handleAdEdit
-                  : handleAdUpload
-              }
-            >
-              <div>
-                {adItem.image && (
-                  <>
-                    <img
-                      src={adItem.image}
-                      alt=""
-                      className="w-full max-w-[300px]"
-                    />
-                    <br />
-                  </>
-                )}
-                <Label htmlFor="file" value="Upload Image" />
-                <FileInput
-                  id="file"
-                  type="text"
-                  sizing="sm"
-                  accept="image/*"
-                  onChange={(e) => onFileChange(e)}
-                  theme={textTheme}
-                />
-              </div>
-              {["name", "link", "category"].map((item, index) => {
-                return (
-                  <div key={index}>
-                    <Label htmlFor={item} value={capitalize(item)} />
-                    <TextInput
-                      id={item}
-                      onChange={(e) => onInputChange(e, item)}
-                      type="text"
-                      sizing="sm"
-                      placeholder={
-                        item === "link" ? "https://www.staticadlink.com" : ""
-                      }
-                      value={adItem[item]}
-                      required
-                      theme={textTheme}
-                    />
-                  </div>
-                );
-              })}
-              <div>
-                <Label htmlFor="description" value="Description (optional)" />
-                <Textarea
-                  id="description"
-                  onChange={(e) => onInputChange(e, "description")}
-                  type="text"
-                  sizing="sm"
-                  value={adItem.description}
-                  theme={textareaTheme}
-                />
-              </div>
-              <Button
-                className="mt-4 w-full disabled:bg-black"
-                type="submit"
-                color="transparent"
-                theme={mainButton}
-              >
-                {modal.toggle && modal.title.includes("edit")
-                  ? "Save Changes"
-                  : "Upload"}
-              </Button>
-            </form>
-          )}
-        </Modal.Body>
-      </Modal>
+      <AdModal
+        modal={modal}
+        resetDefaults={resetDefaults}
+        ad={adItem}
+        setAdItem={setAdItem}
+        handleAdUpload={handleAdUpload}
+        handleAdEdit={handleAdEdit}
+        handleAdDelete={handleAdDelete}
+      />
     </>
   );
 }
 
+function AdModal({
+  modal,
+  resetDefaults,
+  ad,
+  setAdItem,
+  handleAdUpload,
+  handleAdEdit,
+  handleAdDelete,
+}) {
+  const { capitalize } = useFunction();
+
+  const onInputChange = (e, key) => {
+    setAdItem((current) => {
+      return {
+        ...current,
+        [key]: e.target.value,
+      };
+    });
+  };
+  const onAdChange = (evt) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      // Access image contents from reader result
+      const mediaContent = e.target.result;
+      const filename = evt.target.files[0].name
+        .split(".")
+        .slice(0, -1)
+        .join(".");
+
+      setAdItem((ad) => {
+        return {
+          ...ad,
+          image: mediaContent,
+          name: ad.name.length !== 0 ? ad.name : filename,
+          imageFile: evt.target.files[0],
+        };
+      });
+    };
+    reader.readAsDataURL(evt.target.files[0]);
+  };
+
+  const onThumbnailChange = (evt) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      // Access image contents from reader result
+      const mediaContent = e.target.result;
+
+      setAdItem((ad) => {
+        return {
+          ...ad,
+          imageThumbnail: mediaContent,
+          thumbnailFile: evt.target.files[0],
+        };
+      });
+    };
+    reader.readAsDataURL(evt.target.files[0]);
+  };
+
+  return (
+    <Modal
+      position="center"
+      show={modal.toggle}
+      dismissible
+      onClose={() => {
+        resetDefaults();
+      }}
+      size="2xl"
+      theme={modalTheme}
+    >
+      {modal.toggle && (
+        <>
+          <Modal.Header className="border-b-default-dark p-3 px-4">
+            {capitalize(modal.title)}
+          </Modal.Header>
+          <Modal.Body>
+            {modal.title.includes("delete") ? (
+              <div>
+                <p className="text-center w-full">
+                  Confirm deletion for <strong>{ad.name}</strong> advertisement?
+                </p>
+                <Button
+                  className="mt-4 w-fit float-right"
+                  color="transparent"
+                  onClick={() => handleAdDelete()}
+                  theme={redMainButton}
+                >
+                  Delete
+                </Button>
+              </div>
+            ) : (
+              <form
+                className="flex flex-col gap-2"
+                encType="multipart/form-data"
+                onSubmit={
+                  modal.title.includes("edit") ? handleAdEdit : handleAdUpload
+                }
+              >
+                <div className="flex gap-4">
+                  <section className="w-full">
+                    <p>Ad Preview</p>
+                    {ad.image && (
+                      <img
+                        src={ad.image}
+                        alt=""
+                        className="w-full max-w-[175px] rounded-md"
+                      />
+                    )}
+                  </section>
+                  <section className="w-full">
+                    <p>Thumbnail Preview</p>
+                    {ad.imageThumbnail && (
+                      <img
+                        src={ad.imageThumbnail}
+                        alt=""
+                        className="w-full max-w-[250px] rounded-md"
+                      />
+                    )}
+                  </section>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-full">
+                    <Label htmlFor="file" value="Ad" />
+                    <FileInput
+                      id="file"
+                      type="text"
+                      sizing="sm"
+                      accept="image/*"
+                      onChange={(e) => onAdChange(e)}
+                      theme={textTheme}
+                    />
+                  </div>
+                  <div className="w-full">
+                    <Label htmlFor="file_tb" value="Thumbnail" />
+                    <FileInput
+                      id="file_tb"
+                      type="text"
+                      sizing="sm"
+                      accept="image/*"
+                      onChange={(e) => onThumbnailChange(e)}
+                      theme={textTheme}
+                    />
+                  </div>
+                </div>
+                {["name", "link", "category"].map((item, index) => {
+                  return (
+                    <div key={index}>
+                      <Label htmlFor={item} value={capitalize(item)} />
+                      <TextInput
+                        id={item}
+                        onChange={(e) => onInputChange(e, item)}
+                        type="text"
+                        sizing="sm"
+                        placeholder={
+                          item === "link" ? "https://www.staticadlink.com" : ""
+                        }
+                        value={ad[item]}
+                        required
+                        theme={textTheme}
+                      />
+                    </div>
+                  );
+                })}
+                <div>
+                  <Label htmlFor="description" value="Description (optional)" />
+                  <Textarea
+                    id="description"
+                    onChange={(e) => onInputChange(e, "description")}
+                    type="text"
+                    sizing="sm"
+                    value={ad.description}
+                    theme={textareaTheme}
+                  />
+                </div>
+                <Button
+                  className="mt-4 w-full disabled:bg-black"
+                  type="submit"
+                  color="transparent"
+                  theme={mainButton}
+                >
+                  {modal.title.includes("edit") ? "Save Changes" : "Upload"}
+                </Button>
+              </form>
+            )}
+          </Modal.Body>
+        </>
+      )}
+    </Modal>
+  );
+}
 export default StaticAds;

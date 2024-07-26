@@ -54,7 +54,7 @@ function VideoUploadForm({
           />
         </>
       ) : (
-        title === "add" && (
+        title === "video" && (
           <>
             <Label htmlFor="file" value="Upload Video" />
             <FileInput

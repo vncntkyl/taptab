@@ -51,17 +51,6 @@ function AdsPlayer({
     has_finished: false,
     log_date: "",
   };
-  const togglePlayPause = () => {
-    if (videoRef.current) {
-      if (videoRef.current.paused) {
-        videoRef.current.play();
-        setIsPlaying(true);
-      } else {
-        videoRef.current.pause();
-        setIsPlaying(false);
-      }
-    }
-  };
 
   const handleTimeUpdate = () => {
     if (videoRef.current) {
@@ -92,7 +81,6 @@ function AdsPlayer({
       adData.duration = durationBeforeSwitching;
     }
     adData.log_date = format(new Date(), "yyyy-MM-dd'T'HH:mm:ssXXX");
-    console.log(adData, `media_id: ${previousItem._id}`);
     imageTimerRef.current = Date.now();
     await recordAdViews(previousItem._id, adData);
 
@@ -187,7 +175,7 @@ function AdsPlayer({
       const touchPosition = evt.touches[0].clientY;
       const touchScreen = evt.touches[0].screenY;
       const touchRatio = (touchPosition / touchScreen) * 100;
-      if (touchRatio > 90) {
+      if (touchRatio > 45) {
         setXDown(evt.touches[0].clientY);
       }
     }
@@ -197,6 +185,7 @@ function AdsPlayer({
         return;
       }
       let xDiff = evt.touches[0].clientY - xDown;
+    
       if (xDiff < 10) {
         toggleRelatedAds(true); // You might need to change this according to your logic
       } else {
@@ -295,7 +284,7 @@ function AdsPlayer({
                   "absolute top-0 left-0 border w-full h-full flex items-center justify-center gap-4",
                   !isPlaying ? "bg-[#0000009c]" : "bg-transparent"
                 )}
-                onClick={togglePlayPause}
+                onClick={() =>  setIsPlaying((prev) => !prev)}
               >
                 <Button
                   color="transparent"
@@ -329,26 +318,6 @@ function AdsPlayer({
                   )}
                   onClick={(e) => {
                     e.stopPropagation();
-                    togglePlayPause();
-                  }}
-                >
-                  {isPlaying ? (
-                    <MdPlayArrow className="text-9xl text-white" />
-                  ) : (
-                    <MdPause className="text-9xl text-white" />
-                  )}
-                </Button>
-                <Button
-                  color="transparent"
-                  theme={iconButton}
-                  className={classNames(
-                    "focus:ring-0 outline-none animate-fade transition-all bg-[#00000070]",
-                    isPlaying
-                      ? "opacity-0 pointer-events-none"
-                      : "opacity-100 pointer-events-auto"
-                  )}
-                  onClick={(e) => {
-                    e.stopPropagation();
                     if (currentVideoIndex > 0) {
                       setSkipVideo(currentVideoIndex - 1);
                     } else {
@@ -358,38 +327,12 @@ function AdsPlayer({
                 >
                   <MdSkipNext className="text-7xl text-white" />
                 </Button>
-                {/* <div className="w-full">
-                  <Progress
-                    size="md"
-                    progress={
-                      currentTime === 0
-                        ? 0
-                        : (currentTime / (duration || 1)) * 100 // Added a fallback to avoid division by zero
-                    }
-                  />
-                </div> */}
-                <div className="bg-white text-black">
-                  {/* {console.log(currentTime, duration)} */}
-                </div>
-                {/* <Button
-              color="transparent"
-              theme={iconButton}
-              onClick={() => toggleFullScreen((current) => !current)}
-              className="focus:ring-0"
-            >
-              {isFullScreen ? (
-                <MdFullscreenExit className="animate-fade text-4xl" />
-              ) : (
-                <MdFullscreen className="animate-fade text-4xl" />
-              )}
-            </Button> */}
               </div>
               <RelatedAds
                 ads={relatedAds}
                 show={showRelatedAds}
                 setVideo={setPlayingVideo}
                 isPlaying={isPlaying}
-                togglePlaying={setIsPlaying}
               />
             </>
           )}

@@ -2,6 +2,7 @@ import axios from "axios";
 import { developmentRoutes as url } from "./Routes";
 const defaultInformation = {
   name: "",
+  link: "",
   trigger_temperature: "",
   trigger_unit: "C",
   weather: "sunny",

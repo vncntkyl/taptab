@@ -7,7 +7,6 @@ import { CgDanger } from "react-icons/cg";
 import { taptabLogo } from "../assets/index";
 import { useSurvey } from "../functions/EngagementFunctions";
 import classNames from "classnames";
-import Cookies from "js-cookie";
 function AccessForm() {
   const keyRef = useRef(null);
   const { loginTaptab, getIP, validateUser } = useSurvey();

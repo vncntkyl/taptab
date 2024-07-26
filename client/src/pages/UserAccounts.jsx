@@ -16,15 +16,8 @@ import {
 import { useAuth } from "../context/AuthContext";
 function UserAccounts() {
   const { capitalize, convertText } = useFunction();
-  const {
-    registerUser,
-    updateUser,
-    setAlert,
-    setIsLoading,
-    deleteUser,
-    deactivateUser,
-    reactivateUser,
-  } = useAuth();
+  const { registerUser, updateUser, setAlert, setIsLoading, manageStatus } =
+    useAuth();
   const { getUsers } = useUsers();
   const [users, setUsers] = useState(null);
   const [modal, setModal] = useState({
@@ -47,10 +40,7 @@ function UserAccounts() {
     const alert = {
       isOn: true,
       type: "success",
-      message:
-        "You have successfully registered " +
-        user.first_name +
-        ". Their login credentials are their surname in lowercase.",
+      message: "You have successfully registered " + user.first_name,
     };
 
     setModal({
@@ -91,7 +81,7 @@ function UserAccounts() {
   };
   const handleAccountDeletion = async () => {
     setIsLoading(true);
-    const response = await deleteUser(user._id);
+    const response = await manageStatus(user._id, "deleted");
     const alert = {
       isOn: true,
       type: "success",
@@ -112,7 +102,7 @@ function UserAccounts() {
   };
   const handleAccountDeactivation = async () => {
     setIsLoading(true);
-    const response = await deactivateUser(user._id);
+    const response = await manageStatus(user._id, "inactive");
     const alert = {
       isOn: true,
       type: "success",
@@ -133,14 +123,11 @@ function UserAccounts() {
   };
   const handleAccountReactivation = async () => {
     setIsLoading(true);
-    const response = await reactivateUser(user._id);
+    const response = await manageStatus(user._id, "active");
     const alert = {
       isOn: true,
       type: "success",
-      message:
-        "You have successfully reactivated " +
-        user.first_name +
-        ". Updates will show in few seconds.",
+      message: "You have successfully reactivated " + user.first_name + ".",
     };
     setModal({
       toggle: false,
@@ -189,7 +176,7 @@ function UserAccounts() {
             onClick={() =>
               setModal({
                 toggle: true,
-                title: "Create User",
+                title: "Create",
               })
             }
             color="transparent"

@@ -12,9 +12,7 @@ import { useFunction } from "../../context/Functions";
 import { mainButton, textTheme } from "../../context/CustomThemes";
 import MapPicker from "./MapPicker";
 import { useStaticAds } from "../../context/StaticAdsContext";
-import { format } from "date-fns";
 import { useAuth } from "../../context/AuthContext";
-import PropTypes from "prop-types";
 
 function ManageAd() {
   const currentDate = new Date();
@@ -133,12 +131,11 @@ function ManageAd() {
           <div className="flex flex-col gap-6 xl:flex-row">
             <div className="w-full xl:w-1/2 flex flex-col gap-4">
               <div>
-                <Label htmlFor="file" value="Upload Image" />
+                <Label htmlFor="file" value="Upload Ad" />
                 <FileInput
                   id="file"
-                  type="text"
                   sizing="lg"
-                  accept="image/*"
+                  accept="image/*;video/*"
                   onChange={(e) => onFileChange(e)}
                   theme={textTheme}
                 />
@@ -188,8 +185,18 @@ function ManageAd() {
               )}
               {ad?.image && (
                 <div>
-                  <span className="font-semibold">Image Preview:</span>
-                  <img src={ad.image} alt="" className="w-auto max-h-[300px]" />
+                  <span className="font-semibold">Media Preview:</span>
+                  {ad.image.split(":")[1].substring(0, 5) === "image" ? (
+                    <img
+                      src={ad.image}
+                      alt=""
+                      className="w-auto max-h-[300px]"
+                    />
+                  ) : (
+                    <video autoPlay loop className="max-h-[400px]">
+                      <source src={ad.image} type="video/mp4" />
+                    </video>
+                  )}
                 </div>
               )}
             </div>
